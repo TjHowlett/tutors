@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Morning Movement</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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FgOPMz/sSQAAQJAAYDfeXuB55oi9CAB2YWnBdswTexAAABAkANictxXYnrliawIAAIIEAJvylgL7MV9sSQAAQJAAYDPeTmB/5oytCAAACBIAbMJbCRzHvLEFAQAAQQKAp3kbgeOZO54lAAAgSADwFG8hcB7zxzMEAAAECQAe5u0DzmcOeZQAAIAgAQAAQQKAh/jsCOMwjzxCAABAkADgbt42YDzmknsJAAAIEgAAECQAuIvPjDAu88k9BAAABAkAAAgSANzM50UYnznlVgIAAIIEAAAECQAACBIA3MSvK8I8zCu3EAAAECQAACBIAHCVz4kwH3PLNQIAAIIEAAAECQAACBIAABAkAPglv5EI5mV++RUBAABBAgAAggQAAAQJAAAIEgBc5DcQwfzMMZcIAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAb/Jnh2Ed5pm3CAAACBIAABD0+9kPcLTVPoX99e//3OXH/fc//tjlxwXO8Z9/2RW3+Pz17Cc4ji8AABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACMr9RUDcZq+/YAiAMfgCAABBAgAAggQAAAQJAAAIEgAAECQAACDo3fuPH76d/RCj2uvfzwbgGH/52x9nP8KwfAEAgCBfAAAgyBcAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAoP8CmdSLnqn5FVwAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,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FgOPMz/sSQAAQJAAYDfeXuB55oi9CAB2YWnBdswTexAAABAkANictxXYnrliawIAAIIEAJvylgL7MV9sSQAAQJAAYDPeTmB/5oytCAAACBIAbMJbCRzHvLEFAQAAQQKAp3kbgeOZO54lAAAgSADwFG8hcB7zxzMEAAAECQAe5u0DzmcOeZQAAIAgAQAAQQKAh/jsCOMwjzxCAABAkADgbt42YDzmknsJAAAIEgAAECQAuIvPjDAu88k9BAAABAkAAAgSANzM50UYnznlVgIAAIIEAAAECQAACBIA3MSvK8I8zCu3EAAAECQAACBIAHCVz4kwH3PLNQIAAIIEAAAECQAACBIAABAkAPglv5EI5mV++RUBAABBAgAAggQAAAQJAAAIEgBc5DcQwfzMMZcIAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAb/Jnh2Ed5pm3CAAACBIAABD0+9kPcLTVPoX99e//3OXH/fc//tjlxwXO8Z9/2RW3+Pz17Cc4ji8AABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACMr9RUDcZq+/YAiAMfgCAABBAgAAggQAAAQJAAAIEgAAECQAACDo3fuPH76d/RCj2uvfzwbgGH/52x9nP8KwfAEAgCBfAAAgyBcAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAoP8CmdSLnqn5FVwAAAAASUVORK5CYII=">
+<meta name="theme-color" content="#20332F">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #20332F;
+    --ink-soft: #5B6E68;
+    --bg: #F1F0E9;
+    --panel: #FAF9F4;
+    --amber: #C9852F;
+    --sage: #6E8F6B;
+    --clay: #B96A54;
+    --line: #DEDACB;
+    --accent: #B96A54;
+    --sw: 3.4px;
+    --pace: 1;
+  }
+  @keyframes headRoll{0%{transform:rotate(-24deg)}50%{transform:rotate(24deg)}100%{transform:rotate(-24deg)}}
+  @keyframes shoulderRoll{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(-5px)}}
+  @keyframes catcowSpine{0%,100%{d:path("M68,112 Q104,92 140,112")}50%{d:path("M68,112 Q104,128 140,112")}}
+  @keyframes catcowHead{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(16deg)}}
+  @keyframes squatShin{0%,12%,100%{transform:rotate(0deg)}45%,58%{transform:rotate(-14deg)}}
+  @keyframes squatThigh{0%,12%,100%{transform:rotate(0deg)}45%,58%{transform:rotate(88deg)}}
+  @keyframes squatTorso{0%,12%,100%{transform:rotate(0deg)}45%,58%{transform:rotate(-91deg)}}
+  @keyframes wallBody{0%,10%,100%{transform:rotate(0deg)}48%,58%{transform:rotate(7deg)}}
+  @keyframes wallArm{0%,10%,100%{d:path("M100,80 L133,81 L166,82")}48%,58%{d:path("M111,85 L138,100 L166,82")}}
+  @keyframes bridgeBody{0%,10%,100%{d:path("M62,164 L100,172 L124,138")}45%,62%{d:path("M62,164 L100,138 L124,138")}}
+  @keyframes birdArm{0%,12%,100%{d:path("M72,112 L58,126 L46,134")}48%,64%{d:path("M72,112 L54,124 L30,118")}}
+  @keyframes birdLeg{0%,12%,100%{d:path("M142,112 L156,130 L168,140")}48%,64%{d:path("M142,112 L164,106 L188,100")}}
+  @keyframes hamTorso{0%,10%,100%{transform:rotate(0deg)}45%,62%{transform:rotate(-60deg)}}
+  @keyframes hamArms{0%,10%,100%{transform:rotate(0deg)}45%,62%{transform:rotate(52deg)}}
+  @keyframes hipFront{0%,10%,100%{d:path("M106,110 L88,142 L80,172")}48%,64%{d:path("M100,128 L70,142 L80,172")}}
+  @keyframes hipBack{0%,10%,100%{d:path("M106,110 L122,145 L140,174")}48%,64%{d:path("M100,128 L112,166 L140,174")}}
+  @keyframes hipTorso{0%,10%,100%{transform:translate(0px,0px) rotate(0deg)}48%,64%{transform:translate(-6px,18px) rotate(5deg)}}
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Work Sans', -apple-system, sans-serif;
+    color: var(--ink);
+  }
+  #app { width: 100%; max-width: 420px; padding: 28px 22px 40px; box-sizing: border-box; }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  button { font-family: inherit; }
+  .row-center { display: flex; align-items: center; justify-content: center; }
+  .col-center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .pill-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink); color: var(--panel); border: none;
+    border-radius: 999px; padding: 10px 18px; font-size: 14px; cursor: pointer;
+  }
+  .pill-btn.outline { background: none; border: 1px solid var(--line); color: var(--ink); }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--panel); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; }
+  .dots { display: flex; gap: 6px; justify-content: center; }
+  .dot { height: 6px; border-radius: 3px; background: var(--line); transition: all .25s ease; }
+  .dot.done { background: var(--amber); }
+  .dot.current { width: 16px; background: var(--amber); }
+  .dot:not(.current) { width: 6px; }
+  .anim-box {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    height: 190px; display: flex; align-items: center; justify-content: center;
+  }
+  .anim-box svg { width: 190px; height: auto; display: block; }
+  .feedback-btn {
+    text-align: left; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 2px; width: 100%;
+  }
+  .feedback-btn .label { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .feedback-btn .sub { font-size: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     Exercise data
+  ---------------------------------------------------------------- */
+  var EXERCISES = [
+    { id: "neck", name: "Neck & shoulder rolls", category: "Warm up", duration: 30,
+      guidance: "Slow rolls, both directions",
+      note: "Circle one direction the whole way round, then reverse halfway through.",
+      cue: "Keep shoulders relaxed — roll slowly, never force it.", anim: "neck" },
+    { id: "catcow", name: "Cat–cow", category: "Warm up", duration: 30,
+      guidance: "Move with your breath — aim for 5-6 slow cycles",
+      cue: "Arch gently on the inhale, round on the exhale.", anim: "catcow" },
+    { id: "squat", name: "Squats", category: "Strength", duration: 30,
+      levels: [
+        { label: "Chair-assisted squat", guidance: "8 slow reps, hands lightly on a chair" },
+        { label: "Bodyweight squat", guidance: "10 reps at a steady pace" },
+        { label: "Paused squat", guidance: "10 reps, pause 2s at the bottom" }
+      ],
+      cue: "Keep knees tracking over your toes, chest lifted.", anim: "squat" },
+    { id: "pushup", name: "Incline push-ups", category: "Strength", duration: 30,
+      levels: [
+        { label: "Wall push-up", guidance: "8 reps, hands on a wall" },
+        { label: "Counter push-up", guidance: "10 reps, hands on a counter or table" },
+        { label: "Chair push-up", guidance: "10 reps, hands on a low, stable chair" }
+      ],
+      cue: "Keep a straight line from head to heels.", anim: "pushup" },
+    { id: "bridge", name: "Glute bridge", category: "Strength", duration: 30,
+      levels: [
+        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat" },
+        { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses" },
+        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side",
+          note: "Both hips stay lifted throughout — alternate which foot is off the floor each rep (right, left, right...)." }
+      ],
+      cue: "Squeeze your glutes at the top — don't arch your lower back.", anim: "bridge" },
+    { id: "birddog", name: "Bird-dog", category: "Strength", duration: 30,
+      levels: [
+        { label: "Knee lifts", guidance: "5 slow lifts each side, knees stay low",
+          note: "Legs only at this level — alternate knees each rep, no arm movement." },
+        { label: "Opposite arm & leg extend", guidance: "5 reps each side",
+          note: "Diagonal pairs: right arm with left leg, then left arm with right leg. Alternate the pairing each rep." },
+        { label: "Extend & hold", guidance: "5 reps each side, hold 2s out",
+          note: "Diagonal pairs: right arm with left leg, then left arm with right leg. Alternate the pairing each rep." }
+      ],
+      cue: "Keep hips level and move slowly — no rushing.", anim: "birddog" },
+    { id: "hamstring", name: "Standing hamstring stretch", category: "Cool down",
+      holdKey: "hamstring", guidance: "Each leg, gentle hold",
+      note: "Split the hold between legs — lean forward over one leg for about half the time, then switch.",
+      cue: "Hinge from your hips, soft bend in the knees.", anim: "hamstring" },
+    { id: "hipflexor", name: "Hip flexor stretch", category: "Cool down",
+      holdKey: "hipflexor", guidance: "Each side, gentle hold",
+      note: "Split the timer between sides — hold the lunge on one leg for about half the time, then switch.",
+      cue: "Tuck your pelvis slightly to feel it at the front of the hip.", anim: "hipflexor" }
+  ];
+
+  var REST_SECONDS = 10;
+  var STORAGE_KEY = "morning-routine-state";
+  var DEFAULT_STATE = {
+    levels: { squat: 0, pushup: 0, bridge: 0, birddog: 0 },
+    holds: { hamstring: 20, hipflexor: 20 },
+    history: []
+  };
+
+  /* ---------------------------------------------------------------
+     Storage
+  ---------------------------------------------------------------- */
+  function loadState() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      var parsed = JSON.parse(raw);
+      return {
+        levels: Object.assign({}, DEFAULT_STATE.levels, parsed.levels),
+        holds: Object.assign({}, DEFAULT_STATE.holds, parsed.holds),
+        history: parsed.history || []
+      };
+    } catch (e) {
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+  }
+  function saveState(s) {
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  /* ---------------------------------------------------------------
+     Helpers
+  ---------------------------------------------------------------- */
+  function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+  function computeStreak(history) {
+    if (!history.length) return 0;
+    var dates = {};
+    history.forEach(function (h) { dates[h.date] = true; });
+    var streak = 0;
+    var cursor = new Date();
+    if (!dates[todayStr()]) cursor.setDate(cursor.getDate() - 1);
+    while (true) {
+      var key = cursor.toISOString().slice(0, 10);
+      if (dates[key]) { streak++; cursor.setDate(cursor.getDate() - 1); }
+      else break;
+    }
+    return streak;
+  }
+
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+  function applyFeedback(state, feedback) {
+    var next = {
+      levels: Object.assign({}, state.levels),
+      holds: Object.assign({}, state.holds)
+    };
+    var delta = feedback === "easy" ? 1 : (feedback === "hard" || feedback === "pain") ? -1 : 0;
+    Object.keys(next.levels).forEach(function (k) {
+      next.levels[k] = clamp(next.levels[k] + delta, 0, 2);
+    });
+    Object.keys(next.holds).forEach(function (k) {
+      next.holds[k] = clamp(next.holds[k] + delta * 5, 15, 40);
+    });
+    return next;
+  }
+
+  function getGuidance(ex, state) {
+    if (ex.levels) {
+      var lvl = state.levels[ex.id] != null ? state.levels[ex.id] : 0;
+      return ex.levels[lvl];
+    }
+    if (ex.holdKey) {
+      var secs = state.holds[ex.holdKey] != null ? state.holds[ex.holdKey] : 20;
+      return { label: ex.name, guidance: "Hold " + secs + "s", note: ex.note };
+    }
+    return { label: ex.name, guidance: ex.guidance, note: ex.note };
+  }
+
+  function getDuration(ex, state) {
+    if (ex.holdKey) return state.holds[ex.holdKey] != null ? state.holds[ex.holdKey] : 20;
+    return ex.duration;
+  }
+
+  function esc(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ---------------------------------------------------------------
+     Icons
+  ---------------------------------------------------------------- */
+  function iconPlay(size, fill) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="' + fill + '"/></svg>';
+  }
+  function iconPause(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24">' +
+      '<rect x="6" y="5" width="4" height="14" fill="' + color + '"/>' +
+      '<rect x="14" y="5" width="4" height="14" fill="' + color + '"/></svg>';
+  }
+  function iconSkip(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24">' +
+      '<path d="M6 5v14l8-7z" fill="' + color + '"/><rect x="16" y="5" width="2" height="14" fill="' + color + '"/></svg>';
+  }
+  function iconX(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" stroke="' + color + '" stroke-width="2" fill="none" stroke-linecap="round">' +
+      '<line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>';
+  }
+  function iconFlame(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="' + color + '">' +
+      '<path d="M12 2c1 3-3 4-3 8a3 3 0 006 0c0-1-.5-2-1-2 1 4 4 5 4 9a6 6 0 11-12 0c0-5 3-6 4-11 .5-2 1-3.5 2-4z"/></svg>';
+  }
+  function iconCheck(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+      '<polyline points="20 6 9 17 4 12"/></svg>';
+  }
+  function iconChevronRight(size, color) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<polyline points="9 18 15 12 9 6"/></svg>';
+  }
+
+  /* ---------------------------------------------------------------
+     Stick-figure illustrations — from Claude Design export
+  ---------------------------------------------------------------- */
+  var ANIMS = {
+    neck: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M36,178 L164,178"></path>' +
+        '<path d="M72,40 A32 32 0 0 1 128,40" style="stroke-dasharray:4 7;opacity:.45"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M100,112 L92,144 L92,174 L82,177"></path>' +
+        '<path d="M100,112 L108,144 L108,174 L118,177"></path>' +
+        '<path d="M100,112 L100,72"></path>' +
+        '<g style="animation:shoulderRoll calc(4.5s * var(--pace)) ease-in-out infinite">' +
+        '<path d="M82,72 L118,72"></path>' +
+        '<path d="M82,72 L78,98 L80,122"></path>' +
+        '<path d="M118,72 L122,98 L120,122"></path>' +
+        '<path d="M100,70 L100,62"></path>' +
+        '<g style="animation:headRoll calc(4.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 62px">' +
+        '<circle cx="100" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="55" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g></g></g></svg>';
+    },
+    catcow: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M26,176 L178,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M68,112 L66,142 L67,174"></path>' +
+        '<path d="M140,112 L138,172 L166,174"></path>' +
+        '<path d="M68,112 Q104,92 140,112" style="animation:catcowSpine calc(5s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:catcowHead calc(5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:68px 112px">' +
+        '<path d="M68,112 L57,105"></path>' +
+        '<circle cx="48" cy="100" r="10"></circle>' +
+        '<circle cx="39" cy="101" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g></g></svg>';
+    },
+    squat: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M28,178 L178,178"></path>' +
+        '<path d="M110,140 L172,140"></path>' +
+        '<path d="M170,140 L170,92"></path>' +
+        '<path d="M114,140 L114,178"></path>' +
+        '<path d="M168,140 L168,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M92,166 L92,176 L76,176"></path>' +
+        '<g style="animation:squatShin calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 166px">' +
+        '<path d="M92,166 L92,136"></path>' +
+        '<g style="animation:squatThigh calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 136px">' +
+        '<path d="M92,136 L96,104"></path>' +
+        '<g style="animation:squatTorso calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:96px 104px">' +
+        '<path d="M96,104 L94,62"></path>' +
+        '<path d="M94,62 L91,56"></path>' +
+        '<circle cx="88" cy="48" r="10"></circle>' +
+        '<circle cx="79" cy="50" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M94,64 L76,74 L58,72"></path>' +
+        '</g></g></g></g></svg>';
+    },
+    pushup: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M172,18 L172,178"></path>' +
+        '<path d="M30,178 L172,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M68,172 L54,176"></path>' +
+        '<g style="animation:wallBody calc(3.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:68px 172px">' +
+        '<path d="M68,172 L86,120 L100,80"></path>' +
+        '<path d="M100,80 L104,70"></path>' +
+        '<circle cx="107" cy="62" r="10"></circle>' +
+        '<circle cx="116" cy="63" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M100,80 L133,81 L166,82" style="animation:wallArm calc(3.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    bridge: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M20,176 L184,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<circle cx="44" cy="166" r="10"></circle>' +
+        '<circle cx="40" cy="157" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M54,165 L62,164"></path>' +
+        '<path d="M62,164 L76,174 L90,176"></path>' +
+        '<path d="M124,138 L138,174 L152,176"></path>' +
+        '<path d="M62,164 L100,172 L124,138" style="animation:bridgeBody calc(4.2s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    birddog: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M22,176 L182,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M72,112 L70,142 L70,174"></path>' +
+        '<path d="M142,112 L140,172 L164,174"></path>' +
+        '<path d="M72,112 Q107,106 142,112"></path>' +
+        '<path d="M72,112 L61,105"></path>' +
+        '<circle cx="52" cy="100" r="10"></circle>' +
+        '<circle cx="43" cy="101" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M72,112 L58,126 L46,134" style="animation:birdArm calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M142,112 L156,130 L168,140" style="animation:birdLeg calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    hamstring: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M30,178 L170,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M105,110 L92,144 L80,176"></path>' +
+        '<path d="M80,176 L64,168"></path>' +
+        '<path d="M105,110 L114,144 L114,176 L128,178"></path>' +
+        '<g style="animation:hamTorso calc(5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:105px 110px">' +
+        '<path d="M105,110 L103,66"></path>' +
+        '<path d="M103,66 L100,59"></path>' +
+        '<circle cx="97" cy="51" r="10"></circle>' +
+        '<circle cx="88" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:hamArms calc(5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:103px 66px">' +
+        '<path d="M103,66 L101,92 L101,116"></path>' +
+        '</g></g></g></svg>';
+    },
+    hipflexor: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M26,178 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M80,172 L64,177"></path>' +
+        '<path d="M140,174 L152,178"></path>' +
+        '<path d="M106,110 L88,142 L80,172" style="animation:hipFront calc(4.4s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M106,110 L122,145 L140,174" style="animation:hipBack calc(4.4s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:hipTorso calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:106px 110px">' +
+        '<path d="M106,110 L104,66"></path>' +
+        '<path d="M104,66 L101,58"></path>' +
+        '<circle cx="98" cy="50" r="10"></circle>' +
+        '<circle cx="89" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M104,68 L111,90 L107,110"></path>' +
+        '</g></g></svg>';
+    }
+  };
+
+  function ring(pct, size, innerHtml) {
+    var r = (size - 10) / 2;
+    var c = 2 * Math.PI * r;
+    var offset = c * (1 - pct);
+    return '<svg width="' + size + '" height="' + size + '" style="transform:rotate(-90deg)">' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--line)" stroke-width="8"/>' +
+      '<circle id="ring-progress" cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--amber)" stroke-width="8" stroke-linecap="round" ' +
+      'stroke-dasharray="' + c + '" stroke-dashoffset="' + offset + '" style="transition:stroke-dashoffset .9s linear"/>' +
+      '<foreignObject x="0" y="0" width="' + size + '" height="' + size + '" style="transform:rotate(90deg);transform-origin:center">' +
+      '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">' + innerHtml + '</div>' +
+      '</foreignObject></svg>';
+  }
+
+  /* ---------------------------------------------------------------
+     App state + render loop
+  ---------------------------------------------------------------- */
+  var state = loadState();
+  var screen = "home"; // home | ready | session | rest | feedback | done
+  var exIndex = 0;
+  var secondsLeft = 0;
+  var running = true;
+  var lastFeedback = null;
+  var timerHandle = null;
+  var root = document.getElementById("app");
+
+  function persist(next) { state = next; saveState(state); }
+
+  function startTimer() {
+    clearInterval(timerHandle);
+    timerHandle = setInterval(function () {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0) {
+        clearInterval(timerHandle);
+        advance();
+      } else {
+        tick();
+      }
+    }, 1000);
+  }
+  function stopTimer() { clearInterval(timerHandle); }
+
+  function startSession() {
+    exIndex = 0; screen = "ready"; secondsLeft = 10; running = true;
+    render(); startTimer();
+  }
+  function beginExercise(idx) {
+    var ex = EXERCISES[idx];
+    exIndex = idx; screen = "session"; secondsLeft = getDuration(ex, state); running = true;
+    render(); startTimer();
+  }
+  function advance() {
+    if (screen === "ready") { beginExercise(0); return; }
+    if (screen === "session") {
+      if (exIndex < EXERCISES.length - 1) {
+        screen = "rest"; secondsLeft = REST_SECONDS; running = true;
+        render(); startTimer();
+      } else {
+        stopTimer(); screen = "feedback"; render();
+      }
+      return;
+    }
+    if (screen === "rest") { beginExercise(exIndex + 1); return; }
+  }
+  function skip() { stopTimer(); advance(); }
+  function quitSession() { stopTimer(); screen = "home"; render(); }
+  function togglePause() {
+    running = !running;
+    if (running) startTimer(); else stopTimer();
+    render();
+  }
+  function submitFeedback(feedback) {
+    var adjusted = applyFeedback(state, feedback);
+    var history = state.history.filter(function (h) { return h.date !== todayStr(); });
+    history.push({ date: todayStr(), feedback: feedback });
+    persist(Object.assign({}, state, adjusted, { history: history }));
+    lastFeedback = feedback;
+    screen = "done";
+    render();
+  }
+  function resetProgress() {
+    persist(JSON.parse(JSON.stringify(DEFAULT_STATE)));
+    screen = "home";
+    render();
+  }
+
+  /* ---------------------------------------------------------------
+     Screen builders
+  ---------------------------------------------------------------- */
+  function buildHome() {
+    var streak = computeStreak(state.history);
+    var totalSec = EXERCISES.reduce(function (a, e) { return a + (e.duration || 20); }, 0) + REST_SECONDS * (EXERCISES.length - 1);
+    var totalMin = Math.round(totalSec / 60);
+    var streakHtml = streak > 0
+      ? '<div style="display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--ink-soft);margin-bottom:8px">' +
+        iconFlame(15, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>'
+      : "";
+    return (
+      '<div class="col-center" style="gap:6px">' +
+        '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px">Good morning</div>' +
+        '<div class="serif" style="font-size:30px;font-weight:500;line-height:1.15;margin-top:2px">Morning movement</div>' +
+        '<div style="font-size:14px;color:var(--ink-soft);margin-bottom:8px">' + EXERCISES.length + ' movements · ~' + totalMin + ' min</div>' +
+        streakHtml +
+        '<button id="btn-start" style="margin-top:18px;width:156px;height:156px;border-radius:50%;border:none;background:var(--ink);color:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(32,51,47,0.25)">' +
+          iconPlay(30, "var(--panel)") + '<span style="font-size:15px;font-weight:500">Start</span>' +
+        '</button>' +
+        '<div style="margin-top:26px;font-size:12px;color:var(--ink-soft);max-width:260px;line-height:1.5">Stop or ease off anything that causes pain — a little effort is the goal, not strain.</div>' +
+        '<div style="display:flex;gap:16px;margin-top:20px">' +
+          '<button id="btn-backup-open" style="background:none;border:none;color:var(--ink-soft);font-size:12px;text-decoration:underline;cursor:pointer">Backup / restore</button>' +
+          '<button id="btn-reset" style="background:none;border:none;color:var(--ink-soft);font-size:12px;text-decoration:underline;cursor:pointer">Reset progress</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function showBackupStatus(msg, isError) {
+    var el = document.getElementById("backup-status");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isError ? "var(--clay)" : "var(--sage)";
+  }
+
+  function buildBackup() {
+    var exportText = JSON.stringify(state);
+    return (
+      '<div style="display:flex;flex-direction:column;gap:16px">' +
+        '<div class="top-bar">' +
+          '<button id="btn-backup-close" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
+          '<div class="serif" style="font-size:16px;font-weight:500">Backup &amp; restore</div>' +
+          '<div style="width:32px"></div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px">Copy this somewhere safe (notes app, email to yourself) before moving this app to a new URL or device — saved progress does not carry over on its own.</div>' +
+          '<textarea id="backup-export" readonly onclick="this.select()" style="width:100%;min-height:90px;font-family:monospace;font-size:11px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);box-sizing:border-box">' + esc(exportText) + '</textarea>' +
+          '<button id="btn-backup-copy" class="pill-btn" style="margin-top:8px">Copy to clipboard</button>' +
+        '</div>' +
+        '<div style="height:1px;background:var(--line)"></div>' +
+        '<div>' +
+          '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px">Paste a backup below to restore it — this replaces current progress on this device.</div>' +
+          '<textarea id="backup-import" placeholder="Paste backup text here" style="width:100%;min-height:90px;font-family:monospace;font-size:11px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);box-sizing:border-box"></textarea>' +
+          '<button id="btn-backup-restore" class="pill-btn outline" style="margin-top:8px">Restore from text</button>' +
+        '</div>' +
+        '<div id="backup-status" style="font-size:12px;min-height:16px"></div>' +
+      '</div>'
+    );
+  }
+
+  // Shared block: category, exercise name, variant label (if it differs from
+  // the name), animated diagram, guidance, cue, and clarification note.
+  // Used by the get-ready screen, the session screen, and the rest screen's
+  // "up next" preview so the same exercise always looks the same everywhere.
+  function buildExercisePreview(ex, info, opts) {
+    opts = opts || {};
+    var animHeight = opts.animHeight || 190;
+    var eyebrowPrefix = opts.eyebrowPrefix || "";
+    var variantLine = (info.label && info.label !== ex.name)
+      ? '<div style="font-size:14px;color:var(--sage);margin-top:2px">' + esc(info.label) + '</div>'
+      : "";
+    return (
+      '<div style="text-align:center">' +
+        '<div style="font-size:12px;color:var(--sage);font-weight:500">' + esc(eyebrowPrefix + ex.category) + '</div>' +
+        '<div class="serif" style="font-size:22px;font-weight:500">' + esc(ex.name) + '</div>' +
+        variantLine +
+      '</div>' +
+      '<div class="anim-box" style="height:' + animHeight + 'px">' + ANIMS[ex.anim]() + '</div>' +
+      '<div style="text-align:center;font-size:14px;color:var(--ink)">' + esc(info.guidance) + '</div>' +
+      '<div class="serif" style="text-align:center;font-size:13px;color:var(--ink-soft);font-style:italic">' + esc(ex.cue) + '</div>' +
+      (info.note ? '<div style="text-align:center;font-size:12px;color:var(--ink-soft)">' + esc(info.note) + '</div>' : "")
+    );
+  }
+
+  function buildReady() {
+    var ex = EXERCISES[0];
+    var info = getGuidance(ex, state);
+    return (
+      '<div style="display:flex;flex-direction:column;gap:12px">' +
+        '<div class="top-bar">' +
+          '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
+          buildDots(-1, EXERCISES.length) +
+          '<div style="width:32px"></div>' +
+        '</div>' +
+        '<div class="col-center" style="gap:2px">' +
+          '<div style="font-size:14px;color:var(--ink-soft)">Get ready</div>' +
+          '<div class="serif" id="countdown" style="font-size:44px;font-weight:500">' + secondsLeft + '</div>' +
+        '</div>' +
+        buildExercisePreview(ex, info, { animHeight: 150, eyebrowPrefix: "First up · " }) +
+      '</div>'
+    );
+  }
+
+  function buildDots(index, total) {
+    var out = '<div class="dots">';
+    for (var i = 0; i < total; i++) {
+      var cls = "dot" + (i === index ? " current" : (i < index ? " done" : ""));
+      out += '<div class="' + cls + '"></div>';
+    }
+    return out + '</div>';
+  }
+
+  function buildSession() {
+    var ex = EXERCISES[exIndex];
+    var info = getGuidance(ex, state);
+    var duration = getDuration(ex, state);
+    var pct = 1 - secondsLeft / duration;
+    return (
+      '<div style="display:flex;flex-direction:column;gap:14px">' +
+        '<div class="top-bar">' +
+          '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
+          buildDots(exIndex, EXERCISES.length) +
+          '<div style="width:32px"></div>' +
+        '</div>' +
+        buildExercisePreview(ex, info, { animHeight: 190 }) +
+        '<div class="row-center" style="margin-top:4px">' +
+          ring(pct, 108, '<div class="serif" id="countdown" style="font-size:30px;font-weight:500">' + secondsLeft + '</div>') +
+        '</div>' +
+        '<div class="row-center" style="gap:14px;margin-top:4px">' +
+          '<button id="btn-pause" class="pill-btn">' + (running ? iconPause(16, "var(--panel)") : iconPlay(16, "var(--panel)")) + (running ? "Pause" : "Resume") + '</button>' +
+          '<button id="btn-skip" class="pill-btn outline">Skip ' + iconSkip(16, "var(--ink)") + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildRest() {
+    var next = EXERCISES[exIndex + 1];
+    var nextInfo = next ? getGuidance(next, state) : null;
+    return (
+      '<div style="display:flex;flex-direction:column;gap:12px">' +
+        '<div class="top-bar">' +
+          '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
+          buildDots(exIndex, EXERCISES.length) +
+          '<div style="width:32px"></div>' +
+        '</div>' +
+        '<div class="col-center" style="gap:2px">' +
+          '<div style="font-size:14px;color:var(--ink-soft)">Rest</div>' +
+          '<div class="serif" id="countdown" style="font-size:44px;font-weight:500;color:var(--sage)">' + secondsLeft + '</div>' +
+        '</div>' +
+        (next
+          ? buildExercisePreview(next, nextInfo, { animHeight: 150, eyebrowPrefix: "Up next · " })
+          : '<div class="col-center" style="justify-content:center;height:200px">' +
+              '<div style="font-size:13px;color:var(--ink-soft)">Last one — nearly there</div>' +
+            '</div>') +
+        '<div class="row-center" style="margin-top:2px">' +
+          '<button id="btn-skip" class="pill-btn outline">Skip rest ' + iconSkip(16, "var(--ink)") + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildFeedback() {
+    var options = [
+      { key: "easy", label: "Too easy", sub: "I could do more" },
+      { key: "right", label: "Just right", sub: "Good effort level" },
+      { key: "hard", label: "Too hard", sub: "I need to ease off" },
+      { key: "pain", label: "Felt pain", sub: "Something didn't feel right" }
+    ];
+    var btns = options.map(function (o) {
+      return '<button class="feedback-btn" data-feedback="' + o.key + '"><span class="label">' + o.label + '</span><span class="sub">' + o.sub + '</span></button>';
+    }).join("");
+    return (
+      '<div style="display:flex;flex-direction:column;gap:14px;padding-top:20px">' +
+        '<div style="text-align:center">' +
+          '<div class="serif" style="font-size:24px;font-weight:500">How did that feel?</div>' +
+          '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px">This tunes tomorrow\'s session.</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">' + btns + '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildDone() {
+    var streak = computeStreak(state.history);
+    var messages = {
+      easy: "Next session steps up a little.",
+      right: "Holding steady tomorrow.",
+      hard: "Next session eases back a touch.",
+      pain: "Next session eases back — check in with a physio or doctor if that continues."
+    };
+    var streakHtml = streak > 0
+      ? '<div style="font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px">' + iconFlame(14, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>'
+      : "";
+    return (
+      '<div class="col-center" style="justify-content:center;height:480px;gap:14px">' +
+        '<div style="width:56px;height:56px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center">' + iconCheck(28, "var(--panel)") + '</div>' +
+        '<div class="serif" style="font-size:26px;font-weight:500">Nice work</div>' +
+        streakHtml +
+        '<div style="font-size:13px;color:var(--ink-soft);max-width:240px">' + (messages[lastFeedback] || "") + '</div>' +
+        '<button id="btn-home" class="pill-btn" style="margin-top:10px">Done ' + iconChevronRight(15, "var(--panel)") + '</button>' +
+      '</div>'
+    );
+  }
+
+  /* ---------------------------------------------------------------
+     Render + event binding
+  ---------------------------------------------------------------- */
+  function render() {
+    var html;
+    if (screen === "home") html = buildHome();
+    else if (screen === "ready") html = buildReady();
+    else if (screen === "session") html = buildSession();
+    else if (screen === "rest") html = buildRest();
+    else if (screen === "feedback") html = buildFeedback();
+    else if (screen === "done") html = buildDone();
+    else if (screen === "backup") html = buildBackup();
+    else html = "";
+    root.innerHTML = html;
+    bind();
+  }
+
+  // Lightweight per-second update: just the number + ring, no full re-render (avoids flicker & re-binding cost)
+  function tick() {
+    var numEl = document.getElementById("countdown");
+    if (numEl) numEl.textContent = secondsLeft;
+    var ringEl = document.getElementById("ring-progress");
+    if (ringEl && screen === "session") {
+      var ex = EXERCISES[exIndex];
+      var duration = getDuration(ex, state);
+      var pct = 1 - secondsLeft / duration;
+      var r = parseFloat(ringEl.getAttribute("r"));
+      var c = 2 * Math.PI * r;
+      ringEl.setAttribute("stroke-dashoffset", c * (1 - pct));
+    }
+  }
+
+  function bind() {
+    var byId = function (id) { return document.getElementById(id); };
+    if (byId("btn-start")) byId("btn-start").addEventListener("click", startSession);
+    if (byId("btn-reset")) byId("btn-reset").addEventListener("click", resetProgress);
+    if (byId("btn-quit")) byId("btn-quit").addEventListener("click", quitSession);
+    if (byId("btn-pause")) byId("btn-pause").addEventListener("click", togglePause);
+    if (byId("btn-skip")) byId("btn-skip").addEventListener("click", skip);
+    if (byId("btn-home")) byId("btn-home").addEventListener("click", function () { screen = "home"; render(); });
+    if (byId("btn-backup-open")) byId("btn-backup-open").addEventListener("click", function () { screen = "backup"; render(); });
+    if (byId("btn-backup-close")) byId("btn-backup-close").addEventListener("click", function () { screen = "home"; render(); });
+    if (byId("btn-backup-copy")) byId("btn-backup-copy").addEventListener("click", function () {
+      var text = byId("backup-export").value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showBackupStatus("Copied to clipboard.", false);
+        }).catch(function () {
+          byId("backup-export").select();
+          showBackupStatus("Couldn't auto-copy — text is selected, use your keyboard's copy.", true);
+        });
+      } else {
+        byId("backup-export").select();
+        showBackupStatus("Text is selected — use your keyboard's copy.", false);
+      }
+    });
+    if (byId("btn-backup-restore")) byId("btn-backup-restore").addEventListener("click", function () {
+      var raw = byId("backup-import").value.trim();
+      if (!raw) { showBackupStatus("Paste a backup first.", true); return; }
+      try {
+        var parsed = JSON.parse(raw);
+        var next = {
+          levels: Object.assign({}, DEFAULT_STATE.levels, parsed.levels),
+          holds: Object.assign({}, DEFAULT_STATE.holds, parsed.holds),
+          history: Array.isArray(parsed.history) ? parsed.history : []
+        };
+        persist(next);
+        render();
+        showBackupStatus("Restored — you're back on track.", false);
+      } catch (e) {
+        showBackupStatus("That didn't look like a valid backup.", true);
+      }
+    });
+    var fbBtns = document.querySelectorAll(".feedback-btn");
+    fbBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () { submitFeedback(btn.getAttribute("data-feedback")); });
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
