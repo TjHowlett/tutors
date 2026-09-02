@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blues Piano Tutor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23b5772e'/%3E%3Crect x='6' y='14' width='52' height='36' rx='3' fill='white'/%3E%3Cline x1='16.6' y1='14' x2='16.6' y2='50' stroke='%23222' stroke-width='1.5'/%3E%3Cline x1='27.3' y1='14' x2='27.3' y2='50' stroke='%23222' stroke-width='1.5'/%3E%3Cline x1='38' y1='14' x2='38' y2='50' stroke='%23222' stroke-width='1.5'/%3E%3Cline x1='48.6' y1='14' x2='48.6' y2='50' stroke='%23222' stroke-width='1.5'/%3E%3Crect x='12.5' y='14' width='6' height='22' fill='%23222'/%3E%3Crect x='23' y='14' width='6' height='22' fill='%23222'/%3E%3Crect x='39.5' y='14' width='6' height='22' fill='%23222'/%3E%3Crect x='50' y='14' width='6' height='22' fill='%23222'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --panel: #ffffff;
+    --panel-alt: #f0ede5;
+    --border: #d8d3c7;
+    --text: #232323;
+    --text-dim: #6b6b6b;
+    --accent: #b5772e;
+    --accent-dim: #ecd9bb;
+    --good: #2f8f4e;
+    --font: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 19px;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--panel);
+    border-bottom: 2px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+  }
+  header h1 span { color: var(--accent); }
+  nav {
+    display: flex;
+    gap: 8px;
+  }
+  nav button {
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    font-size: 17px;
+    font-family: var(--font);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  nav button.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    font-weight: bold;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 22px;
+  }
+  .day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .day-nav-btns {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .day-nav-btns button {
+    font-size: 22px;
+    padding: 6px 16px;
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .day-title {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  select#daySelect {
+    font-size: 18px;
+    font-family: var(--font);
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .phase-label {
+    color: var(--accent);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 6px;
+  }
+  .goal-box {
+    background: var(--panel-alt);
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 19px;
+  }
+  .goal-box b { color: var(--accent); }
+  .section {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    background: var(--panel-alt);
+  }
+  .section.done {
+    border-color: var(--good);
+    opacity: 0.75;
+  }
+  .section-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .section-head input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: var(--good);
+  }
+  .section-head .stitle {
+    font-size: 21px;
+    font-weight: bold;
+  }
+  .section-head .stime {
+    color: var(--text-dim);
+    font-size: 16px;
+    font-weight: normal;
+  }
+  .section-body {
+    margin-top: 10px;
+    padding-left: 36px;
+    font-size: 18px;
+  }
+  .section-body ul { margin: 8px 0; padding-left: 22px; }
+  .section-body li { margin-bottom: 6px; }
+  .video-link {
+    display: inline-block;
+    margin: 4px 8px 4px 0;
+    padding: 6px 12px;
+    background: var(--accent-dim);
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 15px;
+    border: 1px solid var(--accent);
+  }
+  .video-link:hover { background: var(--accent); color: #ffffff; }
+  textarea {
+    width: 100%;
+    min-height: 90px;
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 17px;
+    padding: 10px;
+    resize: vertical;
+  }
+  h2 { font-size: 24px; border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 21px; color: var(--accent); margin-bottom: 6px; }
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  .plan-cell {
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .plan-cell:hover { border-color: var(--accent); }
+  .plan-cell .pd { font-size: 22px; font-weight: bold; }
+  .plan-cell .pp { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
+  .plan-cell .pg { font-size: 14px; margin-top: 8px; color: var(--text-dim); }
+  .plan-cell .pct {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--good);
+  }
+  table.chart {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 20px;
+    margin: 14px 0;
+  }
+  table.chart td {
+    border: 1px solid var(--border);
+    padding: 14px;
+    text-align: center;
+    background: var(--panel-alt);
+    font-weight: bold;
+  }
+  .scale-row, .shuffle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .note-pill {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .rules-list li { margin-bottom: 10px; font-size: 18px; }
+  .start-date-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-top: 10px;
+  }
+  .start-date-row input[type="date"] {
+    font-family: var(--font);
+    font-size: 16px;
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+  }
+  .start-date-row button {
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+  .save-indicator {
+    font-size: 14px;
+    color: var(--good);
+    min-height: 18px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Blues Piano <span>Tutor</span></h1>
+  <nav>
+    <button id="navToday" class="active">Today</button>
+    <button id="navPlan">Full Plan</button>
+    <button id="navResources">Resources</button>
+  </nav>
+</header>
+
+<main id="app"></main>
+
+<script>
+/* =========================================================================
+   DATA
+   ========================================================================= */
+
+// Core resources (used on Resources page, and referenced from daily sections)
+const RESOURCES = {
+  zachEvans: {
+    title: "Piano Hand Independence: 7 CORE Exercises for Beginners",
+    creator: "Zach Evans",
+    desc: "Seven core hand-independence exercises for beginners. Use one or two as a daily warm-up.",
+    query: "Zach Evans Piano Hand Independence 7 CORE Exercises for Beginners"
+  },
+  pianoStartGuide: {
+    title: "Piano Hand Independence: Exercises to Train Each Hand",
+    creator: "Piano Start Guide",
+    desc: "Off-keyboard tapping drills plus on-keyboard patterns (e.g. RH quarters / LH halves, then swap; one hand legato, other staccato).",
+    query: "Piano Start Guide Piano Hand Independence Exercises to Train Each Hand"
+  },
+  schoolOfBoogie: {
+    title: "Learn your first blues piano left hand – the Blues Shuffle",
+    creator: "School of Boogie",
+    desc: "Classic shuffle (root–5–root–6) taught in multiple keys.",
+    query: "School of Boogie Learn your first blues piano left hand Blues Shuffle"
+  },
+  pianoWithJonny: {
+    title: "How to Play a Blues Shuffle for Beginner Piano",
+    creator: "Piano With Jonny",
+    desc: "Beginner shuffle pattern and how it fits into a 12-bar blues.",
+    query: "Piano With Jonny How to Play a Blues Shuffle for Beginner Piano"
+  },
+  rebelPiano: {
+    title: "Beginner Piano Blues Lesson: Play Your First 12-Bar Blues Today",
+    creator: "Rebel Piano",
+    desc: "Very slow, step-by-step 12-bar blues lesson for hands that \"don't always do what they're told.\"",
+    query: "Rebel Piano Beginner Piano Blues Lesson Play Your First 12-Bar Blues Today"
+  },
+  merriamPianos: {
+    title: "12 Bar Blues Piano Tutorial – Basic Blues Progression, Left Hand & Blues Scale",
+    creator: "Merriam Pianos",
+    desc: "Simple LH pattern (root + 5th) plus easy RH chords/riffs. Adapt to G.",
+    query: "Merriam Pianos 12 Bar Blues Piano Tutorial Basic Blues Progression Left Hand Blues Scale"
+  },
+  gSpecific: {
+    title: "How to Play Blues Piano in G | Shuffle, Riffs, Scales & Chromatics",
+    creator: "(G-specific lesson)",
+    desc: "Blues shuffle in G, G blues scale, and simple riffs/licks once you're comfortable with the basics.",
+    query: "How to Play Blues Piano in G Shuffle Riffs Scales Chromatics"
+  }
+};
+
+function ytLink(query) {
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
+}
+
+function videoLinksHtml(keys) {
+  return keys.map(k => {
+    const r = RESOURCES[k];
+    return `<a class="video-link" target="_blank" rel="noopener" href="${ytLink(r.query)}">▶ ${r.creator} — ${r.title}</a>`;
+  }).join("");
+}
+
+// 14-day plan. Each day has a phase title, an overall goal, and a list of
+// timed sections. Each section gets its own checkbox.
+const PLAN = [
+
+  // ---------------- Days 1-3: Lock in the left-hand shuffle in G ----------------
+  {
+    day: 1, phase: "Days 1–3: Lock in the left-hand shuffle in G",
+    goal: "By end of Day 3: play the LH shuffle through the 12-bar blues in G at ~60 bpm without stopping.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul>
+          <li>Pick one Zach Evans exercise where LH plays steady quarters/halves and RH plays a different rhythm.</li>
+          <li>Or: Piano Start Guide pattern — RH quarters / LH halves for 1–2 min, then swap hands.</li>
+        </ul>`
+      },
+      {
+        id: "lhwork", title: "Learn LH shuffle in G", time: "10–15 min",
+        videos: ["schoolOfBoogie"],
+        body: `<ul>
+          <li>Pinky on G, thumb/middle alternating D (5th) and E (6th), long-short swing feel.</li>
+          <li>Practice one bar of G7: count 1 &amp; 2 &amp; 3 &amp; 4 &amp;, LH plays <b>G–D–G–E</b> in swung 8ths.</li>
+          <li>Loop 4 bars of G7, LH only, at 50–60 bpm.</li>
+          <li>Move the same pattern to C7 (<b>C–G–C–A</b>) and D7 (<b>D–A–D–B</b>) for 2–3 min each.</li>
+        </ul>`
+      },
+      {
+        id: "handstogether", title: "Apply to 12-bar form, LH only", time: "5 min",
+        videos: ["pianoWithJonny"],
+        body: `<ul>
+          <li>Use the 12-bar structure for the overall shape.</li>
+          <li>Play the shuffle through the full 12-bar G progression, LH only, 2–3 times.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 2, phase: "Days 1–3: Lock in the left-hand shuffle in G",
+    goal: "By end of Day 3: play the LH shuffle through the 12-bar blues in G at ~60 bpm without stopping.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul>
+          <li>One Zach Evans exercise, LH steady quarters/halves vs. a different RH rhythm.</li>
+          <li>Or: Piano Start Guide RH quarters / LH halves for 1–2 min, then swap.</li>
+        </ul>`
+      },
+      {
+        id: "lhwork", title: "LH shuffle in G", time: "10–15 min",
+        videos: ["schoolOfBoogie"],
+        body: `<ul>
+          <li>Pinky on G, thumb/middle alternating D and E, long-short swing feel.</li>
+          <li>4 bars of G7 LH-only shuffle at 50–60 bpm.</li>
+          <li>Then C7 (C–G–C–A) and D7 (D–A–D–B), 2–3 min each.</li>
+        </ul>`
+      },
+      {
+        id: "handstogether", title: "Apply to 12-bar form, LH only", time: "5 min",
+        videos: ["pianoWithJonny"],
+        body: `<ul>
+          <li>Play the shuffle through the full 12-bar G progression, LH only, 2–3 times.</li>
+          <li>Aim for no stops between chord changes.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 3, phase: "Days 1–3: Lock in the left-hand shuffle in G",
+    goal: "By end of today: play the LH shuffle through the 12-bar blues in G at ~60 bpm without stopping.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul>
+          <li>One Zach Evans exercise, or Piano Start Guide RH quarters / LH halves then swap.</li>
+        </ul>`
+      },
+      {
+        id: "lhwork", title: "LH shuffle in G", time: "10–15 min",
+        videos: ["schoolOfBoogie"],
+        body: `<ul>
+          <li>Review G7, C7, D7 shuffle patterns.</li>
+          <li>Push tempo toward 60 bpm if it still feels easy.</li>
+        </ul>`
+      },
+      {
+        id: "handstogether", title: "Full 12-bar form, LH only", time: "5 min",
+        videos: ["pianoWithJonny"],
+        body: `<ul>
+          <li><b>Checkpoint:</b> play the shuffle through all 12 bars in G at ~60 bpm without stopping.</li>
+          <li>If it falls apart, slow down and repeat — don't rush to Day 4 until this feels solid.</li>
+        </ul>`
+      }
+    ]
+  },
+
+  // ---------------- Days 4-6: Add a very simple right hand ----------------
+  {
+    day: 4, phase: "Days 4–6: Add a very simple right hand (chords or single notes)",
+    goal: "By end of Day 6: 12-bar blues in G with LH shuffle + RH (slow chords or simple riff) at ~60 bpm, even if imperfect.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans"],
+        body: `<ul><li>Different Zach Evans exercise or varied rhythm than last time.</li></ul>`
+      },
+      {
+        id: "lhreview", title: "LH review", time: "3–5 min",
+        videos: [],
+        body: `<ul><li>12-bar blues, LH shuffle only, once or twice.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "RH option A: whole/half-note chords", time: "10–15 min",
+        videos: ["merriamPianos"],
+        body: `<ul>
+          <li>RH plays G major triad (G–B–D): bars 1–4 as whole or half notes.</li>
+          <li>Bars 5–6: switch to C triad (C–E–G).</li>
+          <li>Bars 7–8: back to G triad.</li>
+          <li>Bar 9: D triad (D–F#–A).</li>
+          <li>Bar 10: C triad.</li>
+          <li>Bars 11–12: G triad (optionally D in bar 12).</li>
+          <li>Keep the LH shuffle steady even if the RH slips.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 5, phase: "Days 4–6: Add a very simple right hand (chords or single notes)",
+    goal: "By end of Day 6: 12-bar blues in G with LH shuffle + RH (slow chords or simple riff) at ~60 bpm, even if imperfect.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans"],
+        body: `<ul><li>Different Zach Evans exercise or varied rhythm.</li></ul>`
+      },
+      {
+        id: "lhreview", title: "LH review", time: "3–5 min",
+        videos: [],
+        body: `<ul><li>12-bar blues, LH shuffle only, once or twice.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "RH option B: simple 3-note riff", time: "5–10 min",
+        videos: ["rebelPiano"],
+        body: `<ul>
+          <li>Easy riff: <b>D–F–G</b> (5–♭7–root) or <b>G–Bb–C</b> (root–♭3–4), repeated each bar.</li>
+          <li>LH shuffles underneath while RH plays the riff.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 6, phase: "Days 4–6: Add a very simple right hand (chords or single notes)",
+    goal: "By end of today: 12-bar blues in G with LH shuffle + RH (slow chords or simple riff) at ~60 bpm, even if imperfect.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans"],
+        body: `<ul><li>Different exercise or varied rhythm again.</li></ul>`
+      },
+      {
+        id: "lhreview", title: "LH review", time: "3–5 min",
+        videos: [],
+        body: `<ul><li>12-bar blues, LH shuffle only, once or twice.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "RH chords AND riff — checkpoint", time: "10–15 min",
+        videos: ["merriamPianos", "rebelPiano"],
+        body: `<ul>
+          <li>Try RH option A (whole/half-note triads) through the 12 bars.</li>
+          <li>Then try RH option B (D–F–G or G–Bb–C riff) through the 12 bars.</li>
+          <li><b>Checkpoint:</b> LH shuffle + either RH approach, ~60 bpm, even if imperfect.</li>
+        </ul>`
+      }
+    ]
+  },
+
+  // ---------------- Days 7-9: Solidify hands together + G blues scale ----------------
+  {
+    day: 7, phase: "Days 7–9: Solidify hands together + add basic G blues scale",
+    goal: "By end of Day 9: comfortable playing 12-bar blues in G with steady LH shuffle + RH chords or blues-scale riff at ~60 bpm.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Continue rotating through Zach Evans / Piano Start Guide exercises.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "12-bar blues, hands together", time: "10–15 min",
+        videos: ["merriamPianos", "rebelPiano"],
+        body: `<ul>
+          <li>Same pattern as Days 4–6. Try both RH approaches (slow chords, then simple riff) in one session.</li>
+          <li>If messy: LH alone for 30s, then add RH again.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "G blues scale + tiny improv", time: "10 min",
+        videos: ["gSpecific"],
+        body: `<ul>
+          <li>Practice the G minor blues scale (<b>G–Bb–C–Db–D–F–G</b>) ascending/descending, RH only, 2–3 min.</li>
+          <li>Then, over the LH shuffle, play 3–4 notes from the scale (e.g. G–Bb–C–D) in a simple pattern each bar.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 8, phase: "Days 7–9: Solidify hands together + add basic G blues scale",
+    goal: "By end of Day 9: comfortable playing 12-bar blues in G with steady LH shuffle + RH chords or blues-scale riff at ~60 bpm.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Continue rotating exercises.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "12-bar blues, hands together", time: "10–15 min",
+        videos: ["merriamPianos", "rebelPiano"],
+        body: `<ul>
+          <li>Try both RH approaches (slow chords, then simple riff) in one session.</li>
+          <li>If messy: LH alone for 30s, then add RH again.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "G blues scale + tiny improv", time: "10 min",
+        videos: ["gSpecific"],
+        body: `<ul>
+          <li>G minor blues scale (G–Bb–C–Db–D–F–G) ascending/descending, RH only, 2–3 min.</li>
+          <li>Over LH shuffle, play 3–4 scale notes in a simple pattern each bar.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 9, phase: "Days 7–9: Solidify hands together + add basic G blues scale",
+    goal: "By end of today: comfortable playing 12-bar blues in G with steady LH shuffle + RH chords or blues-scale riff at ~60 bpm.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Continue rotating exercises.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "12-bar blues, hands together — checkpoint", time: "10–15 min",
+        videos: ["merriamPianos", "rebelPiano"],
+        body: `<ul>
+          <li>Try both RH approaches in one session, back to back.</li>
+          <li>If messy: LH alone for 30s, then add RH again.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "G blues scale + tiny improv", time: "10 min",
+        videos: ["gSpecific"],
+        body: `<ul>
+          <li>G minor blues scale ascending/descending, RH only, 2–3 min.</li>
+          <li>Over LH shuffle, play 3–4 scale notes each bar.</li>
+        </ul>`
+      }
+    ]
+  },
+
+  // ---------------- Days 10-12: Full beginner 12-bar lesson in G ----------------
+  {
+    day: 10, phase: "Days 10–12: Use a full beginner 12-bar lesson in G",
+    goal: "By end of Day 12: play the Rebel Piano 12-bar pattern in G start to finish without stopping, hands together.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Pick any warm-up exercise you haven't done in a couple of days.</li></ul>`
+      },
+      {
+        id: "lhwork", title: "Rebel Piano 12-bar lesson", time: "15–20 min",
+        videos: ["rebelPiano"],
+        body: `<ul>
+          <li>Designed for hands that "don't always do what they're told."</li>
+          <li>Teaches a simple LH pattern (adapt to your G shuffle), a simple RH riff, and how to combine them over 12 bars.</li>
+          <li>Pause/repeat each section until it's playable in G at 50–60 bpm.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "Free improv", time: "3–5 min",
+        videos: [],
+        body: `<ul>
+          <li>LH shuffle continues through 12 bars.</li>
+          <li>RH uses any 3–4 notes from the G blues scale, starting on a different note each time through.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 11, phase: "Days 10–12: Use a full beginner 12-bar lesson in G",
+    goal: "By end of Day 12: play the Rebel Piano 12-bar pattern in G start to finish without stopping, hands together.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Any warm-up exercise.</li></ul>`
+      },
+      {
+        id: "lhwork", title: "Rebel Piano 12-bar lesson", time: "15–20 min",
+        videos: ["rebelPiano"],
+        body: `<ul>
+          <li>Continue working the simple LH pattern (adapted to G shuffle) and RH riff.</li>
+          <li>Pause/repeat each section until playable at 50–60 bpm.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "Free improv", time: "3–5 min",
+        videos: [],
+        body: `<ul>
+          <li>LH shuffle through 12 bars; RH uses 3–4 G blues scale notes, different starting note each pass.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 12, phase: "Days 10–12: Use a full beginner 12-bar lesson in G",
+    goal: "By end of today: play the Rebel Piano 12-bar pattern in G start to finish without stopping, hands together.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans", "pianoStartGuide"],
+        body: `<ul><li>Any warm-up exercise.</li></ul>`
+      },
+      {
+        id: "lhwork", title: "Rebel Piano 12-bar lesson — checkpoint", time: "15–20 min",
+        videos: ["rebelPiano"],
+        body: `<ul>
+          <li><b>Checkpoint:</b> play the full pattern start to finish without stopping, hands together, in G at 50–60 bpm.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "Free improv", time: "3–5 min",
+        videos: [],
+        body: `<ul>
+          <li>LH shuffle through 12 bars; RH uses 3–4 G blues scale notes, different starting note each pass.</li>
+        </ul>`
+      }
+    ]
+  },
+
+  // ---------------- Days 13-14: Add style and confidence ----------------
+  {
+    day: 13, phase: "Days 13–14: Add a bit of style and confidence",
+    goal: "By end of Day 14: play a 12-bar blues in G with steady LH shuffle and simple RH part, varying the RH slightly each time without losing the groove.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans"],
+        body: `<ul><li>Maybe slightly faster tempo or a trickier exercise.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "Play through the 12-bar blues twice", time: "10–15 min",
+        videos: [],
+        body: `<ul>
+          <li>First time: exactly as learned.</li>
+          <li>Second time: change one small thing — a different RH riff, or a simple turnaround in bar 12 (e.g. D7 chord, or D–C–G motion).</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "Optional: G-specific lesson for ideas", time: "10 min",
+        videos: ["gSpecific"],
+        body: `<ul>
+          <li>Watch how riffs/licks are built over the G shuffle.</li>
+          <li>Steal one short idea to use in your 12 bars.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    day: 14, phase: "Days 13–14: Add a bit of style and confidence",
+    goal: "Final goal: play a 12-bar blues in G with steady LH shuffle and simple RH part, varying the RH slightly each time without losing the groove.",
+    sections: [
+      {
+        id: "warmup", title: "Hand independence warm-up", time: "3–5 min",
+        videos: ["zachEvans"],
+        body: `<ul><li>Maybe slightly faster tempo or a trickier exercise.</li></ul>`
+      },
+      {
+        id: "handstogether", title: "Play through the 12-bar blues twice — final checkpoint", time: "10–15 min",
+        videos: [],
+        body: `<ul>
+          <li>First time: exactly as learned.</li>
+          <li>Second time: change one small thing (different RH riff, or turnaround in bar 12).</li>
+          <li>Notice how far you've come from Day 1.</li>
+        </ul>`
+      },
+      {
+        id: "scaleimprov", title: "Optional: G-specific lesson for ideas", time: "10 min",
+        videos: ["gSpecific"],
+        body: `<ul>
+          <li>Watch how riffs/licks are built over the G shuffle and steal one idea for your own playing.</li>
+        </ul>`
+      }
+    ]
+  }
+];
+
+/* =========================================================================
+   STATE / PERSISTENCE
+   ========================================================================= */
+
+// Prefixed with "blues-tutor-" so this doesn't collide with other tools that
+// may end up sharing the same origin (e.g. multiple tutors on one GitHub Pages site).
+const STORAGE_KEY = "blues-tutor-progress-state";
+
+function todayISO() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // local date, not UTC
+  return d.toISOString().slice(0, 10);
+}
+
+function loadState() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+  let state;
+  try { state = raw ? JSON.parse(raw) : null; } catch (e) { state = null; }
+  if (!state) {
+    state = { startDate: todayISO(), currentDay: 1, days: {} };
+  }
+  if (!state.days) state.days = {};
+  if (!state.currentDay) state.currentDay = 1;
+  if (!state.startDate) state.startDate = todayISO();
+  return state;
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    flashSaved();
+  } catch (e) {
+    console.error("Could not save to localStorage", e);
+  }
+}
+
+function getDayData(dayNum) {
+  const key = String(dayNum);
+  if (!state.days[key]) state.days[key] = { checks: {}, notes: "" };
+  return state.days[key];
+}
+
+function computeSuggestedDay() {
+  const start = new Date(state.startDate + "T00:00:00");
+  const now = new Date(todayISO() + "T00:00:00");
+  const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  let day = diffDays + 1;
+  if (day < 1) day = 1;
+  if (day > 14) day = 14;
+  return day;
+}
+
+let state = loadState();
+
+let saveFlashTimeout = null;
+function flashSaved() {
+  const el = document.getElementById("saveIndicator");
+  if (!el) return;
+  el.textContent = "Saved";
+  clearTimeout(saveFlashTimeout);
+  saveFlashTimeout = setTimeout(() => { el.textContent = ""; }, 1200);
+}
+
+/* =========================================================================
+   VIEW: TODAY
+   ========================================================================= */
+
+function renderToday() {
+  const dayNum = state.currentDay;
+  const plan = PLAN[dayNum - 1];
+  const dayData = getDayData(dayNum);
+
+  const sectionsHtml = plan.sections.map(sec => {
+    const checked = !!dayData.checks[sec.id];
+    return `
+      <div class="section ${checked ? "done" : ""}" data-secid="${sec.id}">
+        <label class="section-head">
+          <input type="checkbox" class="sec-check" data-secid="${sec.id}" ${checked ? "checked" : ""}>
+          <div>
+            <div class="stitle">${sec.title} <span class="stime">(${sec.time})</span></div>
+          </div>
+        </label>
+        <div class="section-body">
+          ${sec.body}
+          ${sec.videos.length ? `<div style="margin-top:10px;">${videoLinksHtml(sec.videos)}</div>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const dayOptions = PLAN.map(p => `<option value="${p.day}" ${p.day === dayNum ? "selected" : ""}>Day ${p.day}</option>`).join("");
+
+  const suggested = computeSuggestedDay();
+
+  return `
+    <div class="card">
+      <div class="day-header">
+        <div>
+          <div class="day-title">Day ${dayNum} of 14</div>
+          <div class="phase-label">${plan.phase}</div>
+        </div>
+        <div class="day-nav-btns">
+          <button id="prevDay" ${dayNum <= 1 ? "disabled" : ""}>◀</button>
+          <select id="daySelect">${dayOptions}</select>
+          <button id="nextDay" ${dayNum >= 14 ? "disabled" : ""}>▶</button>
+        </div>
+      </div>
+
+      <div class="goal-box"><b>Today's goal:</b> ${plan.goal}</div>
+
+      <div class="start-date-row">
+        <span>Plan start date:</span>
+        <input type="date" id="startDateInput" value="${state.startDate}">
+        ${suggested !== dayNum ? `<button id="jumpSuggested">Jump to today's suggested day (Day ${suggested})</button>` : `<span>— you're on today's suggested day</span>`}
+        <span class="save-indicator" id="saveIndicator"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Practice structure</h2>
+      ${sectionsHtml}
+    </div>
+
+    <div class="card">
+      <h2>Notes for today</h2>
+      <textarea id="notesArea" placeholder="What worked, what didn't, tempo used, anything to remember for next time...">${escapeHtml(dayData.notes)}</textarea>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+function wireToday() {
+  document.querySelectorAll(".sec-check").forEach(cb => {
+    cb.addEventListener("change", (e) => {
+      const secid = e.target.getAttribute("data-secid");
+      const dayData = getDayData(state.currentDay);
+      dayData.checks[secid] = e.target.checked;
+      saveState();
+      // toggle visual style without full re-render (keeps scroll position)
+      const sectionEl = document.querySelector(`.section[data-secid="${secid}"]`);
+      if (sectionEl) sectionEl.classList.toggle("done", e.target.checked);
+    });
+  });
+
+  const notesArea = document.getElementById("notesArea");
+  if (notesArea) {
+    notesArea.addEventListener("input", (e) => {
+      const dayData = getDayData(state.currentDay);
+      dayData.notes = e.target.value;
+      saveState();
+    });
+  }
+
+  const prevBtn = document.getElementById("prevDay");
+  const nextBtn = document.getElementById("nextDay");
+  const daySelect = document.getElementById("daySelect");
+  if (prevBtn) prevBtn.addEventListener("click", () => { setCurrentDay(state.currentDay - 1); });
+  if (nextBtn) nextBtn.addEventListener("click", () => { setCurrentDay(state.currentDay + 1); });
+  if (daySelect) daySelect.addEventListener("change", (e) => { setCurrentDay(parseInt(e.target.value, 10)); });
+
+  const startDateInput = document.getElementById("startDateInput");
+  if (startDateInput) {
+    startDateInput.addEventListener("change", (e) => {
+      state.startDate = e.target.value;
+      saveState();
+      render();
+    });
+  }
+
+  const jumpBtn = document.getElementById("jumpSuggested");
+  if (jumpBtn) {
+    jumpBtn.addEventListener("click", () => { setCurrentDay(computeSuggestedDay()); });
+  }
+}
+
+function setCurrentDay(n) {
+  if (n < 1) n = 1;
+  if (n > 14) n = 14;
+  state.currentDay = n;
+  saveState();
+  render();
+}
+
+/* =========================================================================
+   VIEW: FULL PLAN
+   ========================================================================= */
+
+function renderPlan() {
+  const cells = PLAN.map(p => {
+    const dayData = getDayData(p.day);
+    const total = p.sections.length;
+    const done = p.sections.filter(s => dayData.checks[s.id]).length;
+    return `
+      <div class="plan-cell" data-day="${p.day}">
+        <div class="pd">Day ${p.day}</div>
+        <div class="pp">${p.phase.split(":")[0]}</div>
+        <div class="pg">${p.goal}</div>
+        <div class="pct">${done}/${total} sections done</div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="card">
+      <h2>Full 14-Day Plan</h2>
+      <p style="color:var(--text-dim);">Click any day to open it in the Today view.</p>
+      <div class="plan-grid">${cells}</div>
+    </div>
+  `;
+}
+
+function wirePlan() {
+  document.querySelectorAll(".plan-cell").forEach(cell => {
+    cell.addEventListener("click", () => {
+      const day = parseInt(cell.getAttribute("data-day"), 10);
+      state.currentDay = day;
+      saveState();
+      currentView = "today";
+      render();
+    });
+  });
+}
+
+/* =========================================================================
+   VIEW: RESOURCES
+   ========================================================================= */
+
+function renderResources() {
+  const resourceCards = Object.values(RESOURCES).map(r => `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:19px;"><b>${r.title}</b></div>
+      <div style="color:var(--text-dim); font-size:16px;">${r.creator}</div>
+      <div style="margin:6px 0;">${r.desc}</div>
+      <a class="video-link" target="_blank" rel="noopener" href="${ytLink(r.query)}">▶ Search on YouTube</a>
+    </div>
+  `).join("");
+
+  return `
+    <div class="card">
+      <h2>Core Videos &amp; Articles</h2>
+      ${resourceCards}
+    </div>
+
+    <div class="card">
+      <h2>12-Bar Blues Chart in G</h2>
+      <p>One chord per bar unless noted:</p>
+      <table class="chart">
+        <tr><td>G7</td><td>G7</td><td>G7</td><td>G7</td></tr>
+        <tr><td>C7</td><td>C7</td><td>G7</td><td>G7</td></tr>
+        <tr><td>D7</td><td>C7</td><td>G7</td><td>G7 (or D7 turnaround)</td></tr>
+      </table>
+      <ul class="rules-list">
+        <li>Bars 1–4: G7</li>
+        <li>Bars 5–6: C7</li>
+        <li>Bars 7–8: G7</li>
+        <li>Bar 9: D7</li>
+        <li>Bar 10: C7</li>
+        <li>Bars 11–12: G7 (often D7 in bar 12 as turnaround)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Left-Hand Shuffle Pattern</h2>
+      <p>Swung 8ths, root–5–root–6:</p>
+      <div class="shuffle-row">
+        <span class="note-pill">G7: G–D–G–E</span>
+        <span class="note-pill">C7: C–G–C–A</span>
+        <span class="note-pill">D7: D–A–D–B</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>G Minor Blues Scale (one octave)</h2>
+      <div class="scale-row">
+        <span class="note-pill">G</span>
+        <span class="note-pill">Bb</span>
+        <span class="note-pill">C</span>
+        <span class="note-pill">Db</span>
+        <span class="note-pill">D</span>
+        <span class="note-pill">F</span>
+        <span class="note-pill">G</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>General Practice Rules</h2>
+      <ul class="rules-list">
+        <li><b>Tempo:</b> start 50–60 bpm; only increase when everything feels easy.</li>
+        <li><b>If hands fall apart:</b> slow down. Play LH alone for 30s, then add RH for 30s, then alternate. Keep the LH pattern going "no matter what" the RH does.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Backup &amp; Restore Progress</h2>
+      <p style="color:var(--text-dim);">
+        Your progress is saved only in this browser, on this device. If you ever move this
+        page to a different URL (e.g. a new hosting location), copy a backup here first, then
+        paste it back in on the new page to bring your checkboxes and notes across.
+      </p>
+      <p><button id="copyBackupBtn" class="video-link" style="border:none; cursor:pointer;">Copy backup to clipboard</button></p>
+      <p id="backupStatus" style="color:var(--good); min-height:20px;"></p>
+      <p style="margin-top:18px;">Paste a backup below to restore it (this replaces your current progress):</p>
+      <textarea id="restoreText" placeholder="Paste backup text here..." style="min-height:70px;"></textarea>
+      <p><button id="restoreBtn" class="video-link" style="border:none; cursor:pointer;">Restore from backup</button></p>
+      <p id="restoreStatus" style="color:var(--good); min-height:20px;"></p>
+    </div>
+  `;
+}
+
+function wireResources() {
+  const copyBtn = document.getElementById("copyBackupBtn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      const text = JSON.stringify(state);
+      const statusEl = document.getElementById("backupStatus");
+      navigator.clipboard.writeText(text).then(() => {
+        statusEl.textContent = "Copied to clipboard.";
+      }).catch(() => {
+        // Clipboard access can fail (e.g. no secure context) - fall back to
+        // showing the text so it can be selected and copied manually.
+        statusEl.textContent = "Couldn't access the clipboard - select and copy the text below instead:";
+        const box = document.createElement("textarea");
+        box.readOnly = true;
+        box.value = text;
+        box.style.minHeight = "70px";
+        box.onclick = () => box.select();
+        statusEl.after(box);
+      });
+    });
+  }
+
+  const restoreBtn = document.getElementById("restoreBtn");
+  if (restoreBtn) {
+    restoreBtn.addEventListener("click", () => {
+      const statusEl = document.getElementById("restoreStatus");
+      const raw = document.getElementById("restoreText").value.trim();
+      if (!raw) {
+        statusEl.style.color = "var(--text-dim)";
+        statusEl.textContent = "Paste a backup first.";
+        return;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        statusEl.style.color = "#c0392b";
+        statusEl.textContent = "That didn't look like a valid backup.";
+        return;
+      }
+      if (!confirm("This will replace your current saved progress. Continue?")) return;
+      state = parsed;
+      if (!state.days) state.days = {};
+      if (!state.currentDay) state.currentDay = 1;
+      if (!state.startDate) state.startDate = todayISO();
+      saveState();
+      statusEl.style.color = "var(--good)";
+      statusEl.textContent = "Restored.";
+    });
+  }
+}
+
+/* =========================================================================
+   ROUTER / RENDER
+   ========================================================================= */
+
+let currentView = "today";
+
+function render() {
+  const app = document.getElementById("app");
+  document.getElementById("navToday").classList.toggle("active", currentView === "today");
+  document.getElementById("navPlan").classList.toggle("active", currentView === "plan");
+  document.getElementById("navResources").classList.toggle("active", currentView === "resources");
+
+  if (currentView === "today") {
+    app.innerHTML = renderToday();
+    wireToday();
+  } else if (currentView === "plan") {
+    app.innerHTML = renderPlan();
+    wirePlan();
+  } else if (currentView === "resources") {
+    app.innerHTML = renderResources();
+    wireResources();
+  }
+}
+
+document.getElementById("navToday").addEventListener("click", () => { currentView = "today"; render(); });
+document.getElementById("navPlan").addEventListener("click", () => { currentView = "plan"; render(); });
+document.getElementById("navResources").addEventListener("click", () => { currentView = "resources"; render(); });
+
+// On first-ever load (no saved state), suggest today's computed day.
+if (!localStorage.getItem(STORAGE_KEY)) {
+  state.currentDay = computeSuggestedDay();
+}
+
+render();
+</script>
+
+</body>
+</html>
