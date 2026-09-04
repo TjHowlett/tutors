@@ -174,7 +174,14 @@
   /* ---------------------------------------------------------------
      Helpers
   ---------------------------------------------------------------- */
-  function todayStr() { return new Date().toISOString().slice(0, 10); }
+  function localDateKey(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function todayStr() { return localDateKey(new Date()); }
 
   function computeStreak(history) {
     if (!history.length) return 0;
@@ -184,7 +191,7 @@
     var cursor = new Date();
     if (!dates[todayStr()]) cursor.setDate(cursor.getDate() - 1);
     while (true) {
-      var key = cursor.toISOString().slice(0, 10);
+      var key = localDateKey(cursor);
       if (dates[key]) { streak++; cursor.setDate(cursor.getDate() - 1); }
       else break;
     }
@@ -437,6 +444,31 @@
 
   function persist(next) { state = next; saveState(state); }
 
+  var audioCtx = null;
+  function unlockAudio() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      else if (audioCtx.state === "suspended") audioCtx.resume();
+    } catch (e) {}
+  }
+  function beep(freq) {
+    if (!audioCtx) return;
+    try {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq || 880;
+      var now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    } catch (e) {}
+  }
+
   function startTimer() {
     clearInterval(timerHandle);
     timerHandle = setInterval(function () {
@@ -445,6 +477,7 @@
         clearInterval(timerHandle);
         advance();
       } else {
+        if (secondsLeft <= 3) beep(secondsLeft === 1 ? 1046 : 784);
         tick();
       }
     }, 1000);
@@ -452,6 +485,7 @@
   function stopTimer() { clearInterval(timerHandle); }
 
   function startSession() {
+    unlockAudio();
     exIndex = 0; screen = "ready"; secondsLeft = 10; running = true;
     render(); startTimer();
   }
