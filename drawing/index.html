@@ -223,6 +223,14 @@
   }
   .history-item .kind.remedial{color:var(--red-pen);}
   .history-item .kind.rep{color:var(--ochre);}
+  .history-detail{
+    padding:4px 0 14px 4px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .history-detail.empty{
+    font-family:'JetBrains Mono', monospace; font-size:12.5px;
+    color:var(--graphite-soft); padding-bottom:14px;
+  }
 
   .empty{
     text-align:center; color:var(--graphite-soft); font-size:13.5px;
@@ -343,6 +351,12 @@ let keyInputDraft = '';
 let workspaceInputDraft = '';
 let showImport = false;
 let backupMessage = null;
+let expandedHistoryId = null;
+
+function toggleHistoryItem(id){
+  expandedHistoryId = (expandedHistoryId === id) ? null : id;
+  render();
+}
 
 function loadState(){
   try{
@@ -573,10 +587,14 @@ Keep strengths and focus_areas to 1-2 items each, each under 15 words. Be specif
 function logHistory(kind){
   const lesson = currentLessonObj();
   state.history.unshift({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
     date: new Date().toISOString().slice(0,10),
     lessonIndex: state.currentLesson,
     title: lesson.title,
     tag: feedback ? feedback.struggle_tag : null,
+    strengths: feedback ? feedback.strengths : null,
+    focusAreas: feedback ? feedback.focus_areas : null,
+    encouragement: feedback ? feedback.encouragement : null,
     kind
   });
   if(feedback && feedback.struggle_tag){
@@ -693,12 +711,29 @@ function renderStruggleTags(){
 
 function renderHistory(){
   if(state.history.length === 0) return '<div class="empty">No completed lessons yet.</div>';
-  return state.history.slice(0,10).map(h => `
-    <div class="history-item">
-      <span>Lesson ${h.lessonIndex+1} · ${h.title} <span class="kind ${h.kind}">${h.kind}</span></span>
-      <span>${h.date}</span>
-    </div>
-  `).join('');
+  return state.history.slice(0,10).map((h, i) => {
+    const id = h.id || ('legacy-' + i); // older entries saved before feedback was tracked won't have an id
+    const isOpen = expandedHistoryId === id;
+    const hasFeedback = h.strengths || h.focusAreas || h.encouragement;
+    let detail = '';
+    if(isOpen){
+      detail = hasFeedback ? `
+        <div class="history-detail">
+          ${h.strengths ? `<span class="note-label">Strengths</span>${h.strengths.map(s => `<div class="strength-line">${s}</div>`).join('')}` : ''}
+          ${h.focusAreas ? `<span class="note-label">Focus next</span>${h.focusAreas.map(f => `<div class="focus-line">${f}</div>`).join('')}` : ''}
+          ${h.encouragement ? `<div class="note">"${h.encouragement}"</div>` : ''}
+        </div>` : `<div class="history-detail empty">No feedback saved for this entry.</div>`;
+    }
+    return `
+      <div>
+        <div class="history-item" style="cursor:pointer;" onclick="toggleHistoryItem('${id}')">
+          <span>Lesson ${h.lessonIndex+1} · ${h.title} <span class="kind ${h.kind}">${h.kind}</span></span>
+          <span>${h.date} ${isOpen ? '▲' : '▼'}</span>
+        </div>
+        ${detail}
+      </div>
+    `;
+  }).join('');
 }
 
 function renderKeySettings(){
