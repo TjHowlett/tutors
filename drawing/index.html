@@ -54,6 +54,8 @@
   }
   .peg.done{background: var(--sage);}
   .peg.current{background: var(--ochre);}
+  .peg.clickable{cursor:pointer;}
+  .peg.revisiting{background: var(--red-pen); outline:2px solid var(--red-pen); outline-offset:1px;}
 
   .card{
     background: #FBF9F2;
@@ -71,6 +73,7 @@
     border-radius:2px;
   }
   .card.remedial::before{background: var(--red-pen);}
+  .card.revisit::before{background: var(--sage);}
   .card-inner{padding-left:14px;}
 
   .lesson-num{
@@ -79,6 +82,7 @@
     text-transform:uppercase; letter-spacing:0.08em;
   }
   .lesson-num.remedial{color:var(--red-pen);}
+  .lesson-num.revisit{color:var(--sage);}
   h2{margin:4px 0 10px; font-size:22px;}
   .why{
     font-size:14.5px; color:var(--graphite-soft); line-height:1.5;
@@ -223,6 +227,7 @@
   }
   .history-item .kind.remedial{color:var(--red-pen);}
   .history-item .kind.rep{color:var(--ochre);}
+  .history-item .kind.revisit{color:var(--sage);}
   .history-detail{
     padding:4px 0 14px 4px;
     border-bottom:1px solid var(--paper-line);
@@ -352,6 +357,34 @@ let workspaceInputDraft = '';
 let showImport = false;
 let backupMessage = null;
 let expandedHistoryId = null;
+let revisitLesson = null; // index of an earlier lesson being repeated, or null when on your real current lesson
+
+function activeLessonIndex(){
+  return revisitLesson !== null ? revisitLesson : state.currentLesson;
+}
+
+function startRevisit(index){
+  if(index === activeLessonIndex()) return;
+  if(uploadedImage || feedback){
+    if(!confirm('Switch lessons? This discards the photo/feedback you have pending here.')) return;
+  }
+  revisitLesson = index;
+  uploadedImage = null;
+  feedback = null;
+  error = null;
+  render();
+}
+
+function exitRevisit(){
+  if(uploadedImage || feedback){
+    if(!confirm('Return to your current lesson? This discards the pending revisit photo/feedback.')) return;
+  }
+  revisitLesson = null;
+  uploadedImage = null;
+  feedback = null;
+  error = null;
+  render();
+}
 
 function toggleHistoryItem(id){
   expandedHistoryId = (expandedHistoryId === id) ? null : id;
@@ -459,7 +492,7 @@ function saveApiKey(){
 }
 
 function currentLessonObj(){
-  return CURRICULUM[state.currentLesson];
+  return CURRICULUM[activeLessonIndex()];
 }
 
 function renderVideoLinks(){
@@ -476,7 +509,7 @@ function renderVideoLinks(){
 
 function currentTaskHtml(){
   const lesson = currentLessonObj();
-  if(state.mode === 'remedial' && state.remedialTag){
+  if(revisitLesson === null && state.mode === 'remedial' && state.remedialTag){
     const plain = state.remedialTag.replace(/-/g, ' ');
     return `<b>Focused rep:</b> "${plain}" has come up more than once. Do the "${lesson.title}" task again, but slow right down and consciously correct for this specific issue on every shape before moving to the next one.`;
   }
@@ -485,7 +518,7 @@ function currentTaskHtml(){
 
 function currentTaskPlainForPrompt(){
   const lesson = currentLessonObj();
-  if(state.mode === 'remedial' && state.remedialTag){
+  if(revisitLesson === null && state.mode === 'remedial' && state.remedialTag){
     const plain = state.remedialTag.replace(/-/g, ' ');
     return `Focused remedial rep of "${lesson.title}": the student is specifically working on correcting "${plain}", which has shown up repeatedly. Original task: ${lesson.task.replace(/<[^>]+>/g,'')}`;
   }
@@ -589,7 +622,7 @@ function logHistory(kind){
   state.history.unshift({
     id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
     date: new Date().toISOString().slice(0,10),
-    lessonIndex: state.currentLesson,
+    lessonIndex: activeLessonIndex(),
     title: lesson.title,
     tag: feedback ? feedback.struggle_tag : null,
     strengths: feedback ? feedback.strengths : null,
@@ -597,7 +630,9 @@ function logHistory(kind){
     encouragement: feedback ? feedback.encouragement : null,
     kind
   });
-  if(feedback && feedback.struggle_tag){
+  if(feedback && feedback.struggle_tag && revisitLesson === null){
+    // only feed struggle-pattern tracking / remedial triggers from your real current lesson,
+    // not from revisiting an old one — a revisit shouldn't retroactively trigger remediation
     const t = feedback.struggle_tag;
     state.struggleCounts[t] = (state.struggleCounts[t] || 0) + 1;
   }
@@ -605,6 +640,17 @@ function logHistory(kind){
 
 function saveAndContinue(){
   if(!feedback) return;
+
+  if(revisitLesson !== null){
+    logHistory('revisit');
+    revisitLesson = null;
+    uploadedImage = null;
+    feedback = null;
+    saveState();
+    render();
+    return;
+  }
+
   const tag = feedback.struggle_tag;
 
   if(state.mode === 'remedial'){
@@ -638,7 +684,7 @@ function saveAndContinue(){
 
 function repeatLesson(){
   if(feedback){
-    logHistory('rep');
+    logHistory(revisitLesson !== null ? 'revisit' : 'rep');
   }
   uploadedImage = null;
   feedback = null;
@@ -757,14 +803,18 @@ function renderKeySettings(){
 function render(){
   const app = document.getElementById('app');
   const lesson = currentLessonObj();
-  const isLastLesson = state.currentLesson === CURRICULUM.length - 1;
-  const isRemedial = state.mode === 'remedial';
+  const activeIndex = activeLessonIndex();
+  const isRevisiting = revisitLesson !== null;
+  const isLastLesson = activeIndex === CURRICULUM.length - 1;
+  const isRemedial = !isRevisiting && state.mode === 'remedial';
 
   const pegs = CURRICULUM.map((_, i) => {
     let cls = 'peg';
-    if(i < state.currentLesson) cls += ' done';
+    if(i < state.currentLesson) cls += ' done clickable';
     else if(i === state.currentLesson) cls += ' current';
-    return `<div class="${cls}"></div>`;
+    if(i === activeIndex && isRevisiting) cls += ' revisiting';
+    const clickable = i < state.currentLesson || (i === state.currentLesson && isRevisiting);
+    return `<div class="${cls}" ${clickable ? `onclick="startRevisit(${i})"` : ''}></div>`;
   }).join('');
 
   let uploadHtml = '';
@@ -785,9 +835,11 @@ function render(){
   if(loading){
     feedbackHtml = `<div class="loading"><div class="pencil-spin"></div> Looking over your page…</div>`;
   } else if(feedback){
-    let continueLabel = isRemedial
-      ? (isLastLesson ? 'Wrap up remedial rep & finish' : 'Wrap up remedial rep & continue')
-      : (isLastLesson ? 'Complete final lesson' : 'Save & continue to next lesson');
+    let continueLabel = isRevisiting
+      ? 'Log this revisit & return to current lesson'
+      : (isRemedial
+          ? (isLastLesson ? 'Wrap up remedial rep & finish' : 'Wrap up remedial rep & continue')
+          : (isLastLesson ? 'Complete final lesson' : 'Save & continue to next lesson'));
     feedbackHtml = `
       <span class="note-label">Strengths</span>
       ${feedback.strengths.map(s => `<div class="strength-line">${s}</div>`).join('')}
@@ -810,9 +862,13 @@ function render(){
     ? `<div class="remedial-banner">🔁 Focused rep triggered — "${state.remedialTag.replace(/-/g,' ')}" has shown up ${state.struggleCounts[state.remedialTag] || REMEDIAL_THRESHOLD} times, so this round targets just that before moving on.</div>`
     : '';
 
+  const revisitBanner = isRevisiting
+    ? `<div class="remedial-banner" style="color:var(--sage); background:#EFF1E6; border-color:#C9D4BD;">📖 Revisiting Lesson ${activeIndex+1} — your real progress (Lesson ${state.currentLesson+1}) is untouched. <a onclick="exitRevisit()" style="cursor:pointer; text-decoration:underline;">Back to current lesson</a></div>`
+    : '';
+
   app.innerHTML = `
     <header>
-      <div class="eyebrow"><span>Sketchbook</span><span>Lesson ${state.currentLesson+1} of ${CURRICULUM.length}${isRemedial ? ' · remedial' : ''}</span></div>
+      <div class="eyebrow"><span>Sketchbook</span><span>${isRevisiting ? `Revisiting lesson ${activeIndex+1}` : `Lesson ${state.currentLesson+1} of ${CURRICULUM.length}${isRemedial ? ' · remedial' : ''}`}</span></div>
       <h1>Your drawing tutor</h1>
       <p class="tagline">A structured beginner curriculum with feedback after every page. Runs standalone with your own API key.</p>
       <div class="progress-row">${pegs}</div>
@@ -824,10 +880,11 @@ function render(){
       </div>
     </div>
 
-    <div class="card ${isRemedial ? 'remedial' : ''}">
+    <div class="card ${isRemedial ? 'remedial' : ''}${isRevisiting ? ' revisit' : ''}">
       <div class="card-inner">
-        <div class="lesson-num ${isRemedial ? 'remedial' : ''}">${isRemedial ? 'Remedial rep' : 'Lesson ' + (state.currentLesson+1)}</div>
+        <div class="lesson-num ${isRemedial ? 'remedial' : ''}${isRevisiting ? ' revisit' : ''}">${isRevisiting ? 'Revisit' : (isRemedial ? 'Remedial rep' : 'Lesson ' + (state.currentLesson+1))}</div>
         <h2>${lesson.title}</h2>
+        ${revisitBanner}
         ${remedialBanner}
         <p class="why">${lesson.why}</p>
         ${renderVideoLinks()}
