@@ -39,6 +39,25 @@
   @keyframes hipFront{0%,10%,100%{d:path("M106,110 L88,142 L80,172")}48%,64%{d:path("M100,128 L70,142 L80,172")}}
   @keyframes hipBack{0%,10%,100%{d:path("M106,110 L122,145 L140,174")}48%,64%{d:path("M100,128 L112,166 L140,174")}}
   @keyframes hipTorso{0%,10%,100%{transform:translate(0px,0px) rotate(0deg)}48%,64%{transform:translate(-6px,18px) rotate(5deg)}}
+  @keyframes armCircleL{0%{d:path("M82,72 L58,72 L34,72")}25%{d:path("M82,72 L60,58 L46,38")}50%{d:path("M82,72 L58,72 L34,72")}75%{d:path("M82,72 L60,88 L48,108")}100%{d:path("M82,72 L58,72 L34,72")}}
+  @keyframes armCircleR{0%{d:path("M118,72 L142,72 L166,72")}25%{d:path("M118,72 L140,58 L154,38")}50%{d:path("M118,72 L142,72 L166,72")}75%{d:path("M118,72 L140,88 L152,108")}100%{d:path("M118,72 L142,72 L166,72")}}
+  @keyframes twistShoulders{0%,100%{transform:scaleX(1) skewX(0deg)}25%{transform:scaleX(.5) skewX(-6deg)}75%{transform:scaleX(.5) skewX(6deg)}}
+  @keyframes twistHead{0%,100%{transform:translateX(0px)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  @keyframes calfRise{0%,12%,100%{transform:translateY(0px)}45%,62%{transform:translateY(-13px)}}
+  @keyframes calfFootA{0%,12%,100%{d:path("M82,174 L64,177")}45%,62%{d:path("M82,161 L66,171")}}
+  @keyframes calfFootB{0%,12%,100%{d:path("M104,174 L116,177")}45%,62%{d:path("M104,161 L118,172")}}
+  @keyframes calfArm{0%,12%,100%{d:path("M108,72 L124,96 L132,119")}45%,62%{d:path("M108,59 L126,90 L132,119")}}
+  @keyframes plankHold{0%,100%{transform:translateY(0px)}50%{transform:translateY(-1.5px)}}
+  @keyframes supermanTorso{0%,100%{d:path("M74,166 Q104,168 132,166")}50%{d:path("M74,160 Q104,172 132,160")}}
+  @keyframes supermanChest{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+  @keyframes supermanArm{0%,100%{d:path("M74,166 L54,175 L30,176")}50%{d:path("M74,160 L56,150 L32,142")}}
+  @keyframes supermanLeg{0%,100%{d:path("M132,166 L154,175 L178,176")}50%{d:path("M132,160 L156,150 L180,142")}}
+  @keyframes sideLeg{0%,10%,100%{d:path("M112,152 L140,160 L166,160")}48%,62%{d:path("M112,152 L136,128 L160,114")}}
+  @keyframes quadShin{0%,10%,100%{d:path("M104,116 L112,146 L116,174")}45%,64%{d:path("M104,116 L112,150 L146,128")}}
+  @keyframes quadFoot{0%,10%,100%{d:path("M116,174 L130,177")}45%,64%{d:path("M146,128 L154,139")}}
+  @keyframes quadArm{0%,10%,100%{d:path("M102,80 L108,106 L110,132")}45%,64%{d:path("M102,80 L122,104 L144,126")}}
+  @keyframes crossArm{0%,12%,100%{d:path("M82,74 L78,100 L76,126")}48%,66%{d:path("M82,74 L104,84 L128,80")}}
+  @keyframes crossPull{0%,12%,100%{d:path("M118,74 L122,100 L124,126")}48%,66%{d:path("M118,74 L128,96 L110,88")}}
   html, body { margin: 0; padding: 0; background: var(--bg); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -92,7 +111,7 @@
   /* ---------------------------------------------------------------
      Exercise data
   ---------------------------------------------------------------- */
-  var EXERCISES = [
+  var SET_A = [
     { id: "neck", name: "Neck & shoulder rolls", category: "Warm up", duration: 30,
       guidance: "Slow rolls, both directions",
       note: "Circle one direction the whole way round, then reverse halfway through.",
@@ -142,11 +161,61 @@
       cue: "Tuck your pelvis slightly to feel it at the front of the hip.", anim: "hipflexor" }
   ];
 
+  var SET_B = [
+    { id: "armcircle", name: "Arm circles", category: "Warm up", duration: 30,
+      guidance: "Small circles, forward then reverse — aim for 8-10 each way",
+      cue: "Keep shoulders relaxed, circles about the size of a dinner plate.", anim: "armcircle" },
+    { id: "torsotwist", name: "Standing torso twists", category: "Warm up", duration: 30,
+      guidance: "Slow controlled twists, aim for 8-10 each way",
+      cue: "Keep hips facing forward — let the twist come from your waist.", anim: "torsotwist" },
+    { id: "calfraise", name: "Calf raises", category: "Strength", duration: 30,
+      levels: [
+        { label: "Chair-assisted calf raise", guidance: "12 slow reps, hands lightly on a chair" },
+        { label: "Bodyweight calf raise", guidance: "15 reps at a steady pace" },
+        { label: "Single-leg calf raise", guidance: "8 reps each leg" }
+      ],
+      cue: "Rise straight up through the big toe — don't let your ankles roll.", anim: "calfraise" },
+    { id: "plank", name: "Modified plank", category: "Strength", duration: 30,
+      levels: [
+        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat" },
+        { label: "Full forearm plank hold", guidance: "Hold 20s" },
+        { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps" }
+      ],
+      cue: "Keep hips level — don't let them sag or pike up.", anim: "plank" },
+    { id: "superman", name: "Superman", category: "Strength", duration: 30,
+      levels: [
+        { label: "Superman — arms only", guidance: "8 slow reps, lifting chest and arms" },
+        { label: "Superman — full extension", guidance: "8 reps, arms and legs together" },
+        { label: "Superman with hold", guidance: "8 reps, hold 2s at the top" }
+      ],
+      cue: "Lengthen through the crown of your head — don't crank your neck back.", anim: "superman" },
+    { id: "sideleg", name: "Side-lying leg raises", category: "Strength", duration: 30,
+      levels: [
+        { label: "Small raises", guidance: "8 reps each side, small controlled lift" },
+        { label: "Full raises", guidance: "10 reps each side" },
+        { label: "Raises with pulse", guidance: "10 reps each side, pulse at the top" }
+      ],
+      note: "Split the reps between sides — do about half lying on each side, then switch.",
+      cue: "Keep the moving leg in line with your body — don't let it drift forward.", anim: "sideleg" },
+    { id: "quadstretch", name: "Standing quad stretch", category: "Cool down",
+      holdKey: "quadstretch", guidance: "Each leg, gentle hold",
+      note: "Split the hold between legs — hold one leg back for about half the time, then switch.",
+      cue: "Keep your knees close together — use a wall or chair for balance.", anim: "quadstretch" },
+    { id: "crossshoulder", name: "Cross-body shoulder stretch", category: "Cool down",
+      holdKey: "crossshoulder", guidance: "Each arm, gentle hold",
+      note: "Split the hold between arms — pull one arm across for about half the time, then switch.",
+      cue: "Keep the shoulder of the stretching arm relaxed — don't shrug it up.", anim: "crossshoulder" }
+  ];
+
+  var SETS = { A: SET_A, B: SET_B };
+  var activeSetLetter = "A";
+  var activeExercises = SET_A;
+
   var REST_SECONDS = 10;
   var STORAGE_KEY = "morning-routine-state";
   var DEFAULT_STATE = {
-    levels: { squat: 0, pushup: 0, bridge: 0, birddog: 0 },
-    holds: { hamstring: 20, hipflexor: 20 },
+    levels: { squat: 0, pushup: 0, bridge: 0, birddog: 0, calfraise: 0, plank: 0, superman: 0, sideleg: 0 },
+    holds: { hamstring: 20, hipflexor: 20, quadstretch: 20, crossshoulder: 20 },
     history: []
   };
 
@@ -198,18 +267,36 @@
     return streak;
   }
 
+  function getLastSetLetter(history) {
+    if (!history.length) return null;
+    var sorted = history.slice().sort(function (a, b) {
+      return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0);
+    });
+    return sorted[sorted.length - 1].set || "A";
+  }
+
+  function getNextSetLetter(state) {
+    var last = getLastSetLetter(state.history);
+    if (!last) return "A";
+    return last === "A" ? "B" : "A";
+  }
+
   function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-  function applyFeedback(state, feedback) {
+  function applyFeedback(state, feedback, exerciseSet) {
     var next = {
       levels: Object.assign({}, state.levels),
       holds: Object.assign({}, state.holds)
     };
     var delta = feedback === "easy" ? 1 : (feedback === "hard" || feedback === "pain") ? -1 : 0;
+    var setIds = {};
+    exerciseSet.forEach(function (ex) { setIds[ex.id] = true; });
     Object.keys(next.levels).forEach(function (k) {
+      if (!setIds[k]) return;
       next.levels[k] = clamp(next.levels[k] + delta, 0, 2);
     });
     Object.keys(next.holds).forEach(function (k) {
+      if (!setIds[k]) return;
       next.holds[k] = clamp(next.holds[k] + delta * 5, 15, 40);
     });
     return next;
@@ -414,6 +501,158 @@
         '<circle cx="89" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
         '<path d="M104,68 L111,90 L107,110"></path>' +
         '</g></g></svg>';
+    },
+    armcircle: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M30,178 L170,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.4;stroke-dasharray:4 7">' +
+        '<circle cx="46" cy="73" r="35"></circle>' +
+        '<circle cx="154" cy="73" r="35"></circle>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M100,114 L92,146 L92,176 L78,178"></path>' +
+        '<path d="M100,114 L108,146 L108,176 L122,178"></path>' +
+        '<path d="M100,114 L100,72"></path>' +
+        '<path d="M82,72 L118,72"></path>' +
+        '<path d="M100,70 L100,62"></path>' +
+        '<circle cx="100" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="55" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M82,72 L58,72 L34,72" style="animation:armCircleL calc(4.4s * var(--pace)) linear infinite"></path>' +
+        '<path d="M118,72 L142,72 L166,72" style="animation:armCircleR calc(4.4s * var(--pace)) linear infinite"></path>' +
+        '</g></svg>';
+    },
+    torsotwist: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M30,178 L170,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.4;stroke-dasharray:4 7">' +
+        '<path d="M62,30 A44 18 0 0 1 138,30"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M100,114 L90,146 L90,176 L76,178"></path>' +
+        '<path d="M100,114 L110,146 L110,176 L124,178"></path>' +
+        '<path d="M100,114 L100,72"></path>' +
+        '<g style="animation:twistShoulders calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 72px">' +
+        '<path d="M78,72 L122,72"></path>' +
+        '<path d="M78,72 L64,84 L62,98"></path>' +
+        '<path d="M122,72 L136,84 L138,98"></path>' +
+        '</g>' +
+        '<path d="M100,70 L100,62"></path>' +
+        '<g style="animation:twistHead calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 62px">' +
+        '<circle cx="100" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="55" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g></g></svg>';
+    },
+    calfraise: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M28,178 L178,178"></path>' +
+        '<path d="M118,120 L176,120"></path>' +
+        '<path d="M174,120 L174,74"></path>' +
+        '<path d="M122,120 L122,178"></path>' +
+        '<path d="M172,120 L172,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:calfRise calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 174px">' +
+        '<path d="M92,112 L84,144 L82,174"></path>' +
+        '<path d="M92,112 L100,144 L104,174"></path>' +
+        '<path d="M92,112 L92,72"></path>' +
+        '<path d="M76,72 L108,72"></path>' +
+        '<path d="M76,72 L70,96 L70,118"></path>' +
+        '<path d="M92,70 L92,62"></path>' +
+        '<circle cx="92" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M82,174 L64,177" style="animation:calfFootA calc(3.8s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,174 L116,177" style="animation:calfFootB calc(3.8s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M108,72 L124,96 L132,119" style="animation:calfArm calc(3.8s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    plank: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M22,176 L182,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:plankHold calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 150px">' +
+        '<path d="M74,132 L70,174"></path>' +
+        '<path d="M70,174 L44,174"></path>' +
+        '<path d="M74,132 L118,146"></path>' +
+        '<path d="M118,146 L140,174"></path>' +
+        '<path d="M140,174 L166,168"></path>' +
+        '<path d="M74,132 L63,126"></path>' +
+        '<circle cx="54" cy="121" r="10"></circle>' +
+        '<circle cx="46" cy="124" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g></g></svg>';
+    },
+    superman: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M18,178 L186,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M74,166 Q104,168 132,166" style="animation:supermanTorso calc(4.4s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:supermanChest calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:74px 166px">' +
+        '<path d="M74,166 L58,146"></path>' +
+        '<circle cx="44" cy="136" r="10"></circle>' +
+        '<circle cx="36" cy="140" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M74,166 L54,175 L30,176" style="animation:supermanArm calc(4.4s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M132,166 L154,175 L178,176" style="animation:supermanLeg calc(4.4s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    sideleg: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M18,172 L186,172"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M58,150 L112,152"></path>' +
+        '<path d="M112,152 L138,166 L166,168"></path>' +
+        '<path d="M58,150 L48,144"></path>' +
+        '<circle cx="39" cy="138" r="10"></circle>' +
+        '<circle cx="31" cy="136" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M58,150 L70,164 L90,170"></path>' +
+        '<path d="M112,152 L140,160 L166,160" style="animation:sideLeg calc(4.2s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    quadstretch: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M26,178 L178,178"></path>' +
+        '<path d="M168,20 L168,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M104,116 L94,146 L94,176 L80,178"></path>' +
+        '<path d="M104,116 L102,74"></path>' +
+        '<path d="M102,74 L100,64"></path>' +
+        '<circle cx="98" cy="52" r="11"></circle>' +
+        '<circle cx="106" cy="54" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M104,76 L136,80 L168,78"></path>' +
+        '<path d="M104,116 L112,146 L116,174" style="animation:quadShin calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M116,174 L130,177" style="animation:quadFoot calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M102,80 L108,106 L110,132" style="animation:quadArm calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
+    },
+    crossshoulder: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M30,178 L170,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M100,116 L92,146 L92,176 L78,178"></path>' +
+        '<path d="M100,116 L108,146 L108,176 L122,178"></path>' +
+        '<path d="M100,116 L100,74"></path>' +
+        '<path d="M82,74 L118,74"></path>' +
+        '<path d="M100,72 L100,64"></path>' +
+        '<circle cx="100" cy="52" r="11"></circle>' +
+        '<circle cx="100" cy="57" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M82,74 L78,100 L76,126" style="animation:crossArm calc(4.8s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M118,74 L122,100 L124,126" style="animation:crossPull calc(4.8s * var(--pace)) ease-in-out infinite"></path>' +
+        '</g></svg>';
     }
   };
 
@@ -486,18 +725,20 @@
 
   function startSession() {
     unlockAudio();
+    activeSetLetter = getNextSetLetter(state);
+    activeExercises = SETS[activeSetLetter];
     exIndex = 0; screen = "ready"; secondsLeft = 10; running = true;
     render(); startTimer();
   }
   function beginExercise(idx) {
-    var ex = EXERCISES[idx];
+    var ex = activeExercises[idx];
     exIndex = idx; screen = "session"; secondsLeft = getDuration(ex, state); running = true;
     render(); startTimer();
   }
   function advance() {
     if (screen === "ready") { beginExercise(0); return; }
     if (screen === "session") {
-      if (exIndex < EXERCISES.length - 1) {
+      if (exIndex < activeExercises.length - 1) {
         screen = "rest"; secondsLeft = REST_SECONDS; running = true;
         render(); startTimer();
       } else {
@@ -515,9 +756,9 @@
     render();
   }
   function submitFeedback(feedback) {
-    var adjusted = applyFeedback(state, feedback);
+    var adjusted = applyFeedback(state, feedback, activeExercises);
     var history = state.history.filter(function (h) { return h.date !== todayStr(); });
-    history.push({ date: todayStr(), feedback: feedback });
+    history.push({ date: todayStr(), feedback: feedback, set: activeSetLetter });
     persist(Object.assign({}, state, adjusted, { history: history }));
     lastFeedback = feedback;
     screen = "done";
@@ -534,7 +775,9 @@
   ---------------------------------------------------------------- */
   function buildHome() {
     var streak = computeStreak(state.history);
-    var totalSec = EXERCISES.reduce(function (a, e) { return a + (e.duration || 20); }, 0) + REST_SECONDS * (EXERCISES.length - 1);
+    var upcomingLetter = getNextSetLetter(state);
+    var upcomingExercises = SETS[upcomingLetter];
+    var totalSec = upcomingExercises.reduce(function (a, e) { return a + (e.duration || 20); }, 0) + REST_SECONDS * (upcomingExercises.length - 1);
     var totalMin = Math.round(totalSec / 60);
     var streakHtml = streak > 0
       ? '<div style="display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--ink-soft);margin-bottom:8px">' +
@@ -544,7 +787,8 @@
       '<div class="col-center" style="gap:6px">' +
         '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px">Good morning</div>' +
         '<div class="serif" style="font-size:30px;font-weight:500;line-height:1.15;margin-top:2px">Morning movement</div>' +
-        '<div style="font-size:14px;color:var(--ink-soft);margin-bottom:8px">' + EXERCISES.length + ' movements · ~' + totalMin + ' min</div>' +
+        '<div style="font-size:12px;color:var(--sage);font-weight:500;margin-top:2px">Today · Set ' + upcomingLetter + '</div>' +
+        '<div style="font-size:14px;color:var(--ink-soft);margin-bottom:8px">' + upcomingExercises.length + ' movements · ~' + totalMin + ' min</div>' +
         streakHtml +
         '<button id="btn-start" style="margin-top:18px;width:156px;height:156px;border-radius:50%;border:none;background:var(--ink);color:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(32,51,47,0.25)">' +
           iconPlay(30, "var(--panel)") + '<span style="font-size:15px;font-weight:500">Start</span>' +
@@ -615,13 +859,13 @@
   }
 
   function buildReady() {
-    var ex = EXERCISES[0];
+    var ex = activeExercises[0];
     var info = getGuidance(ex, state);
     return (
       '<div style="display:flex;flex-direction:column;gap:12px">' +
         '<div class="top-bar">' +
           '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
-          buildDots(-1, EXERCISES.length) +
+          buildDots(-1, activeExercises.length) +
           '<div style="width:32px"></div>' +
         '</div>' +
         '<div class="col-center" style="gap:2px">' +
@@ -643,7 +887,7 @@
   }
 
   function buildSession() {
-    var ex = EXERCISES[exIndex];
+    var ex = activeExercises[exIndex];
     var info = getGuidance(ex, state);
     var duration = getDuration(ex, state);
     var pct = 1 - secondsLeft / duration;
@@ -651,7 +895,7 @@
       '<div style="display:flex;flex-direction:column;gap:14px">' +
         '<div class="top-bar">' +
           '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
-          buildDots(exIndex, EXERCISES.length) +
+          buildDots(exIndex, activeExercises.length) +
           '<div style="width:32px"></div>' +
         '</div>' +
         buildExercisePreview(ex, info, { animHeight: 190 }) +
@@ -667,13 +911,13 @@
   }
 
   function buildRest() {
-    var next = EXERCISES[exIndex + 1];
+    var next = activeExercises[exIndex + 1];
     var nextInfo = next ? getGuidance(next, state) : null;
     return (
       '<div style="display:flex;flex-direction:column;gap:12px">' +
         '<div class="top-bar">' +
           '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
-          buildDots(exIndex, EXERCISES.length) +
+          buildDots(exIndex, activeExercises.length) +
           '<div style="width:32px"></div>' +
         '</div>' +
         '<div class="col-center" style="gap:2px">' +
@@ -758,7 +1002,7 @@
     if (numEl) numEl.textContent = secondsLeft;
     var ringEl = document.getElementById("ring-progress");
     if (ringEl && screen === "session") {
-      var ex = EXERCISES[exIndex];
+      var ex = activeExercises[exIndex];
       var duration = getDuration(ex, state);
       var pct = 1 - secondsLeft / duration;
       var r = parseFloat(ringEl.getAttribute("r"));
