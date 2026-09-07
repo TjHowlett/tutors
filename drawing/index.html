@@ -126,6 +126,13 @@
   .video-link:hover{border-color:var(--sage); background:#EFF1E6;}
   .video-link .play{font-size:13px; flex-shrink:0;}
 
+  .materials-line{
+    font-size:13.5px; line-height:1.5; color:var(--graphite-soft);
+    margin:2px 0 12px; padding:8px 12px;
+    background:#F6F3E9; border:1px solid var(--paper-line); border-radius:3px;
+  }
+  .materials-line b{color:var(--graphite);}
+
   .upload-zone{
     margin-top:16px;
     border:2px dashed var(--paper-line);
@@ -280,18 +287,21 @@ const CURRICULUM = [
     title: "Line control",
     why: "Almost every 'I can't draw' problem is really a hand-eye coordination gap, not an ideas gap. This closes that gap first.",
     task: "Draw <b>20 straight lines</b> (mix of lengths and angles), <b>20 circles</b>, and <b>20 curved lines</b> — freehand, no ruler, no guides. Aim for one confident stroke per shape rather than several short corrective ones.",
+    materials: "HB or B — firm enough to stay controlled, soft enough to show confidence. Eraser: medium (resist correcting every wobble).",
     video: {label: "Drawabox — Lesson 1: Lines, Ellipses & Boxes", url: "https://drawabox.com/lesson/1"}
   },
   {
     title: "Ellipses & consistency",
     why: "Ellipses show up everywhere (cups, wheels, eyes) and reveal whether your hand can hold a curve steady while it changes direction.",
     task: "Draw <b>30 ellipses</b> of varying sizes, rotating your page or wrist for each. Then pick your best 5 and go over them once more, matching the original line exactly.",
+    materials: "HB or B, same as lesson 1. Eraser: medium.",
     video: {label: "Drawabox — Ellipses (video)", url: "https://www.youtube.com/watch?v=tHJ3rzk6kno"}
   },
   {
     title: "Basic perspective — boxes",
     why: "Boxes in perspective are the foundation for drawing almost any solid object convincingly.",
     task: "Draw <b>10 boxes</b> freehand: start with 5 in one-point perspective, then 5 in two-point. Don't worry about neatness — focus on the vanishing lines converging correctly.",
+    materials: "H or 2H for the light construction/vanishing lines, then HB or B over the top for the final edges. Eraser: hard, for cleaning up guide lines once the box is done.",
     video: {label: "Drawing boxes in 1-point perspective", url: "https://www.youtube.com/watch?v=fEL31f0FOx0"},
     video2: {label: "Drawing boxes in 2-point perspective", url: "https://www.youtube.com/watch?v=p95xfhtyBqA"}
   },
@@ -299,30 +309,35 @@ const CURRICULUM = [
     title: "Proportion basics",
     why: "Before shading or detail, the biggest visible errors in a drawing are almost always proportion errors.",
     task: "Choose a simple object near you (a mug, a shoe, a phone). Draw it <b>3 times</b>, spending under 3 minutes each, focusing only on getting the overall proportions right — ignore detail entirely.",
+    materials: "HB — light, even, easy to adjust quickly. Eraser: medium.",
     video: {label: "Proko — How to Draw Accurate Proportions", url: "https://www.youtube.com/watch?v=1J7RQvKnWf4"}
   },
   {
     title: "Value & shading",
     why: "Shading is what turns a flat outline into something that reads as three-dimensional.",
     task: "Draw a <b>value scale</b> (a strip from white to black in 6 steps using only pencil pressure), then shade one simple sphere using at least 4 of those values.",
+    materials: "Use your full range for this one: F or H for the lightest step, HB–2B for the middle steps, 5B–8B for the darkest. Eraser: soft/black eraser for gently lifting a highlight rather than erasing to bare paper.",
     video: {label: "Proko — How to See Values Correctly", url: "https://www.proko.com/course-lesson/how-to-see-values-correctly"}
   },
   {
     title: "Form — cylinders & spheres",
     why: "Almost every complex object breaks down into these two forms — mastering them generalises to everything else.",
     task: "Draw <b>3 cylinders</b> from different angles and <b>3 spheres</b>, adding simple shading to each to suggest roundness.",
+    materials: "HB for the outlines, then 2B–5B for the shading gradient (light side to core shadow). Eraser: soft, for lifting the highlight.",
     video: {label: "How to Draw a Sphere, Cylinder, Cone, Cube", url: "https://www.youtube.com/watch?v=NlaG6ecO3JQ"}
   },
   {
     title: "Simple still life",
     why: "This is the first lesson where everything so far — line, proportion, form, shading — gets combined in one drawing.",
     task: "Set up <b>2–3 simple objects</b> together (mug, book, apple) and draw the whole group in one sketch, spending no more than 20 minutes.",
+    materials: "HB for the initial layout and linework, 2B–6B for shading as needed per object. Eraser: medium for corrections, soft for highlights.",
     video: {label: "Simple still life — beginner pencil tutorial", url: "https://www.youtube.com/watch?v=fmXiWP5HITo"}
   },
   {
     title: "Perspective — interiors",
     why: "Applying perspective to a real space (rather than an isolated box) is where it starts to feel genuinely useful.",
     task: "Sit in a room and draw the <b>corner of it</b> — where two walls and the floor meet — using one or two-point perspective to place the furniture roughly.",
+    materials: "H or 2H for vanishing-line guides (easy to erase later), HB–B for the final visible lines. Eraser: hard, for cleaning up guides.",
     video: {label: "Drawing a room in 1-point perspective", url: "https://www.youtube.com/watch?v=k-6lQxWY33A"}
   }
 ];
@@ -505,6 +520,12 @@ function renderVideoLinks(){
   }
   html += `</div>`;
   return html;
+}
+
+function renderMaterials(){
+  const lesson = currentLessonObj();
+  if(!lesson.materials) return '';
+  return `<div class="materials-line">✏️ <b>Pencils:</b> ${lesson.materials}</div>`;
 }
 
 function currentTaskHtml(){
@@ -888,6 +909,7 @@ function render(){
         ${remedialBanner}
         <p class="why">${lesson.why}</p>
         ${renderVideoLinks()}
+        ${renderMaterials()}
         <div class="task-box">${currentTaskHtml()}</div>
         ${uploadHtml}
         <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])"/>
