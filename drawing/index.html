@@ -282,88 +282,815 @@
 <div class="wrap" id="app"></div>
 
 <script>
-const CURRICULUM = [
-  {
-    title: "Line control",
-    why: "Almost every 'I can't draw' problem is really a hand-eye coordination gap, not an ideas gap. This closes that gap first.",
-    task: "Draw <b>20 straight lines</b> (mix of lengths and angles), <b>20 circles</b>, and <b>20 curved lines</b> — freehand, no ruler, no guides. Aim for one confident stroke per shape rather than several short corrective ones.",
-    materials: "HB or B — firm enough to stay controlled, soft enough to show confidence. Eraser: medium (resist correcting every wobble).",
-    video: {label: "Drawabox — Lesson 1: Lines, Ellipses & Boxes", url: "https://drawabox.com/lesson/1"}
-  },
-  {
-    title: "Ellipses & consistency",
-    why: "Ellipses show up everywhere (cups, wheels, eyes) and reveal whether your hand can hold a curve steady while it changes direction.",
-    task: "Draw <b>30 ellipses</b> of varying sizes, rotating your page or wrist for each. Then pick your best 5 and go over them once more, matching the original line exactly.",
-    materials: "HB or B, same as lesson 1. Eraser: medium.",
-    video: {label: "Drawabox — Ellipses (video)", url: "https://www.youtube.com/watch?v=tHJ3rzk6kno"}
-  },
-  {
-    title: "Basic perspective — boxes",
-    why: "Boxes in perspective are the foundation for drawing almost any solid object convincingly.",
-    task: "Draw <b>10 boxes</b> freehand: start with 5 in one-point perspective, then 5 in two-point. Don't worry about neatness — focus on the vanishing lines converging correctly.",
-    materials: "H or 2H for the light construction/vanishing lines, then HB or B over the top for the final edges. Eraser: hard, for cleaning up guide lines once the box is done.",
-    video: {label: "Drawing boxes in 1-point perspective", url: "https://www.youtube.com/watch?v=fEL31f0FOx0"},
-    video2: {label: "Drawing boxes in 2-point perspective", url: "https://www.youtube.com/watch?v=p95xfhtyBqA"}
-  },
-  {
-    title: "Proportion basics",
-    why: "Before shading or detail, the biggest visible errors in a drawing are almost always proportion errors.",
-    task: "Choose a simple object near you (a mug, a shoe, a phone). Draw it <b>3 times</b>, spending under 3 minutes each, focusing only on getting the overall proportions right — ignore detail entirely.",
-    materials: "HB — light, even, easy to adjust quickly. Eraser: medium.",
-    video: {label: "Proko — How to Draw Accurate Proportions", url: "https://www.youtube.com/watch?v=1J7RQvKnWf4"}
-  },
-  {
-    title: "Value & shading",
-    why: "Shading is what turns a flat outline into something that reads as three-dimensional.",
-    task: "Draw a <b>value scale</b> (a strip from white to black in 6 steps using only pencil pressure), then shade one simple sphere using at least 4 of those values.",
-    materials: "Use your full range for this one: F or H for the lightest step, HB–2B for the middle steps, 5B–8B for the darkest. Eraser: soft/black eraser for gently lifting a highlight rather than erasing to bare paper.",
-    video: {label: "Proko — How to See Values Correctly", url: "https://www.proko.com/course-lesson/how-to-see-values-correctly"}
-  },
-  {
-    title: "Form — cylinders & spheres",
-    why: "Almost every complex object breaks down into these two forms — mastering them generalises to everything else.",
-    task: "Draw <b>3 cylinders</b> from different angles and <b>3 spheres</b>, adding simple shading to each to suggest roundness.",
-    materials: "HB for the outlines, then 2B–5B for the shading gradient (light side to core shadow). Eraser: soft, for lifting the highlight.",
-    video: {label: "How to Draw a Sphere, Cylinder, Cone, Cube", url: "https://www.youtube.com/watch?v=NlaG6ecO3JQ"}
-  },
-  {
-    title: "Simple still life",
-    why: "This is the first lesson where everything so far — line, proportion, form, shading — gets combined in one drawing.",
-    task: "Set up <b>2–3 simple objects</b> together (mug, book, apple) and draw the whole group in one sketch, spending no more than 20 minutes.",
-    materials: "HB for the initial layout and linework, 2B–6B for shading as needed per object. Eraser: medium for corrections, soft for highlights.",
-    video: {label: "Simple still life — beginner pencil tutorial", url: "https://www.youtube.com/watch?v=fmXiWP5HITo"}
-  },
-  {
-    title: "Perspective — interiors",
-    why: "Applying perspective to a real space (rather than an isolated box) is where it starts to feel genuinely useful.",
-    task: "Sit in a room and draw the <b>corner of it</b> — where two walls and the floor meet — using one or two-point perspective to place the furniture roughly.",
-    materials: "H or 2H for vanishing-line guides (easy to erase later), HB–B for the final visible lines. Eraser: hard, for cleaning up guides.",
-    video: {label: "Drawing a room in 1-point perspective", url: "https://www.youtube.com/watch?v=k-6lQxWY33A"}
-  }
-];
-
-const STORAGE_KEY = 'drawing-tutor-progress-state';
+// v2 data model (16-skill engine) — deliberately a new key, not a migration, since the
+// old fixed-lesson shape and this per-skill shape are structurally incompatible. Old
+// saved progress under the v1 key is simply never read again.
+const STORAGE_KEY = 'drawing-tutor-progress-state-v2';
 const API_KEY_STORAGE = 'drawing-tutor-anthropic-key';
 const WORKSPACE_ID_STORAGE = 'drawing-tutor-anthropic-workspace-id';
 // old names, kept only so existing saved data migrates automatically the first time
 // this runs under the renamed keys — safe to remove these three lines after that happens
-const LEGACY_STORAGE_KEY = 'sketchbook-progress-state';
 const LEGACY_API_KEY_STORAGE = 'sketchbook-anthropic-key';
 const LEGACY_WORKSPACE_ID_STORAGE = 'sketchbook-anthropic-workspace-id';
-const REMEDIAL_THRESHOLD = 2;
 const MODEL = "claude-sonnet-5";
 
-let state = {
-  currentLesson: 0,
-  mode: 'normal',
-  remedialTag: null,
-  remedialDone: {},
-  history: [],
-  struggleCounts: {}
+// --- 16-skill model -------------------------------------------------------
+
+const SKILL_IDS = [
+  'line-confidence', 'circle-curve-control', 'ellipse-consistency',
+  'perspective-1pt', 'perspective-2pt', 'perspective-interiors',
+  'proportion-by-eye', 'measuring-angles-lengths',
+  'cylinders', 'spheres', 'boxes-volume',
+  'value-scale', 'rendering-form-shading', 'light-source-consistency',
+  'combining-objects', 'observation-vs-imagination'
+];
+
+const SKILL_META = {
+  'line-confidence':            { checkable: true,  category: 'foundations', prereqs: [] },
+  'circle-curve-control':       { checkable: true,  category: 'foundations', prereqs: [] },
+  'ellipse-consistency':        { checkable: true,  category: 'foundations', prereqs: ['circle-curve-control'] },
+
+  'perspective-1pt':            { checkable: true,  category: 'perspective', prereqs: ['line-confidence'] },
+  'perspective-2pt':            { checkable: true,  category: 'perspective', prereqs: ['perspective-1pt'] },
+  'perspective-interiors':      { checkable: true,  category: 'perspective', prereqs: ['perspective-2pt'] },
+
+  'proportion-by-eye':          { checkable: true,  category: 'proportion', prereqs: [] },
+  'measuring-angles-lengths':   { checkable: true,  category: 'proportion', prereqs: ['proportion-by-eye'] },
+
+  'cylinders':                  { checkable: true,  category: 'form', prereqs: ['circle-curve-control'] },
+  'spheres':                    { checkable: true,  category: 'form', prereqs: ['circle-curve-control'] },
+  'boxes-volume':                { checkable: true,  category: 'form', prereqs: ['perspective-1pt'] },
+
+  'value-scale':                { checkable: true,  category: 'value-shading', prereqs: [] },
+  'rendering-form-shading':     { checkable: false, category: 'value-shading', prereqs: ['value-scale'] },
+  'light-source-consistency':   { checkable: false, category: 'value-shading', prereqs: ['rendering-form-shading'] },
+
+  // combining-objects' second prerequisite is "any one form-category skill", not a fixed id —
+  // resolved at runtime (stage 3) by scanning SKILL_META for category:'form', not listed here
+  'combining-objects':          { checkable: false, category: 'composition', prereqs: ['proportion-by-eye'] },
+  'observation-vs-imagination': { checkable: false, category: 'composition', prereqs: [] }
 };
 
-let uploadedImage = null;
-let feedback = null;
+const SKILL_TITLES = {
+  'line-confidence': 'Line confidence',
+  'circle-curve-control': 'Circle/curve control',
+  'ellipse-consistency': 'Ellipse consistency',
+  'perspective-1pt': '1-point perspective',
+  'perspective-2pt': '2-point perspective',
+  'perspective-interiors': 'Perspective in real spaces',
+  'proportion-by-eye': 'Proportion by eye',
+  'measuring-angles-lengths': 'Measuring angles and lengths',
+  'cylinders': 'Cylinders',
+  'spheres': 'Spheres',
+  'boxes-volume': 'Boxes as volume',
+  'value-scale': 'Value scale control',
+  'rendering-form-shading': 'Rendering form with shading',
+  'light-source-consistency': 'Light source consistency',
+  'combining-objects': 'Combining multiple objects',
+  'observation-vs-imagination': 'Drawing from observation vs imagination'
+};
+
+function skillTitle(id){
+  return SKILL_TITLES[id] || id;
+}
+
+// Pass rule for checkable skills (section 1 + confirmed in review):
+// at least this many logged primary reps, with no failed criteria in the
+// most recent RECENT_WINDOW primary-evidence entries.
+const PASS_RULE = {
+  minPrimaryReps: 5,
+  recentWindow: 3
+};
+
+// --- Exercise bank (stage 2) -----------------------------------------------
+// Passive, static reference data (section 10: "never decides anything").
+// referencePhoto per variant is one of 'none' | 'optional' | 'required'.
+// Some full-exercise variants incidentally touch a skill that isn't fixed
+// (e.g. "whichever form skill matches the chosen object") — those are captured
+// in `dynamicIncidentalNote` as free text rather than invented fixed skill ids.
+
+const EXERCISE_BANK = {
+
+  'line-confidence': {
+    passCriteria: [
+      'Lines are single, confident strokes — not several short, overlapping corrective strokes',
+      'Lines hold a reasonably straight/intended path over their full length (not wavering or arcing unintentionally)',
+      'Line weight is reasonably consistent along the stroke (not trailing off or scratchy at the ends)'
+    ],
+    videos: [
+      { label: 'Superimposed Lines', channel: 'Drawabox', duration: '8:58', url: 'https://youtube.com/watch?v=dzGmoJanhbQ', secondary: false },
+      { label: 'Ghosted Lines', channel: 'Drawabox', duration: '10:32', url: 'https://youtube.com/watch?v=LkJG6pKTuRc', secondary: false },
+      { label: 'Levels of the Ghosting Method', channel: 'Drawabox', duration: '4:54', url: 'https://youtube.com/watch?v=o1HAVipdsZM', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: '20 straight lines, freehand, mixing lengths and angles — one confident stroke per line', referencePhoto: 'none' },
+      { id: 'drill-2', text: '20 straight lines drawn slowly, then 20 more drawn fast — same criteria, to separate control from confidence', referencePhoto: 'none' },
+      { id: 'drill-3', text: '15 lines connecting two marked dots each (varying distance/angle) — tests aiming as well as stroke quality', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a simple geometric pattern (e.g. a grid of triangles) freehand, no ruler', incidentalSkills: ['proportion-by-eye'], referencePhoto: 'none' },
+      { id: 'full-2', text: 'Trace the outline of a real object in one continuous confident line, no lifting the pencil to correct', incidentalSkills: ['proportion-by-eye', 'observation-vs-imagination'], referencePhoto: 'optional', referenceNote: 'the object being traced' }
+    ]
+  },
+
+  'circle-curve-control': {
+    passCriteria: [
+      'Circles/curves are single confident strokes',
+      'Roundness is consistent (not lopsided or flat on one side)',
+      'Closes cleanly near the start point without a big overlap or gap'
+    ],
+    videos: [
+      { label: 'Superimposed Lines', channel: 'Drawabox', duration: '8:58', url: 'https://youtube.com/watch?v=dzGmoJanhbQ', secondary: false },
+      { label: 'Ellipses', channel: 'Drawabox', duration: '12:48', url: 'https://youtube.com/watch?v=tHJ3rzk6kno', secondary: false },
+      { label: 'Tables of Ellipses', channel: 'Drawabox', duration: '6:36', url: 'https://youtube.com/watch?v=7WLmXufShyA', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: '20 circles, varying sizes, freehand', referencePhoto: 'none' },
+      { id: 'drill-2', text: '20 curved lines of varying arc (shallow to tight), each in one stroke', referencePhoto: 'none' },
+      { id: 'drill-3', text: '10 circles, then immediately 10 more inside/around them (nested) — tests control under closer spacing', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a bowl of round fruit (any mix, any count)', incidentalSkills: ['proportion-by-eye'], referencePhoto: 'optional', referenceNote: 'the actual fruit' },
+      { id: 'full-2', text: 'Draw a coiled rope or a plant with curling tendrils/vines', incidentalSkills: ['observation-vs-imagination'], referencePhoto: 'optional', referenceNote: 'the actual rope/plant' }
+    ]
+  },
+
+  'ellipse-consistency': {
+    passCriteria: [
+      'Ellipse holds a consistent width-to-height ratio along its full curve (not egg-shaped unless intended)',
+      'Both ends are symmetric',
+      'No visible corners'
+    ],
+    videos: [
+      { label: 'Tables of Ellipses', channel: 'Drawabox', duration: '6:36', url: 'https://youtube.com/watch?v=7WLmXufShyA', secondary: false },
+      { label: 'Ellipses in Planes', channel: 'Drawabox', duration: '4:00', url: 'https://youtube.com/watch?v=9EUc-nni1_w', secondary: false },
+      { label: 'Ellipses', channel: 'Drawabox', duration: '12:48', url: 'https://youtube.com/watch?v=tHJ3rzk6kno', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: '20 ellipses, freehand, varying sizes and angles of rotation', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'A row of ellipses in a "table" — same size, rotating degree of tilt across the row', referencePhoto: 'none' },
+      { id: 'drill-3', text: '10 ellipses, then draw a second ellipse tightly inside each (like a rim + base of a cup) — tests consistency at close spacing', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw 3–5 round objects viewed at an angle (mugs, jars, wheels — your choice of subject and count)', incidentalSkills: ['proportion-by-eye', 'cylinders'], referencePhoto: 'optional', referenceNote: 'the actual objects' },
+      { id: 'full-2', text: 'Draw a table set from above/an angle with plates and cups', incidentalSkills: ['proportion-by-eye', 'combining-objects'], referencePhoto: 'optional', referenceNote: 'the actual objects' }
+    ]
+  },
+
+  'perspective-1pt': {
+    passCriteria: [
+      'All converging lines actually meet at a single vanishing point on the horizon (not near-misses)',
+      'Horizon line and vanishing point are clearly established before drawing',
+      'Box faces read as flat planes, not warped'
+    ],
+    videos: [
+      { label: 'Perspective for Beginners', channel: 'Proko', duration: '13:56', url: 'https://youtube.com/watch?v=BYlW8XC0MlI', secondary: false },
+      { label: 'Ghosted Planes', channel: 'Drawabox', duration: '6:00', url: 'https://youtube.com/watch?v=JsG7cMasVjo', secondary: false },
+      { label: 'Two-Point Perspective Drawing Made Simple', channel: 'Proko', duration: '13:33', url: 'https://youtube.com/watch?v=9-Y4K4hqZwo', secondary: false, note: 'shown as contrast, not the main topic' }
+    ],
+    drills: [
+      { id: 'drill-1', text: '5 boxes in 1-point perspective, varying position relative to the vanishing point (above/below/either side of eye level)', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Draw the vanishing point and horizon first, then 8 lines from scattered points all converging correctly into it', referencePhoto: 'none' },
+      { id: 'drill-3', text: '3 boxes stacked or arranged in a row, all sharing the same vanishing point — tests consistency across multiple objects', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a street, hallway, or train track receding into the distance (your choice of subject)', incidentalSkills: ['line-confidence'], referencePhoto: 'optional', referenceNote: 'the actual street/building' },
+      { id: 'full-2', text: 'Draw a simple building facade face-on with a receding side wall', incidentalSkills: ['boxes-volume'], referencePhoto: 'optional', referenceNote: 'the actual street/building' }
+    ]
+  },
+
+  'perspective-2pt': {
+    passCriteria: [
+      'Two vanishing points are both used consistently (lines actually converge to one or the other, not drifting)',
+      'Vertical edges stay truly vertical',
+      'Box proportions stay believable (not warped/stretched near the vanishing points)'
+    ],
+    videos: [
+      { label: 'Two-Point Perspective Drawing Made Simple', channel: 'Proko', duration: '13:33', url: 'https://youtube.com/watch?v=9-Y4K4hqZwo', secondary: false },
+      { label: 'Perspective for Beginners', channel: 'Proko', duration: '13:56', url: 'https://youtube.com/watch?v=BYlW8XC0MlI', secondary: false },
+      { label: 'Ghosted Lines', channel: 'Drawabox', duration: '10:32', url: 'https://youtube.com/watch?v=LkJG6pKTuRc', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: '5 boxes in 2-point perspective at varying distances from the vanishing points', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'One long horizon line with both vanishing points marked, then 10 lines drawn to test which point they should converge to', referencePhoto: 'none' },
+      { id: 'drill-3', text: '3 boxes of different proportions (cube, tall, wide) using the same two vanishing points', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a building corner from outside, at an angle (your choice of building complexity)', incidentalSkills: ['boxes-volume', 'proportion-by-eye'], referencePhoto: 'optional', referenceNote: 'the actual building/furniture' },
+      { id: 'full-2', text: 'Draw a piece of furniture (table, bookshelf, chest) at an angle', incidentalSkills: ['boxes-volume'], referencePhoto: 'optional', referenceNote: 'the actual building/furniture' }
+    ]
+  },
+
+  'perspective-interiors': {
+    passCriteria: [
+      "The room's walls/floor/ceiling agree on a single consistent perspective system (not mixing 1-point and 2-point inconsistently)",
+      "Furniture within the room is sized/angled consistently with the room's own vanishing points"
+    ],
+    videos: [
+      { label: 'Perspective for Beginners', channel: 'Proko', duration: '13:56', url: 'https://youtube.com/watch?v=BYlW8XC0MlI', secondary: false },
+      { label: 'How To Draw A Room with One Point Perspective', channel: 'Circle Line Art School', duration: '11:09', url: 'https://youtube.com/watch?v=yEymIyLbiAI', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Draw just the corner of a room (two walls + floor/ceiling meeting) — no furniture yet', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same corner, now add one simple box-shaped object (a box or crate) correctly sized within it', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Draw the same corner from two different seated positions in the room — tests re-establishing vanishing points from scratch', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a full corner of a real room with 2–3 pieces of furniture (your choice of room and how much furniture)', incidentalSkills: ['boxes-volume', 'combining-objects', 'proportion-by-eye'], referencePhoto: 'none' },
+      { id: 'full-2', text: 'Draw a doorway or window seen at an angle within a wall', incidentalSkills: ['boxes-volume'], referencePhoto: 'none' }
+    ]
+  },
+
+  'proportion-by-eye': {
+    passCriteria: [
+      "Relative sizes and placements of parts match the reference reasonably closely (e.g. a mug's height-to-width ratio, a face's eye spacing) — judged by comparison to the photo reference, not an abstract ideal"
+    ],
+    videos: [
+      { label: 'Visual Measuring Proportion', channel: 'Ctrl+Paint', duration: '4:41', url: 'https://youtube.com/watch?v=eH444HP5WXU', secondary: false },
+      { label: 'Visual Measuring', channel: 'Ctrl+Paint', duration: '6:01', url: 'https://youtube.com/watch?v=W5M6aP1SFdQ', secondary: false },
+      { label: 'Linear Block-in', channel: 'Ctrl+Paint', duration: null, url: 'https://youtube.com/watch?v=9BqD38TQGjo', secondary: false, note: 'duration not verified' }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Pick 3 simple objects, draw each in under 3 minutes focusing only on getting the proportions right — ignore all detail', referencePhoto: 'required', referenceNote: 'the objects being drawn' },
+      { id: 'drill-2', text: 'Draw a single object twice: once estimating by eye only, once using the pencil-measuring technique (holding pencil at arm’s length to compare lengths) — compare the two', referencePhoto: 'required', referenceNote: 'the object' },
+      { id: 'drill-3', text: 'Divide a rectangle you’ve drawn into equal thirds by eye, then check — repeat with quarters and fifths', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: "Draw a person's face from a photo, focusing only on proportion (feature placement), not likeness or shading", incidentalSkills: ['observation-vs-imagination'], referencePhoto: 'required', referenceNote: 'the face photo being drawn' },
+      { id: 'full-2', text: 'Draw a full-body figure from a photo focusing only on proportion (limb/torso ratios)', incidentalSkills: ['observation-vs-imagination'], referencePhoto: 'required', referenceNote: 'the figure photo being drawn' }
+    ]
+  },
+
+  'measuring-angles-lengths': {
+    passCriteria: [
+      "Angles in the drawing are reasonably close to the reference's actual angles (not defaulted to vertical/horizontal out of habit)",
+      'Relative lengths between parts are consistent with the reference'
+    ],
+    videos: [
+      { label: 'Visual Measuring', channel: 'Ctrl+Paint', duration: '6:01', url: 'https://youtube.com/watch?v=W5M6aP1SFdQ', secondary: false },
+      { label: 'Visual Measuring Proportion', channel: 'Ctrl+Paint', duration: '4:41', url: 'https://youtube.com/watch?v=eH444HP5WXU', secondary: false },
+      { label: 'Linear Block-in', channel: 'Ctrl+Paint', duration: null, url: 'https://youtube.com/watch?v=9BqD38TQGjo', secondary: false, note: 'duration not verified' }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Draw 10 lines at angles you first estimate by eye, then check with a protractor/ruler afterwards — track how close you got', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Pick an object with a clear diagonal or tilt (a tilted book, a leaning ladder) and draw just that one angle correctly', referencePhoto: 'required', referenceNote: 'the tilted object' },
+      { id: 'drill-3', text: 'Draw a simple object using only straight measuring lines first (no curves) to block in proportions before any detail', referencePhoto: 'required', referenceNote: 'the object' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw an object with several non-90-degree angles (an open laptop, a step ladder, a wedge of cheese — your choice)', incidentalSkills: ['proportion-by-eye'], referencePhoto: 'required', referenceNote: 'the object' },
+      { id: 'full-2', text: 'Draw a chair or stool from an angle where the legs splay at different angles', incidentalSkills: ['proportion-by-eye', 'boxes-volume'], referencePhoto: 'required', referenceNote: 'the chair/stool' }
+    ]
+  },
+
+  'cylinders': {
+    passCriteria: [
+      'The two end ellipses of the cylinder are consistent with each other in proportion',
+      "The cylinder's sides are parallel (not tapering unintentionally)",
+      'Basic shading (if included) reads as consistent with a single light direction'
+    ],
+    videos: [
+      { label: 'How to Draw Cylinders and Ellipses', channel: 'Proko', duration: '14:35', url: 'https://youtube.com/watch?v=PdtDtGBu-Dc', secondary: false },
+      { label: 'Structure Basics: Making Things Look 3D', channel: 'Proko', duration: '11:11', url: 'https://youtube.com/watch?v=3uEtdDvK6Xo', secondary: false },
+      { label: 'How to Draw a Cylinder 2', channel: 'Drawabox', duration: '26:39', url: 'https://youtube.com/watch?v=RBwHU72-Abk', secondary: false, note: 'over length — optional/advanced' }
+    ],
+    drills: [
+      { id: 'drill-1', text: '3 cylinders from different angles (upright, tilted, lying down), line only, no shading', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same 3 cylinders, now add simple shading to suggest roundness', referencePhoto: 'none' },
+      { id: 'drill-3', text: "Draw one cylinder, then a second one that's clearly narrower/wider — tests proportion consistency across variants", referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a mug, glass, or can from observation (your choice)', incidentalSkills: ['ellipse-consistency', 'rendering-form-shading'], referencePhoto: 'optional', referenceNote: 'the actual object' },
+      { id: 'full-2', text: 'Draw a stack of 2–3 cylindrical objects (cans, rolls, tubes)', incidentalSkills: ['combining-objects', 'proportion-by-eye'], referencePhoto: 'optional', referenceNote: 'the actual objects' }
+    ]
+  },
+
+  'spheres': {
+    passCriteria: [
+      'The sphere reads as fully round (shading wraps convincingly, not flat or "circle with shadow")',
+      "Light source direction is consistent across the sphere's surface"
+    ],
+    videos: [
+      { label: 'How to Draw a 3D Sphere: Shading for Beginners', channel: 'Circle Line Art School', duration: '4:00', url: 'https://youtube.com/watch?v=9r2SIYXQNgI', secondary: false },
+      { label: 'Structure Basics: Making Things Look 3D', channel: 'Proko', duration: '11:11', url: 'https://youtube.com/watch?v=3uEtdDvK6Xo', secondary: false },
+      { label: 'Value Scale & Sphere Shading Exercise', channel: 'That Art Teacher', duration: '12:16', url: 'https://youtube.com/watch?v=qNju05AR3Kc', secondary: true }
+    ],
+    drills: [
+      { id: 'drill-1', text: '3 spheres, line only', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same 3 spheres, add shading using at least 4 distinct values to suggest roundness', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Draw one sphere lit from three different directions (three separate spheres, same size) — tests deliberate control of light placement', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a round fruit (orange, apple) with shading from observation', incidentalSkills: ['rendering-form-shading', 'light-source-consistency'], referencePhoto: 'optional', referenceNote: 'the actual fruit' },
+      { id: 'full-2', text: 'Draw 2–3 spheres of different sizes together with a single consistent light source', incidentalSkills: ['combining-objects', 'light-source-consistency'], referencePhoto: 'optional', referenceNote: 'the actual objects' }
+    ]
+  },
+
+  'boxes-volume': {
+    passCriteria: [
+      'The box reads as a solid volume, not a flat outline (achieved through correct perspective lines and/or shading)',
+      'All visible faces are proportionally consistent with each other'
+    ],
+    videos: [
+      { label: 'Structure Basics: Making Things Look 3D', channel: 'Proko', duration: '11:11', url: 'https://youtube.com/watch?v=3uEtdDvK6Xo', secondary: false },
+      { label: 'An Easier Way to Draw Perspective', channel: 'Proko', duration: '9:57', url: 'https://youtube.com/watch?v=ZMuoU_NWmlE', secondary: false },
+      { label: 'How to Rotate a Box in Perspective', channel: 'dr. Draw', duration: '10:01', url: 'https://youtube.com/watch?v=MNA1oBmWRY4', secondary: true }
+    ],
+    drills: [
+      { id: 'drill-1', text: '5 boxes freehand in 1-point perspective, line only', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same 5 boxes, add flat shading per face (one tone per visible face) to reinforce volume', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Draw one box, then a second box resting on top at a slight rotation — tests maintaining volume across two related forms', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a stack of books or boxes (your choice of count/arrangement)', incidentalSkills: ['combining-objects', 'proportion-by-eye'], referencePhoto: 'optional', referenceNote: 'the actual objects' },
+      { id: 'full-2', text: 'Draw a piece of furniture built from box-like forms (a drawer unit, a shelf)', incidentalSkills: ['perspective-2pt'], referencePhoto: 'optional', referenceNote: 'the actual furniture' }
+    ]
+  },
+
+  'value-scale': {
+    passCriteria: [
+      'The value scale shows genuinely distinct, evenly-spaced steps from white to black (not clustered in the middle, not skipping straight from light to dark)',
+      'Pressure/technique is controlled, not scratchy or uneven within a single step'
+    ],
+    videos: [
+      { label: 'Value Scales Demo', channel: 'Stecher Studios', duration: '7:21', url: 'https://youtube.com/watch?v=SxYlhThVIEY', secondary: true, note: 'primary recommendation — cleanest isolated drill, despite being a secondary-source channel' },
+      { label: 'How to shade in Pencil: Value scale', channel: 'Mr. Otter Art Studio', duration: '14:46', url: 'https://youtube.com/watch?v=YpUFcOBYIj0', secondary: true, note: 'over length, partly drifts into rendering' },
+      { label: 'How to Draw Value Scales with Graphite Pencils', channel: 'giulia palazzo', duration: '17:44', url: 'https://youtube.com/watch?v=ZBxDNu7IT3A', secondary: true, note: 'over length' }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'A 6-step value scale strip using only pencil pressure, no cross-hatching', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same 6-step scale, this time using a different technique (cross-hatching or circular scribbling) — compare control between techniques', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'A 10-step scale (finer gradation) — tests control at the harder, more granular end', referencePhoto: 'none' }
+    ],
+    fullExercises: [],
+    noFullExerciseReason: "Intentionally a pure isolated drill skill — a value scale isn't naturally something drawn \"as a scene.\""
+  },
+
+  'rendering-form-shading': {
+    assessmentNotes: [
+      "Does the shading follow the form's actual surface (not just \"dark side/light side\" flatly applied)?",
+      'Are at least 3–4 distinct values used rather than 2?',
+      'Do edges/transitions look intentional rather than uniformly smudged?'
+    ],
+    videos: [
+      { label: 'Shading Light and Form: Basics', channel: 'Proko', duration: '7:15', url: 'https://youtube.com/watch?v=V3WmrWUEIJo', secondary: false },
+      { label: 'How to Draw a Still Life: A Cup and Saucer', channel: 'Circle Line Art School', duration: '10:56', url: 'https://youtube.com/watch?v=CSBoEHlnvj0', secondary: false },
+      { label: 'Draw a Still Life: From Line Drawing to Shading', channel: 'Circle Line Art School', duration: '5:59', url: 'https://youtube.com/watch?v=tpFBpo17ORA', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Shade one sphere using at least 4 values', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Shade one cylinder and one box side-by-side, same light source — tests applying the same light logic across different forms', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Shade the same simple object twice, using dramatically different light harshness (soft diffuse light vs harsh direct light)', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw and shade a single still-life object of your choice from observation', incidentalSkills: ['light-source-consistency'], dynamicIncidentalNote: 'plus whichever form skill (cylinders / spheres / boxes-volume) matches the chosen object', referencePhoto: 'optional', referenceNote: 'the actual object' },
+      { id: 'full-2', text: 'Draw and shade a simple draped cloth or crumpled paper', incidentalSkills: ['observation-vs-imagination'], referencePhoto: 'optional', referenceNote: 'the actual cloth/paper' }
+    ]
+  },
+
+  'light-source-consistency': {
+    assessmentNotes: [
+      'Is there one clear, identifiable light direction across the whole drawing (not each object shaded as if lit separately)?',
+      'Do cast shadows (if included) agree with that same light direction?'
+    ],
+    videos: [
+      { label: 'Shading Light and Form: Basics', channel: 'Proko', duration: '7:15', url: 'https://youtube.com/watch?v=V3WmrWUEIJo', secondary: false },
+      { label: 'How to Draw a Still Life: A Cup and Saucer', channel: 'Circle Line Art School', duration: '10:56', url: 'https://youtube.com/watch?v=CSBoEHlnvj0', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Draw 2 simple forms (a sphere and a box) lit from the same clearly-stated direction', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Same 2 forms, now add a cast shadow for each consistent with that light direction', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Draw one object, shade it, then redraw it shaded from a different light direction — compare', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a small still life (2–3 objects, your choice) with one light source and consistent cast shadows', incidentalSkills: ['combining-objects', 'rendering-form-shading'], referencePhoto: 'optional', referenceNote: 'the actual setup' },
+      { id: 'full-2', text: 'Draw a room corner or desk setup with a single light source affecting everything in view', incidentalSkills: ['perspective-interiors', 'combining-objects'], referencePhoto: 'optional', referenceNote: 'the actual setup' }
+    ]
+  },
+
+  'combining-objects': {
+    assessmentNotes: [
+      'Do objects sit in believable spatial relationship to each other (correct relative scale, overlap, and placement on a shared ground)?',
+      'Does the arrangement read as one coherent scene rather than separate objects pasted together?'
+    ],
+    videos: [
+      { label: 'Draw a Still Life: From Line Drawing to Shading', channel: 'Circle Line Art School', duration: '5:59', url: 'https://youtube.com/watch?v=tpFBpo17ORA', secondary: false },
+      { label: 'How to Draw a Still Life: Bottles and Jugs', channel: 'Circle Line Art School', duration: '16:30', url: 'https://youtube.com/watch?v=qQy3Bm5SCkQ', secondary: false },
+      { label: 'How to Draw a Still Life: A Cup and Saucer', channel: 'Circle Line Art School', duration: '10:56', url: 'https://youtube.com/watch?v=CSBoEHlnvj0', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Draw 2 objects of clearly different sizes next to each other, focusing only on getting their relative scale right', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Draw 2 objects where one partially overlaps/occludes the other', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Draw 3 objects in a loose row at different distances from you (near/mid/far) — tests scale-with-distance', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Set up 2–3 objects together (your choice — mug, book, fruit, etc.) and draw the whole group', incidentalSkills: ['proportion-by-eye'], dynamicIncidentalNote: 'plus relevant form skills for whichever objects are chosen', referencePhoto: 'none' },
+      { id: 'full-2', text: "Draw a corner of a real desk or shelf as-is, with whatever's actually sitting there", incidentalSkills: ['observation-vs-imagination', 'proportion-by-eye'], referencePhoto: 'none' }
+    ]
+  },
+
+  'observation-vs-imagination': {
+    assessmentNotes: [
+      'For observation tasks: does the drawing genuinely match specifics of the real reference (not generic/idealised)?',
+      'For imagination tasks: is the result internally consistent (proportions, perspective, light agree with each other even though invented)?'
+    ],
+    videos: [
+      { label: 'Lesson 2: Observation and Memory', channel: 'Drawabox', duration: '6:26', url: 'https://youtube.com/watch?v=QW-YPV3SDn0', secondary: false },
+      { label: 'Basic Rendering 2: Imaginary Light', channel: 'Ctrl+Paint', duration: '1:06', url: 'https://youtube.com/watch?v=F_QRC__kuEs', secondary: true, note: 'very short, supplementary only' },
+      { label: 'How to Draw a Still Life: A Cup and Saucer', channel: 'Circle Line Art School', duration: '10:56', url: 'https://youtube.com/watch?v=CSBoEHlnvj0', secondary: false }
+    ],
+    drills: [
+      { id: 'drill-1', text: 'Draw a real object in front of you, then draw the same type of object entirely from memory/imagination — compare the two side by side', referencePhoto: 'none' },
+      { id: 'drill-2', text: 'Draw a real object, covering it after 30 seconds and finishing from memory', referencePhoto: 'none' },
+      { id: 'drill-3', text: 'Invent a simple object (a made-up creature, tool, or container) and draw it from imagination, applying perspective/form rules deliberately', referencePhoto: 'none' }
+    ],
+    fullExercises: [
+      { id: 'full-1', text: 'Draw a real scene in front of you (any subject/setting you choose)', incidentalSkills: ['proportion-by-eye', 'combining-objects'], referencePhoto: 'optional', referenceNote: 'the real scene, if convenient to photograph separately' },
+      { id: 'full-2', text: 'Invent and draw a short scene from imagination (a room, a creature in a setting)', incidentalSkills: ['combining-objects', 'perspective-interiors'], referencePhoto: 'none' }
+    ]
+  }
+
+};
+
+// General craft/materials reference — NOT a tracked skill (no reps, pass/fail, or
+// rotation, and not tied to any one skill/exercise). Purely reference content the
+// session screen can surface and the AI feedback step (stage 5) may optionally draw
+// on, e.g. suggesting a softer pencil or a kneaded-eraser technique as a focus area.
+const MATERIALS_REFERENCE = {
+  videos: [
+    { label: 'Drawing Basics: Understanding Pencil Grades', channel: 'Leanne Bishop', duration: '4:34', url: 'https://youtube.com/watch?v=8IM05ZpBueo', secondary: true, topic: 'pencil-grades' },
+    { label: 'Best Erasers for Drawing', channel: 'The Virtual Instructor', duration: '7:38', url: 'https://youtube.com/watch?v=C41eKpEEWAs', secondary: true, topic: 'eraser-technique', note: 'primary overview' },
+    { label: 'How to Use a Kneaded Eraser or Gummy Eraser', channel: 'LZM Studio', duration: '4:36', url: 'https://youtube.com/watch?v=EfAwE5ei8Do', secondary: true, topic: 'eraser-technique', note: 'optional follow-up' }
+  ]
+};
+
+// --- Selection engine (stage 3) --------------------------------------------
+//
+// Per section 10: the ONLY active decision-maker. Everything above (bank) and
+// below (data layer via `state`) is passive. Functions here either PULL
+// (decide what to serve next, read-only) or PUSH (process AI feedback into
+// updated state, write-only-via-caller — these functions mutate the `state`
+// object passed in, but it's still the caller's job to persist it via
+// saveState(), matching every other function in this file).
+//
+// Evidence-array convention (fixing an ambiguity the design doc doesn't
+// pin down explicitly): entries are pushed in chronological order (oldest
+// first), so "the most recent N reps" is always `array.slice(-N)`. This is
+// the opposite convention from `state.submissions`, which stays newest-first
+// via unshift (matching the original app's history list) — flagging this
+// clearly since mixing the two up silently would be an easy, hard-to-spot bug.
+
+const WORKING_SET_SIZE = 5;
+const INITIAL_WORKING_SET = [
+  'line-confidence', 'circle-curve-control', 'proportion-by-eye',
+  'value-scale', 'observation-vs-imagination'
+];
+const WARMUP_CAP = 3;
+const PASSED_SKILL_REFRESH_RATE = 4 / 20; // "roughly 4-in-20 selections" (section 6)
+
+// ASSUMPTION (design doc doesn't give a formula — flagging for sign-off):
+// every skill in the working set gets a base weight of 1 ("every skill still
+// gets some airtime"), plus +1 for every rep in its recent evidence window
+// that contained at least one failed criterion ("weaker skills picked more
+// often"). Open-ended skills' evidence has no pass/fail, so they only ever
+// carry the base weight of 1 from this term. Tune FAIL_WEIGHT_BONUS if this
+// under/over-corrects in practice.
+const FAIL_WEIGHT_BONUS = 1;
+
+function isFormSkill(skillId){
+  return SKILL_META[skillId].category === 'form';
+}
+
+function hasPassedAnyFormSkill(state){
+  return SKILL_IDS.some(id => isFormSkill(id) && state.skills[id].status === 'passed');
+}
+
+// Prerequisites are a hard gate for ENTERING the working set only (section 6) —
+// once a skill is already in state.workingSet, this function is never consulted again for it.
+function prereqsMet(state, skillId){
+  const meta = SKILL_META[skillId];
+  const basePrereqsMet = meta.prereqs.every(p => state.skills[p].status === 'passed');
+  if(skillId === 'combining-objects'){
+    // second prerequisite is "one form skill", not a fixed id (section 1) — resolved here at runtime
+    return basePrereqsMet && hasPassedAnyFormSkill(state);
+  }
+  return basePrereqsMet;
+}
+
+// Adds newly-eligible skills into any open working-set slots, using the
+// backfill tiebreak order from section 6: all-fit-first, then two-prerequisite
+// skills outrank one-prerequisite skills, then listed order (which already
+// naturally puts perspective-2pt before boxes-volume, so no separate special
+// case is needed for that specific listed tie).
+function backfillWorkingSet(state){
+  const openSlots = WORKING_SET_SIZE - state.workingSet.length;
+  if(openSlots <= 0) return;
+
+  const candidates = SKILL_IDS.filter(id =>
+    !state.workingSet.includes(id) &&
+    state.skills[id].status !== 'passed' &&
+    prereqsMet(state, id)
+  );
+  if(candidates.length === 0) return;
+
+  const prereqCount = id => id === 'combining-objects' ? 2 : SKILL_META[id].prereqs.length;
+  candidates.sort((a, b) => {
+    const byPrereqCount = prereqCount(b) - prereqCount(a);
+    if(byPrereqCount !== 0) return byPrereqCount;
+    return SKILL_IDS.indexOf(a) - SKILL_IDS.indexOf(b);
+  });
+
+  state.workingSet.push(...candidates.slice(0, openSlots));
+}
+
+// Section 8: warmup pool accumulates permanently — this only ever adds ids,
+// never removes them. Call after any operation that could change working-set
+// membership or a skill's status (backfill, pass confirmation, feedback processing).
+function updateWarmupPool(state){
+  SKILL_IDS.forEach(id => {
+    const skillState = state.skills[id];
+    const meta = SKILL_META[id];
+    const qualifies =
+      (meta.category === 'foundations' && (skillState.status === 'in-progress' || skillState.status === 'passed')) ||
+      state.workingSet.includes(id);
+    if(qualifies && !state.warmupPool.includes(id)){
+      state.warmupPool.push(id);
+    }
+  });
+}
+
+function computeSkillWeight(state, skillId){
+  const recent = state.skills[skillId].fullEvidence.slice(-PASS_RULE.recentWindow);
+  const failedReps = recent.filter(e => (e.criteriaResults || []).some(c => c.result === 'fail')).length;
+  return 1 + failedReps * FAIL_WEIGHT_BONUS;
+}
+
+function weightedRandomPick(items, weights){
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for(let i = 0; i < items.length; i++){
+    r -= weights[i];
+    if(r <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
+// Section 6, first-pass exception: with zero history, serve the initial
+// working set once each in listed order before real weighting starts.
+function pickPrimarySkill(state){
+  if(state.firstPassRemaining.length > 0){
+    return state.firstPassRemaining[0];
+  }
+  const weights = state.workingSet.map(id => computeSkillWeight(state, id));
+  return weightedRandomPick(state.workingSet, weights);
+}
+
+// Section 6, passed-skill refresh rule: ~4-in-20 chance to instead serve a
+// passed skill as primary via a FULL exercise variant that incidentally
+// touches >=2 currently-active working-set skills. Only full-exercise
+// variants carry incidentalSkills tags, so this can never pick a drill.
+// Returns null when the roll misses or no qualifying variant exists (in
+// which case the caller falls back to the normal weighted pick).
+function maybePassedSkillRefresh(state){
+  if(state.firstPassRemaining.length > 0) return null; // doesn't apply during the first-pass phase
+  if(Math.random() >= PASSED_SKILL_REFRESH_RATE) return null;
+
+  const candidates = [];
+  SKILL_IDS.forEach(id => {
+    if(state.skills[id].status !== 'passed') return;
+    (EXERCISE_BANK[id].fullExercises || []).forEach(variant => {
+      const activeTouched = (variant.incidentalSkills || []).filter(s => state.workingSet.includes(s));
+      if(activeTouched.length >= 2){
+        candidates.push({ skillId: id, variant });
+      }
+    });
+  });
+  if(candidates.length === 0) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+// Returns the variantId most recently served as this skill's PRIMARY exercise,
+// or null if it's never been served. Used to avoid repeating the same variant
+// immediately (section 6) — checked against submissions (newest-first).
+function getLastVariantId(state, skillId){
+  for(const sub of state.submissions){
+    if(sub.exercise && sub.exercise.primarySkill === skillId){
+      return sub.exercise.variantId;
+    }
+  }
+  return null;
+}
+
+// ASSUMPTION (design doc doesn't specify a drill-vs-full ratio — flagging for
+// sign-off): 50/50 when the skill has full exercises available, else drill
+// only (value-scale). Picks a specific variant, avoiding an immediate repeat
+// of the exact same variant unless it's the only one available (section 6).
+function pickExerciseForSkill(state, skillId){
+  const bank = EXERCISE_BANK[skillId];
+  const hasFull = bank.fullExercises && bank.fullExercises.length > 0;
+  const kind = hasFull && Math.random() < 0.5 ? 'full' : 'drill';
+  const pool = kind === 'full' ? bank.fullExercises : bank.drills;
+
+  const lastVariantId = getLastVariantId(state, skillId);
+  let choices = pool;
+  if(pool.length > 1 && lastVariantId){
+    const filtered = pool.filter(v => v.id !== lastVariantId);
+    if(filtered.length > 0) choices = filtered;
+  }
+  const variant = choices[Math.floor(Math.random() * choices.length)];
+  return buildBundle(state, skillId, kind, variant);
+}
+
+function criteriaTextFor(skillId){
+  const bank = EXERCISE_BANK[skillId];
+  return SKILL_META[skillId].checkable ? bank.passCriteria.slice() : bank.assessmentNotes.slice();
+}
+
+// Bundles the full exercise package (section 10) — the single unit handed to
+// the session screen, which passes it straight to the AI feedback step
+// without re-fetching anything from the bank itself.
+function buildBundle(state, primarySkillId, kind, variant){
+  const incidentalSkills = (variant.incidentalSkills || []).slice();
+  const criteriaText = { [primarySkillId]: criteriaTextFor(primarySkillId) };
+  incidentalSkills.forEach(id => { criteriaText[id] = criteriaTextFor(id); });
+
+  return {
+    primarySkill: primarySkillId,
+    incidentalSkills,
+    kind,                                    // 'drill' | 'full'
+    variantId: variant.id,
+    taskText: variant.text,
+    referencePhoto: variant.referencePhoto,  // 'none' | 'optional' | 'required'
+    referenceNote: variant.referenceNote || null,
+    dynamicIncidentalNote: variant.dynamicIncidentalNote || null,
+    criteriaText                             // snapshot text — this is what gets stored verbatim on the submission
+  };
+}
+
+// Main "pull" entry point: decide what exercise to serve next.
+function selectNextExercise(state){
+  const refresh = maybePassedSkillRefresh(state);
+  if(refresh){
+    return buildBundle(state, refresh.skillId, 'full', refresh.variant);
+  }
+  const skillId = pickPrimarySkill(state);
+  return pickExerciseForSkill(state, skillId);
+}
+
+// Section 8: warmup selection — random 3 when oversubscribed, no weighting.
+function selectWarmup(state){
+  if(state.warmupPool.length <= WARMUP_CAP) return state.warmupPool.slice();
+  const shuffled = state.warmupPool.slice().sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, WARMUP_CAP);
+}
+
+// Main "push" entry point: turn the AI's raw feedback into updated state.
+// `aiRawResult` shape (per skill touched, keyed by skill id):
+//   checkable:  { criteriaResults: [{text, result: 'pass'|'fail'|'not-assessable'}] }
+//   open-ended: { notAssessable: bool, note: string }
+//
+// ASSUMPTION (flagging for sign-off): the design doc frames not-assessable as
+// a per-criterion outcome, but also says a not-assessable result "does not
+// count as a rep... produces a plain retake message, with no other action
+// taken" — which reads as all-or-nothing per skill, not partial-credit. So:
+// if ANY criterion for a touched skill comes back not-assessable, that whole
+// skill's result for this submission is discarded entirely (no evidence, no
+// rep, no submission field for it) rather than mixing pass/fail criteria
+// with a not-assessable one in the same logged rep.
+function processFeedback(state, bundle, aiRawResult, dateStr){
+  dateStr = dateStr || new Date().toISOString().slice(0, 10);
+  const submissionId = 'sub-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  const touchedSkills = [bundle.primarySkill, ...bundle.incidentalSkills];
+  const results = {};
+  const notAssessableSkills = [];
+
+  touchedSkills.forEach(skillId => {
+    const raw = aiRawResult[skillId];
+    const meta = SKILL_META[skillId];
+    const role = skillId === bundle.primarySkill ? 'primary' : 'incidental';
+
+    const anyNotAssessable = meta.checkable
+      ? (raw.criteriaResults || []).some(c => c.result === 'not-assessable')
+      : !!raw.notAssessable;
+
+    if(anyNotAssessable){
+      notAssessableSkills.push(skillId);
+      results[skillId] = { role, notAssessable: true };
+      return;
+    }
+
+    const skillState = state.skills[skillId];
+    const evidenceEntry = {
+      submissionId, date: dateStr, role,
+      criteriaResults: meta.checkable ? raw.criteriaResults.slice() : null,
+      note: meta.checkable ? null : raw.note
+    };
+    skillState.fullEvidence.push(evidenceEntry);
+    if(role === 'primary'){
+      skillState.primaryRepCount += 1;
+      skillState.primaryEvidence.push(evidenceEntry);
+      if(skillState.status === 'not-started') skillState.status = 'in-progress';
+    } else {
+      skillState.incidentalRepCount += 1;
+    }
+    if(!meta.checkable){
+      skillState.lastCheckIn = dateStr;
+    }
+    results[skillId] = { role, criteriaResults: evidenceEntry.criteriaResults, note: evidenceEntry.note };
+  });
+
+  const anyLogged = touchedSkills.some(id => !notAssessableSkills.includes(id));
+  if(anyLogged){
+    state.submissions.unshift({
+      id: submissionId,
+      date: dateStr,
+      exercise: { primarySkill: bundle.primarySkill, incidentalSkills: bundle.incidentalSkills, kind: bundle.kind, variantId: bundle.variantId },
+      snapshot: { taskText: bundle.taskText, criteriaText: bundle.criteriaText },
+      results
+    });
+  }
+
+  // Pass check (section 7) — only the primary skill's primaryRepCount could have
+  // just changed, so only it needs checking here.
+  if(!notAssessableSkills.includes(bundle.primarySkill)){
+    const meta = SKILL_META[bundle.primarySkill];
+    const skillState = state.skills[bundle.primarySkill];
+    if(meta.checkable && skillState.status !== 'passed' && !state.pendingPassConfirmation &&
+       skillState.primaryRepCount >= PASS_RULE.minPrimaryReps){
+      const recent = skillState.primaryEvidence.slice(-PASS_RULE.recentWindow);
+      const anyFail = recent.some(e => (e.criteriaResults || []).some(c => c.result === 'fail'));
+      if(!anyFail){
+        state.pendingPassConfirmation = bundle.primarySkill;
+      }
+    }
+  }
+
+  updateWarmupPool(state);
+
+  return {
+    submissionId,
+    notAssessableSkills,
+    fullyNotAssessable: notAssessableSkills.length === touchedSkills.length
+  };
+}
+
+// Section 7: resolving the pass confirmation decision.
+function confirmPass(state, skillId){
+  state.skills[skillId].status = 'passed';
+  state.pendingPassConfirmation = null;
+  const idx = state.workingSet.indexOf(skillId);
+  if(idx !== -1) state.workingSet.splice(idx, 1);
+  backfillWorkingSet(state);
+  updateWarmupPool(state);
+}
+
+function declinePass(state, skillId){
+  // "a genuine fresh start" (section 7) — primaryEvidence is wiped alongside
+  // the counter so the two stay in lockstep for the next recent-window check.
+  // fullEvidence (selection weighting / diagnostic history) is untouched.
+  state.skills[skillId].primaryRepCount = 0;
+  state.skills[skillId].primaryEvidence = [];
+  state.pendingPassConfirmation = null;
+}
+
+function createSkillState(){
+  return {
+    status: 'not-started',       // 'not-started' | 'in-progress' | 'passed'
+    primaryRepCount: 0,
+    incidentalRepCount: 0,
+    primaryEvidence: [],         // [{submissionId, date, role:'primary', criteriaResults}] — drives the pass rule
+    fullEvidence: [],            // [{submissionId, date, role, criteriaResults}] — primary+incidental, drives selection weighting
+    lastCheckIn: null            // open-ended skills only
+  };
+}
+
+function createInitialSkillsState(){
+  const skills = {};
+  SKILL_IDS.forEach(id => { skills[id] = createSkillState(); });
+  return skills;
+}
+
+function createInitialState(){
+  return {
+    version: 2,
+    skills: createInitialSkillsState(),
+
+    workingSet: INITIAL_WORKING_SET.slice(),        // starts as the 5 no-prerequisite skills (section 6)
+    warmupPool: INITIAL_WORKING_SET.slice(),        // accumulates permanently, never shrinks (section 8)
+    firstPassRemaining: INITIAL_WORKING_SET.slice(),// first-pass exception queue, listed order (section 6)
+
+    pendingPassConfirmation: null,  // skill id awaiting the in-session confirm/decline decision, or null
+
+    submissions: []             // full history, newest first (unshift) — see per-submission shape in design
+                                 // doc section 5. NOTE: does not include photos — those are never persisted,
+                                 // only used transiently to get AI feedback (confirmed decision, not an oversight).
+  };
+}
+
+let state = createInitialState();
+
+let uploadedImage = null;      // the drawing photo: {base64, mediaType, previewUrl}
+let referenceImage = null;     // optional second photo, same shape, null if not provided
+let feedback = null;           // {rawResult, processResult} from the last getFeedback() call, or null
 let loading = false;
 let error = null;
 let showKeySettings = false;
@@ -371,53 +1098,262 @@ let keyInputDraft = '';
 let workspaceInputDraft = '';
 let showImport = false;
 let backupMessage = null;
-let expandedHistoryId = null;
-let revisitLesson = null; // index of an earlier lesson being repeated, or null when on your real current lesson
+let expandedSubmissionId = null;
 
-function activeLessonIndex(){
-  return revisitLesson !== null ? revisitLesson : state.currentLesson;
+let currentBundle = null;      // the exercise currently being served, from selectNextExercise() — held here
+                                // (not in `state`) because it's mid-flight, not yet a finished submission
+let warmupDone = false;        // session-only (not persisted) — resets on every page load, per section 8
+let warmupSelection = null;    // {skills, tasks} chosen for this session's warmup, computed once per load
+let showSkillsView = false;    // session-only — toggles the read-only skills screen (stage 6)
+
+function toggleSkillsView(){
+  showSkillsView = !showSkillsView;
+  render();
 }
 
-function startRevisit(index){
-  if(index === activeLessonIndex()) return;
-  if(uploadedImage || feedback){
-    if(!confirm('Switch lessons? This discards the photo/feedback you have pending here.')) return;
+function ensureWarmupSelection(){
+  if(!warmupSelection){
+    const skills = selectWarmup(state);
+    const tasks = skills.map(id => {
+      const bank = EXERCISE_BANK[id];
+      const variant = bank.drills[Math.floor(Math.random() * bank.drills.length)];
+      return { skillId: id, title: skillTitle(id), text: variant.text };
+    });
+    warmupSelection = { skills, tasks };
   }
-  revisitLesson = index;
+}
+
+function startExercises(){
+  warmupDone = true;
+  render();
+}
+
+function ensureCurrentBundle(){
+  if(!currentBundle && !state.pendingPassConfirmation){
+    currentBundle = selectNextExercise(state);
+  }
+}
+
+function readImageFile(file, onDone){
+  const reader = new FileReader();
+  reader.onload = () => {
+    const result = reader.result;
+    const mediaType = file.type || 'image/jpeg';
+    const base64 = result.split(',')[1];
+    onDone({base64, mediaType, previewUrl: result});
+  };
+  reader.onerror = () => {
+    error = "Couldn't read that image — try a different photo.";
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDrawingFile(file){
+  readImageFile(file, img => {
+    uploadedImage = img;
+    feedback = null;
+    error = null;
+    render();
+  });
+}
+
+function handleReferenceFile(file){
+  readImageFile(file, img => {
+    referenceImage = img;
+    feedback = null;
+    error = null;
+    render();
+  });
+}
+
+function clearReferenceImage(){
+  referenceImage = null;
+  render();
+}
+
+// Builds the prompt sent to the AI. Per design doc section 4: judged strictly against
+// the criteria/notes the bundle already carries (never re-fetches or invents its own),
+// allows a variable number of feedback points (each skill contributes exactly as many
+// criteria as its bank entry defines — nothing padded or trimmed to a fixed count), and
+// asks for pass/fail/not-assessable per criterion rather than a freeform struggle label.
+function buildFeedbackPrompt(bundle, hasReferenceImage){
+  const skillIds = [bundle.primarySkill, ...bundle.incidentalSkills];
+
+  const skillBlocks = skillIds.map(id => {
+    const meta = SKILL_META[id];
+    const title = skillTitle(id);
+    const role = id === bundle.primarySkill ? 'primary' : 'incidental';
+    const items = bundle.criteriaText[id];
+    if(meta.checkable){
+      const list = items.map((c, i) => `${i + 1}. ${c}`).join('\n');
+      return `### ${title} (${role}, checkable)\nCriteria — judge each one independently, a single messy detail should not fail every criterion if the rest are genuinely fine:\n${list}\nRespond with "results": an array of exactly ${items.length} strings, in this same order, each one of "pass", "fail", or "not-assessable".`;
+    }
+    const list = items.map(n => `- ${n}`).join('\n');
+    return `### ${title} (${role}, open-ended — no pass/fail, just an honest written note)\nThings to consider:\n${list}\nRespond with "note" (a short, specific 1-3 sentence comment) and "notAssessable" (boolean).`;
+  }).join('\n\n');
+
+  const responseShape = skillIds.map(id => {
+    const meta = SKILL_META[id];
+    return meta.checkable
+      ? `  "${id}": { "results": [${bundle.criteriaText[id].map(() => '"pass"').join(', ')}] }`
+      : `  "${id}": { "notAssessable": false, "note": "..." }`;
+  }).join(',\n');
+
+  return `You are a warm, precise beginner drawing tutor reviewing a student's practice page for a structured 16-skill curriculum.
+
+Exercise assigned: "${bundle.taskText}"
+${hasReferenceImage ? 'A second reference photo was also provided — compare the drawing against it where relevant.' : ''}
+
+Assess ONLY the skill(s) below, using ONLY the specific criteria/notes given for each — do not invent your own criteria or a freeform label for what's wrong.
+
+Use "not-assessable" / notAssessable:true ONLY when the photo genuinely cannot be judged — blurry, cropped, badly lit, or missing/mismatched a required reference photo. Do not use it just because the work is poor; poor work that is clearly visible should be judged "fail", not "not-assessable".
+
+If, and only if, something about pencil grade or eraser technique seems genuinely worth mentioning from what you actually see, you may also include one short top-level "tip" string (e.g. suggesting a softer pencil for deeper darks, or a kneaded eraser for lifting highlights). Leave "tip" as null in the vast majority of cases — most submissions don't need one.
+
+${skillBlocks}
+
+Respond ONLY with strict JSON, no markdown fences, no preamble, in exactly this shape:
+{
+${responseShape},
+  "tip": null
+}`;
+}
+
+// Turns the AI's raw JSON into the shape processFeedback() expects (Stage 3, unchanged
+// since it was tested): {skillId: {criteriaResults:[{text,result}]}} for checkable skills,
+// {skillId: {notAssessable, note}} for open-ended. Criterion TEXT comes from the bundle
+// (already known client-side) rather than trusting the AI to echo it back — the AI only
+// supplies the result for each position, matched by index.
+function adaptAiResponseToRaw(bundle, aiJson){
+  const skillIds = [bundle.primarySkill, ...bundle.incidentalSkills];
+  const raw = {};
+  skillIds.forEach(id => {
+    const meta = SKILL_META[id];
+    const entry = aiJson[id];
+    if(!entry) throw new Error('AI response is missing "' + id + '"');
+    if(meta.checkable){
+      const criteriaText = bundle.criteriaText[id];
+      const results = entry.results;
+      if(!Array.isArray(results) || results.length !== criteriaText.length){
+        throw new Error('AI response for "' + id + '" has the wrong number of results');
+      }
+      raw[id] = { criteriaResults: criteriaText.map((text, i) => ({ text, result: results[i] })) };
+    } else {
+      raw[id] = { notAssessable: !!entry.notAssessable, note: entry.note || null };
+    }
+  });
+  return raw;
+}
+
+async function getFeedback(){
+  if(!uploadedImage || !currentBundle) return;
+  if(currentBundle.referencePhoto === 'required' && !referenceImage){
+    error = 'This exercise needs a reference photo of ' + (currentBundle.referenceNote || 'the subject') + ' as well — add that before requesting feedback.';
+    render();
+    return;
+  }
+  const apiKey = getApiKey();
+  if(!apiKey){
+    error = "Add your Anthropic API key first (tap \"API key settings\" below).";
+    render();
+    return;
+  }
+
+  loading = true;
+  error = null;
+  render();
+
+  const bundle = currentBundle;
+  const prompt = buildFeedbackPrompt(bundle, !!referenceImage);
+  const content = [
+    { type: "image", source: { type: "base64", media_type: uploadedImage.mediaType, data: uploadedImage.base64 } }
+  ];
+  if(referenceImage){
+    content.push({ type: "image", source: { type: "base64", media_type: referenceImage.mediaType, data: referenceImage.base64 } });
+  }
+  content.push({ type: "text", text: prompt });
+
+  try{
+    const headers = {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    };
+    const workspaceId = getWorkspaceId();
+    if(workspaceId){
+      headers["anthropic-workspace-id"] = workspaceId;
+    }
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1500,
+        messages: [{ role: "user", content }]
+      })
+    });
+    const data = await response.json();
+    if(data.error){
+      throw new Error(data.error.message || 'API error');
+    }
+    const textBlock = (data.content || []).map(b => b.text || '').join('\n');
+    const clean = textBlock.replace(/```json|```/g, '').trim();
+    const aiJson = JSON.parse(clean);
+    const rawResult = adaptAiResponseToRaw(bundle, aiJson);
+    const processResult = processFeedback(state, bundle, rawResult);
+    feedback = { rawResult, processResult, tip: aiJson.tip || null };
+    saveState();
+  }catch(e){
+    const msg = String(e.message || '');
+    if(msg.toLowerCase().includes('workspace')){
+      error = "This API key needs a workspace ID. Open \"API key settings\" below and paste in your workspace ID from console.anthropic.com → Settings → Workspaces.";
+    } else if(msg.toLowerCase().includes('authentication') || msg.includes('401')){
+      error = "That API key was rejected — double check it's copied correctly, and that billing is set up in the Anthropic Console.";
+    } else {
+      error = "Couldn't get feedback right now (" + (msg || 'unknown error') + "). Check your connection and try again.";
+    }
+  }
+  loading = false;
+  render();
+}
+
+function nextExercise(){
+  currentBundle = null;
   uploadedImage = null;
+  referenceImage = null;
   feedback = null;
   error = null;
   render();
 }
 
-function exitRevisit(){
-  if(uploadedImage || feedback){
-    if(!confirm('Return to your current lesson? This discards the pending revisit photo/feedback.')) return;
+function resolvePassConfirm(confirmed){
+  const skillId = state.pendingPassConfirmation;
+  if(!skillId) return;
+  if(confirmed){
+    confirmPass(state, skillId);
+  } else {
+    declinePass(state, skillId);
   }
-  revisitLesson = null;
-  uploadedImage = null;
-  feedback = null;
-  error = null;
-  render();
+  saveState();
+  nextExercise();
 }
 
-function toggleHistoryItem(id){
-  expandedHistoryId = (expandedHistoryId === id) ? null : id;
+function toggleSubmission(id){
+  expandedSubmissionId = (expandedSubmissionId === id) ? null : id;
   render();
 }
 
 function loadState(){
   try{
-    let raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if(legacy){
-        raw = legacy;
-        localStorage.setItem(STORAGE_KEY, legacy); // migrate silently to the new key name
-      }
-    }
+    const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){
-      state = Object.assign(state, JSON.parse(raw));
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.version === 2){
+        state = parsed;
+      }
+      // any other/missing version is an incompatible (pre-v2) shape — ignored, start fresh
     }
   }catch(e){
     // no saved state yet, or it was corrupted — start fresh
@@ -506,216 +1442,14 @@ function saveApiKey(){
   render();
 }
 
-function currentLessonObj(){
-  return CURRICULUM[activeLessonIndex()];
-}
-
-function renderVideoLinks(){
-  const lesson = currentLessonObj();
-  if(!lesson.video) return '';
-  let html = `<div class="video-links">
-    <a class="video-link" href="${lesson.video.url}" target="_blank" rel="noopener noreferrer"><span class="play">▶</span> ${lesson.video.label}</a>`;
-  if(lesson.video2){
-    html += `<a class="video-link" href="${lesson.video2.url}" target="_blank" rel="noopener noreferrer"><span class="play">▶</span> ${lesson.video2.label}</a>`;
-  }
-  html += `</div>`;
-  return html;
-}
-
-function renderMaterials(){
-  const lesson = currentLessonObj();
-  if(!lesson.materials) return '';
-  return `<div class="materials-line">✏️ <b>Pencils:</b> ${lesson.materials}</div>`;
-}
-
-function currentTaskHtml(){
-  const lesson = currentLessonObj();
-  if(revisitLesson === null && state.mode === 'remedial' && state.remedialTag){
-    const plain = state.remedialTag.replace(/-/g, ' ');
-    return `<b>Focused rep:</b> "${plain}" has come up more than once. Do the "${lesson.title}" task again, but slow right down and consciously correct for this specific issue on every shape before moving to the next one.`;
-  }
-  return lesson.task;
-}
-
-function currentTaskPlainForPrompt(){
-  const lesson = currentLessonObj();
-  if(revisitLesson === null && state.mode === 'remedial' && state.remedialTag){
-    const plain = state.remedialTag.replace(/-/g, ' ');
-    return `Focused remedial rep of "${lesson.title}": the student is specifically working on correcting "${plain}", which has shown up repeatedly. Original task: ${lesson.task.replace(/<[^>]+>/g,'')}`;
-  }
-  return lesson.task.replace(/<[^>]+>/g,'');
-}
-
-function handleFile(file){
-  const reader = new FileReader();
-  reader.onload = () => {
-    const result = reader.result;
-    const mediaType = file.type || 'image/jpeg';
-    const base64 = result.split(',')[1];
-    uploadedImage = {base64, mediaType, previewUrl: result};
-    feedback = null;
-    error = null;
-    render();
-  };
-  reader.onerror = () => {
-    error = "Couldn't read that image — try a different photo.";
-    render();
-  };
-  reader.readAsDataURL(file);
-}
-
-async function getFeedback(){
-  if(!uploadedImage) return;
-  const apiKey = getApiKey();
-  if(!apiKey){
-    error = "Add your Anthropic API key first (tap \"API key settings\" below).";
-    render();
-    return;
-  }
-
-  loading = true;
-  error = null;
-  render();
-
-  const lesson = currentLessonObj();
-  const prompt = `You are a warm, precise beginner drawing tutor reviewing a student's practice page.
-Lesson: "${lesson.title}"
-Task assigned: "${currentTaskPlainForPrompt()}"
-
-Look at the uploaded photo of their practice page and respond ONLY with strict JSON, no markdown fences, no preamble, in exactly this shape:
-{
-  "strengths": ["short specific strength", "short specific strength"],
-  "focus_areas": ["short specific thing to work on"],
-  "struggle_tag": "a 2-4 word lowercase-hyphenated tag naming the single main recurring issue, e.g. 'wobbly-lines' or 'uneven-ellipses' or 'flat-shading'",
-  "encouragement": "one short warm sentence, no more than 20 words, specific to what you saw"
-}
-Keep strengths and focus_areas to 1-2 items each, each under 15 words. Be specific to what's actually visible, not generic. If this is a focused remedial rep, judge specifically whether the named issue improved.`;
-
-  try{
-    const headers = {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    };
-    const workspaceId = getWorkspaceId();
-    if(workspaceId){
-      headers["anthropic-workspace-id"] = workspaceId;
-    }
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: [
-            {type: "image", source: {type: "base64", media_type: uploadedImage.mediaType, data: uploadedImage.base64}},
-            {type: "text", text: prompt}
-          ]
-        }]
-      })
-    });
-    const data = await response.json();
-    if(data.error){
-      throw new Error(data.error.message || 'API error');
-    }
-    const textBlock = (data.content || []).map(b => b.text || '').join('\n');
-    const clean = textBlock.replace(/```json|```/g, '').trim();
-    feedback = JSON.parse(clean);
-  }catch(e){
-    const msg = String(e.message || '');
-    if(msg.toLowerCase().includes('workspace')){
-      error = "This API key needs a workspace ID. Open \"API key settings\" below and paste in your workspace ID from console.anthropic.com → Settings → Workspaces.";
-    } else if(msg.toLowerCase().includes('authentication') || msg.includes('401')){
-      error = "That API key was rejected — double check it's copied correctly, and that billing is set up in the Anthropic Console.";
-    } else {
-      error = "Couldn't get feedback right now (" + (msg || 'unknown error') + "). Check your connection and try again.";
-    }
-  }
-  loading = false;
-  render();
-}
-
-function logHistory(kind){
-  const lesson = currentLessonObj();
-  state.history.unshift({
-    id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
-    date: new Date().toISOString().slice(0,10),
-    lessonIndex: activeLessonIndex(),
-    title: lesson.title,
-    tag: feedback ? feedback.struggle_tag : null,
-    strengths: feedback ? feedback.strengths : null,
-    focusAreas: feedback ? feedback.focus_areas : null,
-    encouragement: feedback ? feedback.encouragement : null,
-    kind
-  });
-  if(feedback && feedback.struggle_tag && revisitLesson === null){
-    // only feed struggle-pattern tracking / remedial triggers from your real current lesson,
-    // not from revisiting an old one — a revisit shouldn't retroactively trigger remediation
-    const t = feedback.struggle_tag;
-    state.struggleCounts[t] = (state.struggleCounts[t] || 0) + 1;
-  }
-}
-
-function saveAndContinue(){
-  if(!feedback) return;
-
-  if(revisitLesson !== null){
-    logHistory('revisit');
-    revisitLesson = null;
-    uploadedImage = null;
-    feedback = null;
-    saveState();
-    render();
-    return;
-  }
-
-  const tag = feedback.struggle_tag;
-
-  if(state.mode === 'remedial'){
-    logHistory('remedial');
-    if(tag) state.remedialDone[tag] = true;
-    state.mode = 'normal';
-    state.remedialTag = null;
-    if(state.currentLesson < CURRICULUM.length - 1){
-      state.currentLesson += 1;
-    }
-  } else {
-    logHistory('normal');
-    const willTriggerRemedial = tag &&
-      state.struggleCounts[tag] >= REMEDIAL_THRESHOLD &&
-      !state.remedialDone[tag];
-    if(willTriggerRemedial){
-      state.mode = 'remedial';
-      state.remedialTag = tag;
-    } else {
-      if(state.currentLesson < CURRICULUM.length - 1){
-        state.currentLesson += 1;
-      }
-    }
-  }
-
-  uploadedImage = null;
-  feedback = null;
-  saveState();
-  render();
-}
-
-function repeatLesson(){
-  if(feedback){
-    logHistory(revisitLesson !== null ? 'revisit' : 'rep');
-  }
-  uploadedImage = null;
-  feedback = null;
-  saveState();
-  render();
-}
-
 function resetProgress(){
-  state = {currentLesson: 0, mode:'normal', remedialTag:null, remedialDone:{}, history: [], struggleCounts: {}};
+  state = createInitialState();
+  currentBundle = null;
+  warmupDone = false;
+  warmupSelection = null;
+  showSkillsView = false;
   uploadedImage = null;
+  referenceImage = null;
   feedback = null;
   error = null;
   saveState();
@@ -756,51 +1490,25 @@ function importBackup(){
   }
   try{
     const parsed = JSON.parse(box.value.trim());
-    state = Object.assign({
-      currentLesson: 0, mode:'normal', remedialTag:null, remedialDone:{}, history: [], struggleCounts: {}
-    }, parsed);
+    if(!parsed || parsed.version !== 2){
+      backupMessage = "That backup is from an older version of this app and can't be restored here.";
+      render();
+      return;
+    }
+    state = Object.assign(createInitialState(), parsed);
     saveState();
     showImport = false;
     backupMessage = "Progress restored.";
+    currentBundle = null;
+    warmupDone = false;
+    warmupSelection = null;
     uploadedImage = null;
+    referenceImage = null;
     feedback = null;
   }catch(e){
     backupMessage = "That didn't look like a valid backup — make sure you copied the whole thing.";
   }
   render();
-}
-
-function renderStruggleTags(){
-  const entries = Object.entries(state.struggleCounts).sort((a,b) => b[1]-a[1]);
-  if(entries.length === 0) return '<div class="empty">No recurring struggles logged yet — they\'ll show up here as patterns emerge.</div>';
-  return entries.map(([tag,count]) => `<span class="tag">${tag}${count>1 ? ` <b>×${count}</b>` : ''}</span>`).join('');
-}
-
-function renderHistory(){
-  if(state.history.length === 0) return '<div class="empty">No completed lessons yet.</div>';
-  return state.history.slice(0,10).map((h, i) => {
-    const id = h.id || ('legacy-' + i); // older entries saved before feedback was tracked won't have an id
-    const isOpen = expandedHistoryId === id;
-    const hasFeedback = h.strengths || h.focusAreas || h.encouragement;
-    let detail = '';
-    if(isOpen){
-      detail = hasFeedback ? `
-        <div class="history-detail">
-          ${h.strengths ? `<span class="note-label">Strengths</span>${h.strengths.map(s => `<div class="strength-line">${s}</div>`).join('')}` : ''}
-          ${h.focusAreas ? `<span class="note-label">Focus next</span>${h.focusAreas.map(f => `<div class="focus-line">${f}</div>`).join('')}` : ''}
-          ${h.encouragement ? `<div class="note">"${h.encouragement}"</div>` : ''}
-        </div>` : `<div class="history-detail empty">No feedback saved for this entry.</div>`;
-    }
-    return `
-      <div>
-        <div class="history-item" style="cursor:pointer;" onclick="toggleHistoryItem('${id}')">
-          <span>Lesson ${h.lessonIndex+1} · ${h.title} <span class="kind ${h.kind}">${h.kind}</span></span>
-          <span>${h.date} ${isOpen ? '▲' : '▼'}</span>
-        </div>
-        ${detail}
-      </div>
-    `;
-  }).join('');
 }
 
 function renderKeySettings(){
@@ -821,79 +1529,267 @@ function renderKeySettings(){
   `;
 }
 
-function render(){
-  const app = document.getElementById('app');
-  const lesson = currentLessonObj();
-  const activeIndex = activeLessonIndex();
-  const isRevisiting = revisitLesson !== null;
-  const isLastLesson = activeIndex === CURRICULUM.length - 1;
-  const isRemedial = !isRevisiting && state.mode === 'remedial';
+function renderVideoLinksForBank(bank){
+  if(!bank.videos || bank.videos.length === 0) return '';
+  return `<div class="video-links">` + bank.videos.map(v =>
+    `<a class="video-link" href="${v.url}" target="_blank" rel="noopener noreferrer"><span class="play">▶</span> ${v.channel} — ${v.label}${v.secondary ? ' <i>(secondary source)</i>' : ''}</a>`
+  ).join('') + `</div>`;
+}
 
-  const pegs = CURRICULUM.map((_, i) => {
-    let cls = 'peg';
-    if(i < state.currentLesson) cls += ' done clickable';
-    else if(i === state.currentLesson) cls += ' current';
-    if(i === activeIndex && isRevisiting) cls += ' revisiting';
-    const clickable = i < state.currentLesson || (i === state.currentLesson && isRevisiting);
-    return `<div class="${cls}" ${clickable ? `onclick="startRevisit(${i})"` : ''}></div>`;
-  }).join('');
-
-  let uploadHtml = '';
+function renderDrawingUpload(){
   if(uploadedImage){
-    uploadHtml = `
-      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+    return `
+      <div class="upload-zone" onclick="document.getElementById('drawingFileInput').click()">
         <img src="${uploadedImage.previewUrl}" alt="your practice page"/>
         <div>Tap to replace photo</div>
       </div>`;
-  } else {
-    uploadHtml = `
-      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-        📷 Tap to upload a photo of your practice page
-      </div>`;
   }
+  return `
+    <div class="upload-zone" onclick="document.getElementById('drawingFileInput').click()">
+      📷 Tap to upload a photo of your practice page
+    </div>`;
+}
+
+function renderReferenceUpload(bundle){
+  const label = bundle.referencePhoto === 'required' ? 'Reference photo (required)' : 'Reference photo (optional)';
+  const hint = bundle.referenceNote ? ` — ${bundle.referenceNote}` : '';
+  if(referenceImage){
+    return `
+      <div class="materials-line" style="margin-top:14px;">📎 <b>${label}</b>${hint}</div>
+      <div class="upload-zone" onclick="document.getElementById('referenceFileInput').click()">
+        <img src="${referenceImage.previewUrl}" alt="reference photo"/>
+        <div>Tap to replace reference photo</div>
+      </div>
+      <button class="secondary" onclick="clearReferenceImage()">Remove reference photo</button>
+    `;
+  }
+  return `
+    <div class="materials-line" style="margin-top:14px;">📎 <b>${label}</b>${hint}</div>
+    <div class="upload-zone" onclick="document.getElementById('referenceFileInput').click()">
+      📎 Tap to add a reference photo${hint}
+    </div>
+  `;
+}
+
+// Shared between the exercise screen (feedback with no pending decision) and the
+// pass-confirmation screen (feedback that triggered one) — same rendering either way.
+function renderFeedbackDetail(feedbackObj, bundle){
+  const { rawResult, processResult } = feedbackObj;
+  const touchedSkills = [bundle.primarySkill, ...bundle.incidentalSkills];
+  let html = '';
+  touchedSkills.forEach(skillId => {
+    const title = skillTitle(skillId);
+    const role = skillId === bundle.primarySkill ? 'primary' : 'incidental';
+    if(processResult.notAssessableSkills.includes(skillId)){
+      html += `<div class="materials-line">🔍 <b>${title}</b> — couldn't be judged from this photo (blurry, cropped, or a missing/mismatched reference photo). No rep counted here — it'll come up again another time.</div>`;
+      return;
+    }
+    const meta = SKILL_META[skillId];
+    html += `<span class="note-label">${title}${role === 'incidental' ? ' (incidental)' : ''}</span>`;
+    if(meta.checkable){
+      html += rawResult[skillId].criteriaResults.map(c =>
+        `<div class="${c.result === 'pass' ? 'strength-line' : 'focus-line'}">${c.text}</div>`
+      ).join('');
+    } else {
+      html += `<div class="note">"${rawResult[skillId].note}"</div>`;
+    }
+  });
+  if(feedbackObj.tip){
+    html += `<div class="materials-line">✏️ ${feedbackObj.tip}</div>`;
+  }
+  return html;
+}
+
+function renderWarmupCard(){
+  const tasks = warmupSelection.tasks;
+  return `
+    <div class="card">
+      <div class="card-inner">
+        <div class="lesson-num">Warmup</div>
+        <h2>Loosen up first</h2>
+        <p class="why">Quick and unscored — no photo, no feedback, doesn't touch your progress. Just a few reps to warm your hand up before today's real exercise.</p>
+        ${tasks.map(t => `<div class="task-box" style="margin-bottom:10px;"><b>${t.title}:</b> ${t.text}</div>`).join('')}
+        <button class="accent" onclick="startExercises()">Done warming up — start today's exercise</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPassConfirmationCard(){
+  const skillId = state.pendingPassConfirmation;
+  const title = skillTitle(skillId);
+  const feedbackBlock = (feedback && currentBundle && currentBundle.primarySkill === skillId)
+    ? renderFeedbackDetail(feedback, currentBundle)
+    : '';
+  return `
+    <div class="card revisit">
+      <div class="card-inner">
+        <div class="lesson-num revisit">Pass check</div>
+        <h2>${title}</h2>
+        ${feedbackBlock}
+        <div class="remedial-banner" style="color:var(--sage); background:#EFF1E6; border-color:#C9D4BD;">
+          🎯 You've now logged ${PASS_RULE.minPrimaryReps}+ reps of "${title}" with no failed criteria in the last ${PASS_RULE.recentWindow}. Pass it, or keep working on it a while longer?
+        </div>
+        <div class="btn-row">
+          <button class="accent" onclick="resolvePassConfirm(true)">Yes — pass this skill</button>
+          <button class="secondary" onclick="resolvePassConfirm(false)">Not yet — keep practicing</button>
+        </div>
+        <p class="key-note">Choosing "keep practicing" resets this skill's rep count to 0 for a genuine fresh run at it — your submission history isn't deleted, just the pass-progress counter.</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderExerciseCard(){
+  const bundle = currentBundle;
+  const bank = EXERCISE_BANK[bundle.primarySkill];
+  const kindLabel = bundle.kind === 'drill' ? 'Drill' : 'Full exercise';
 
   let feedbackHtml = '';
   if(loading){
     feedbackHtml = `<div class="loading"><div class="pencil-spin"></div> Looking over your page…</div>`;
   } else if(feedback){
-    let continueLabel = isRevisiting
-      ? 'Log this revisit & return to current lesson'
-      : (isRemedial
-          ? (isLastLesson ? 'Wrap up remedial rep & finish' : 'Wrap up remedial rep & continue')
-          : (isLastLesson ? 'Complete final lesson' : 'Save & continue to next lesson'));
     feedbackHtml = `
-      <span class="note-label">Strengths</span>
-      ${feedback.strengths.map(s => `<div class="strength-line">${s}</div>`).join('')}
-      <span class="note-label">Focus next</span>
-      ${feedback.focus_areas.map(f => `<div class="focus-line">${f}</div>`).join('')}
-      <div class="note">"${feedback.encouragement}"</div>
+      ${renderFeedbackDetail(feedback, bundle)}
       <div class="btn-row">
-        <button class="accent" onclick="saveAndContinue()">${continueLabel}</button>
+        <button class="accent" onclick="nextExercise()">Continue to next exercise</button>
       </div>
-      <button class="secondary" onclick="repeatLesson()">Give me another rep of this lesson</button>
     `;
   } else if(uploadedImage){
     feedbackHtml = `
       <button onclick="getFeedback()">Get feedback on this page</button>
-      <button class="secondary" onclick="repeatLesson()">Skip feedback, just give me another rep</button>
+      <button class="secondary" onclick="nextExercise()">Skip feedback, just get another exercise</button>
     `;
   }
 
-  const remedialBanner = isRemedial
-    ? `<div class="remedial-banner">🔁 Focused rep triggered — "${state.remedialTag.replace(/-/g,' ')}" has shown up ${state.struggleCounts[state.remedialTag] || REMEDIAL_THRESHOLD} times, so this round targets just that before moving on.</div>`
-    : '';
+  return `
+    <div class="card">
+      <div class="card-inner">
+        <div class="lesson-num">${kindLabel}</div>
+        <h2>${skillTitle(bundle.primarySkill)}</h2>
+        ${bundle.incidentalSkills.length ? `<p class="why">Also touches: ${bundle.incidentalSkills.map(skillTitle).join(', ')}${bundle.dynamicIncidentalNote ? ' — ' + bundle.dynamicIncidentalNote : ''}</p>` : ''}
+        ${renderVideoLinksForBank(bank)}
+        <div class="task-box">${bundle.taskText}</div>
+        ${bundle.referencePhoto !== 'none' ? renderReferenceUpload(bundle) : ''}
+        ${renderDrawingUpload()}
+        <input type="file" id="drawingFileInput" accept="image/*" capture="environment" onchange="handleDrawingFile(this.files[0])"/>
+        ${bundle.referencePhoto !== 'none' ? `<input type="file" id="referenceFileInput" accept="image/*" capture="environment" onchange="handleReferenceFile(this.files[0])"/>` : ''}
+        ${feedbackHtml}
+        ${error ? `<div class="err">${error}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
 
-  const revisitBanner = isRevisiting
-    ? `<div class="remedial-banner" style="color:var(--sage); background:#EFF1E6; border-color:#C9D4BD;">📖 Revisiting Lesson ${activeIndex+1} — your real progress (Lesson ${state.currentLesson+1}) is untouched. <a onclick="exitRevisit()" style="cursor:pointer; text-decoration:underline;">Back to current lesson</a></div>`
-    : '';
+function renderSubmissionHistory(){
+  if(state.submissions.length === 0) return '<div class="empty">No submissions logged yet.</div>';
+  return state.submissions.slice(0, 10).map(sub => {
+    const isOpen = expandedSubmissionId === sub.id;
+    const primaryTitle = skillTitle(sub.exercise.primarySkill);
+    const kindLabel = sub.exercise.kind === 'drill' ? 'drill' : 'full';
+    let detail = '';
+    if(isOpen){
+      const skillIds = [sub.exercise.primarySkill, ...sub.exercise.incidentalSkills];
+      detail = `<div class="history-detail">` + skillIds.map(id => {
+        const r = sub.results[id];
+        if(!r) return '';
+        const title = skillTitle(id);
+        const roleTag = r.role === 'incidental' ? ' (incidental)' : '';
+        if(r.notAssessable){
+          return `<div class="materials-line">${title}${roleTag}: not assessable this time</div>`;
+        }
+        if(r.criteriaResults){
+          return `<span class="note-label">${title}${roleTag}</span>` +
+            r.criteriaResults.map(c => `<div class="${c.result === 'pass' ? 'strength-line' : 'focus-line'}">${c.text}</div>`).join('');
+        }
+        return `<span class="note-label">${title}${roleTag}</span><div class="note">"${r.note}"</div>`;
+      }).join('') + `</div>`;
+    }
+    return `
+      <div>
+        <div class="history-item" style="cursor:pointer;" onclick="toggleSubmission('${sub.id}')">
+          <span>${primaryTitle} <span class="kind rep">${kindLabel}</span></span>
+          <span>${sub.date} ${isOpen ? '▲' : '▼'}</span>
+        </div>
+        ${detail}
+      </div>
+    `;
+  }).join('');
+}
+
+// Stage 6: purely informational, fully read-only (section 9) — no interactive
+// controls, no writes. Reads only from the finished data model.
+function renderSkillsViewCard(){
+  const passed = SKILL_IDS.filter(id => state.skills[id].status === 'passed');
+  const inRotation = SKILL_IDS.filter(id => state.workingSet.includes(id));
+  const future = SKILL_IDS.filter(id => !state.workingSet.includes(id) && state.skills[id].status !== 'passed');
+
+  function rotationLine(id){
+    const meta = SKILL_META[id];
+    const label = !meta.checkable
+      ? 'open-ended'
+      : (state.skills[id].primaryRepCount > 0
+          ? `${state.skills[id].primaryRepCount}/${PASS_RULE.minPrimaryReps} reps`
+          : 'not started');
+    return `<div class="history-item"><span>${skillTitle(id)}</span><span>${label}</span></div>`;
+  }
+
+  return `
+    <div class="card">
+      <div class="card-inner">
+        <div class="lesson-num">Skills</div>
+        <h2>Your 16 skills</h2>
+
+        <span class="note-label">Passed (${passed.length})</span>
+        ${passed.length ? `<div>${passed.map(id => `<span class="tag">${skillTitle(id)}</span>`).join('')}</div>` : '<div class="empty">None yet.</div>'}
+
+        <span class="note-label" style="margin-top:16px; display:block;">In rotation (${inRotation.length})</span>
+        ${inRotation.length ? inRotation.map(rotationLine).join('') : '<div class="empty">Nothing in rotation.</div>'}
+
+        <span class="note-label" style="margin-top:16px; display:block;">Future skills (${future.length})</span>
+        ${future.length ? `<div>${future.map(id => `<span class="tag">${skillTitle(id)}</span>`).join('')}</div>` : '<div class="empty">Nothing waiting.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  const app = document.getElementById('app');
+
+  let mainCardHtml;
+  let screenLabel;
+  if(state.pendingPassConfirmation){
+    mainCardHtml = renderPassConfirmationCard();
+    screenLabel = 'Pass check';
+  } else if(showSkillsView){
+    mainCardHtml = renderSkillsViewCard();
+    screenLabel = 'Skills';
+  } else if(!warmupDone){
+    ensureWarmupSelection();
+    mainCardHtml = renderWarmupCard();
+    screenLabel = 'Warmup';
+  } else {
+    ensureCurrentBundle();
+    mainCardHtml = renderExerciseCard();
+    screenLabel = currentBundle.kind === 'drill' ? 'Drill' : 'Full exercise';
+  }
+
+  const passedCount = SKILL_IDS.filter(id => state.skills[id].status === 'passed').length;
+  // the skills-view toggle is hidden during a pending pass decision — that's the one
+  // moment this decision can be made (section 7), so nothing should let you navigate past it
+  const skillsNavHtml = state.pendingPassConfirmation ? '' : `
+    <div class="settings-row" style="margin-bottom:14px;">
+      <a onclick="toggleSkillsView()">${showSkillsView ? '← Back to exercises' : 'View your 16 skills →'}</a>
+    </div>`;
 
   app.innerHTML = `
     <header>
-      <div class="eyebrow"><span>Sketchbook</span><span>${isRevisiting ? `Revisiting lesson ${activeIndex+1}` : `Lesson ${state.currentLesson+1} of ${CURRICULUM.length}${isRemedial ? ' · remedial' : ''}`}</span></div>
+      <div class="eyebrow"><span>Sketchbook</span><span>${passedCount}/16 skills passed · ${screenLabel}</span></div>
       <h1>Your drawing tutor</h1>
-      <p class="tagline">A structured beginner curriculum with feedback after every page. Runs standalone with your own API key.</p>
-      <div class="progress-row">${pegs}</div>
+      <p class="tagline">A 16-skill tracking engine with feedback after every page. Runs standalone with your own API key.</p>
     </header>
+
+    ${skillsNavHtml}
 
     <div class="card">
       <div class="card-inner">
@@ -901,36 +1797,13 @@ function render(){
       </div>
     </div>
 
-    <div class="card ${isRemedial ? 'remedial' : ''}${isRevisiting ? ' revisit' : ''}">
-      <div class="card-inner">
-        <div class="lesson-num ${isRemedial ? 'remedial' : ''}${isRevisiting ? ' revisit' : ''}">${isRevisiting ? 'Revisit' : (isRemedial ? 'Remedial rep' : 'Lesson ' + (state.currentLesson+1))}</div>
-        <h2>${lesson.title}</h2>
-        ${revisitBanner}
-        ${remedialBanner}
-        <p class="why">${lesson.why}</p>
-        ${renderVideoLinks()}
-        ${renderMaterials()}
-        <div class="task-box">${currentTaskHtml()}</div>
-        ${uploadHtml}
-        <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])"/>
-        ${feedbackHtml}
-        ${error ? `<div class="err">${error}</div>` : ''}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-inner">
-        <div class="lesson-num">Trouble spots</div>
-        <h2 style="font-size:18px;">Recurring struggles</h2>
-        <div>${renderStruggleTags()}</div>
-      </div>
-    </div>
+    ${mainCardHtml}
 
     <div class="card">
       <div class="card-inner">
         <div class="lesson-num">Log</div>
-        <h2 style="font-size:18px;">Session history</h2>
-        <div>${renderHistory()}</div>
+        <h2 style="font-size:18px;">Recent submissions</h2>
+        <div>${renderSubmissionHistory()}</div>
       </div>
     </div>
 
@@ -938,7 +1811,7 @@ function render(){
       <div class="card-inner">
         <div class="lesson-num">Backup</div>
         <h2 style="font-size:18px;">Move progress between devices/browsers</h2>
-        <p class="key-note">Progress is tied to this exact page's origin (the URL/path it's opened from). If you ever open the file a different way and your lesson position looks reset, use this to carry it across — it does not include your API key.</p>
+        <p class="key-note">Progress is tied to this exact page's origin (the URL/path it's opened from). If you ever open the file a different way and your progress looks reset, use this to carry it across — it does not include your API key.</p>
         <div class="btn-row">
           <button class="secondary" onclick="exportBackup()">Copy backup to clipboard</button>
           <button class="secondary" onclick="toggleImport()">Restore from backup</button>
@@ -951,7 +1824,7 @@ function render(){
       </div>
     </div>
 
-    <div class="reset-link"><a onclick="if(confirm('Reset all progress? This clears your lesson position and history.')) resetProgress()">Reset all progress</a></div>
+    <div class="reset-link"><a onclick="if(confirm('Reset all progress? This clears every skill\\'s status and history.')) resetProgress()">Reset all progress</a></div>
   `;
 }
 
