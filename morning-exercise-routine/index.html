@@ -740,10 +740,13 @@
       osc.stop(now + 0.18);
     } catch (e) {}
   }
-  // Transition beep — a distinct lower pitch from the 1046/784Hz countdown
-  // beeps, used for the halfway midpoint beep and for the start/end of a
-  // side-swap pause, so these read as a different kind of cue by ear.
-  var TRANSITION_BEEP_FREQ = 523;
+  // Transition beep — a distinct pitch from the 1046/784Hz countdown beeps,
+  // used for the halfway midpoint beep and for the start/end of a side-swap
+  // pause, so these read as a different kind of cue by ear. Kept close to
+  // the countdown beeps' register (not dropped an octave) — small phone
+  // speakers reproduce lower tones much more weakly at the same volume, so
+  // a big pitch drop reads as "too quiet" even though the gain is identical.
+  var TRANSITION_BEEP_FREQ = 660;
   function transitionBeep() { beep(TRANSITION_BEEP_FREQ); }
 
   function startTimer() {
