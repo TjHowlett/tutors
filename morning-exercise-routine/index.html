@@ -135,8 +135,8 @@
       cue: "Keep a straight line from head to heels.", anim: "pushup" },
     { id: "bridge", name: "Glute bridge", category: "Strength",
       levels: [
-        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30, midpointBeep: true },
-        { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses", duration: 35 },
+        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
+        { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses", duration: 35, transitionAt: 20 },
         { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, sideSwap: true,
           note: "Both hips stay lifted throughout — alternate which foot is off the floor each rep (right, left, right...)." }
       ],
@@ -177,7 +177,7 @@
       cue: "Rise straight up through the big toe — don't let your ankles roll.", anim: "calfraise" },
     { id: "plank", name: "Modified plank", category: "Strength",
       levels: [
-        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30, midpointBeep: true },
+        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
         { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 25 },
         { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps", duration: 35 }
       ],
@@ -324,21 +324,30 @@
   }
 
   // Resolves the halfway-transition behaviour for the exercise's *current*
-  // level/hold: sideSwap (5s pause + beeps, for exercises done on one side
-  // then the other) or midpointBeep (a single beep, no pause, for exercises
-  // structured as hold-lower-repeat). Both are opt-in flags set on the
-  // relevant level object (leveled exercises) or the exercise itself
-  // (hold-key stretches), since which levels need this can vary — e.g.
-  // plank's "Hold 15s, lower, repeat" level needs a midpoint beep, but its
-  // "Hold 20s" level is a plain single hold and doesn't.
+  // level/hold:
+  //  - sideSwap: a 5s pause + beeps, for exercises done on one side then
+  //    the other. These genuinely split the duration 50/50 (the guidance
+  //    text says "half the time" or an even side-to-side rep split), so the
+  //    trigger point is always duration/2 — computed here, not stored.
+  //  - transitionAt: a single beep (no pause) at an exact number of seconds
+  //    elapsed, for exercises with a fixed first phase (e.g. "Hold 15s,
+  //    lower, repeat" out of a 30s total, or "Hold 20s, then 5 pulses" out
+  //    of 35s). This is NOT always half the duration — it's whatever the
+  //    guidance text actually says — so it's stored explicitly per level
+  //    rather than assumed.
+  // Both are opt-in, set on the relevant level object (leveled exercises)
+  // or the exercise itself (hold-key stretches), since which levels need
+  // this varies — e.g. plank's "Hold 15s, lower, repeat" level needs a
+  // transition beep, but its "Hold 20s" level is a plain single hold and
+  // doesn't.
   function getTransitionFlags(ex, state) {
-    if (ex.holdKey) return { sideSwap: !!ex.sideSwap, midpointBeep: !!ex.midpointBeep };
+    if (ex.holdKey) return { sideSwap: !!ex.sideSwap, transitionAt: ex.transitionAt || null };
     if (ex.levels) {
       var lvl = state.levels[ex.id] != null ? state.levels[ex.id] : 0;
       var levelObj = ex.levels[lvl];
-      return { sideSwap: !!levelObj.sideSwap, midpointBeep: !!levelObj.midpointBeep };
+      return { sideSwap: !!levelObj.sideSwap, transitionAt: levelObj.transitionAt || null };
     }
-    return { sideSwap: false, midpointBeep: false };
+    return { sideSwap: false, transitionAt: null };
   }
 
   function esc(str) {
@@ -723,7 +732,7 @@
       else if (audioCtx.state === "suspended") audioCtx.resume();
     } catch (e) {}
   }
-  function beep(freq) {
+  function beep(freq, peakGain) {
     if (!audioCtx) return;
     try {
       var osc = audioCtx.createOscillator();
@@ -732,7 +741,7 @@
       osc.frequency.value = freq || 880;
       var now = audioCtx.currentTime;
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(peakGain || 0.22, now + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -747,7 +756,11 @@
   // speakers reproduce lower tones much more weakly at the same volume, so
   // a big pitch drop reads as "too quiet" even though the gain is identical.
   var TRANSITION_BEEP_FREQ = 660;
-  function transitionBeep() { beep(TRANSITION_BEEP_FREQ); }
+  // Slightly louder than the standard 0.22 gain used by countdown beeps —
+  // at 660Hz (lower than the 784/1046Hz countdown tones), equal gain still
+  // reads as quieter on small phone speakers, so this compensates.
+  var TRANSITION_BEEP_GAIN = 0.3;
+  function transitionBeep() { beep(TRANSITION_BEEP_FREQ, TRANSITION_BEEP_GAIN); }
 
   function startTimer() {
     clearInterval(timerHandle);
@@ -767,15 +780,19 @@
         advance();
         return;
       }
-      // Halfway check — only for the "session" (exercise) screen, only once
-      // per exercise, and only for exercises flagged sideSwap/midpointBeep.
+      // Transition check — only for the "session" (exercise) screen, only
+      // once per exercise. sideSwap triggers at exactly half the duration.
+      // transitionAt triggers at its own exact seconds-elapsed value, which
+      // is NOT always half the duration — see getTransitionFlags.
       if (screen === "session" && !midpointDone) {
         var ex = activeExercises[exIndex];
         var duration = getDuration(ex, state);
         var flags = getTransitionFlags(ex, state);
-        if ((flags.sideSwap || flags.midpointBeep) && secondsLeft <= Math.floor(duration / 2)) {
+        var sideSwapTrigger = flags.sideSwap && secondsLeft <= Math.floor(duration / 2);
+        var transitionAtTrigger = flags.transitionAt != null && secondsLeft <= (duration - flags.transitionAt);
+        if (sideSwapTrigger || transitionAtTrigger) {
           midpointDone = true;
-          if (flags.sideSwap) {
+          if (sideSwapTrigger) {
             startSideSwapPause();
             return;
           } else {
