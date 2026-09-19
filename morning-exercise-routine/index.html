@@ -135,9 +135,9 @@
       cue: "Keep a straight line from head to heels.", anim: "pushup" },
     { id: "bridge", name: "Glute bridge", category: "Strength",
       levels: [
-        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30 },
+        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30, midpointBeep: true },
         { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses", duration: 35 },
-        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40,
+        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, sideSwap: true,
           note: "Both hips stay lifted throughout — alternate which foot is off the floor each rep (right, left, right...)." }
       ],
       cue: "Squeeze your glutes at the top — don't arch your lower back.", anim: "bridge" },
@@ -152,11 +152,11 @@
       ],
       cue: "Keep hips level and move slowly — no rushing.", anim: "birddog" },
     { id: "hamstring", name: "Standing hamstring stretch", category: "Cool down",
-      holdKey: "hamstring", guidance: "Each leg, gentle hold",
+      holdKey: "hamstring", guidance: "Each leg, gentle hold", sideSwap: true,
       note: "Split the hold between legs — lean forward over one leg for about half the time, then switch.",
       cue: "Hinge from your hips, soft bend in the knees.", anim: "hamstring" },
     { id: "hipflexor", name: "Hip flexor stretch", category: "Cool down",
-      holdKey: "hipflexor", guidance: "Each side, gentle hold",
+      holdKey: "hipflexor", guidance: "Each side, gentle hold", sideSwap: true,
       note: "Split the timer between sides — hold the lunge on one leg for about half the time, then switch.",
       cue: "Tuck your pelvis slightly to feel it at the front of the hip.", anim: "hipflexor" }
   ];
@@ -177,7 +177,7 @@
       cue: "Rise straight up through the big toe — don't let your ankles roll.", anim: "calfraise" },
     { id: "plank", name: "Modified plank", category: "Strength",
       levels: [
-        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30 },
+        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30, midpointBeep: true },
         { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 25 },
         { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps", duration: 35 }
       ],
@@ -191,18 +191,18 @@
       cue: "Lengthen through the crown of your head — don't crank your neck back.", anim: "superman" },
     { id: "sideleg", name: "Side-lying leg raises", category: "Strength",
       levels: [
-        { label: "Small raises", guidance: "8 reps each side, small controlled lift", duration: 30 },
-        { label: "Full raises", guidance: "10 reps each side", duration: 35 },
-        { label: "Raises with pulse", guidance: "10 reps each side, pulse at the top", duration: 40 }
+        { label: "Small raises", guidance: "8 reps each side, small controlled lift", duration: 30, sideSwap: true },
+        { label: "Full raises", guidance: "10 reps each side", duration: 35, sideSwap: true },
+        { label: "Raises with pulse", guidance: "10 reps each side, pulse at the top", duration: 40, sideSwap: true }
       ],
       note: "Split the reps between sides — do about half lying on each side, then switch.",
       cue: "Keep the moving leg in line with your body — don't let it drift forward.", anim: "sideleg" },
     { id: "quadstretch", name: "Standing quad stretch", category: "Cool down",
-      holdKey: "quadstretch", guidance: "Each leg, gentle hold",
+      holdKey: "quadstretch", guidance: "Each leg, gentle hold", sideSwap: true,
       note: "Split the hold between legs — hold one leg back for about half the time, then switch.",
       cue: "Keep your knees close together — use a wall or chair for balance.", anim: "quadstretch" },
     { id: "crossshoulder", name: "Cross-body shoulder stretch", category: "Cool down",
-      holdKey: "crossshoulder", guidance: "Each arm, gentle hold",
+      holdKey: "crossshoulder", guidance: "Each arm, gentle hold", sideSwap: true,
       note: "Split the hold between arms — pull one arm across for about half the time, then switch.",
       cue: "Keep the shoulder of the stretching arm relaxed — don't shrug it up.", anim: "crossshoulder" }
   ];
@@ -321,6 +321,24 @@
       return ex.levels[lvl].duration;
     }
     return ex.duration;
+  }
+
+  // Resolves the halfway-transition behaviour for the exercise's *current*
+  // level/hold: sideSwap (5s pause + beeps, for exercises done on one side
+  // then the other) or midpointBeep (a single beep, no pause, for exercises
+  // structured as hold-lower-repeat). Both are opt-in flags set on the
+  // relevant level object (leveled exercises) or the exercise itself
+  // (hold-key stretches), since which levels need this can vary — e.g.
+  // plank's "Hold 15s, lower, repeat" level needs a midpoint beep, but its
+  // "Hold 20s" level is a plain single hold and doesn't.
+  function getTransitionFlags(ex, state) {
+    if (ex.holdKey) return { sideSwap: !!ex.sideSwap, midpointBeep: !!ex.midpointBeep };
+    if (ex.levels) {
+      var lvl = state.levels[ex.id] != null ? state.levels[ex.id] : 0;
+      var levelObj = ex.levels[lvl];
+      return { sideSwap: !!levelObj.sideSwap, midpointBeep: !!levelObj.midpointBeep };
+    }
+    return { sideSwap: false, midpointBeep: false };
   }
 
   function esc(str) {
@@ -685,6 +703,17 @@
   var timerHandle = null;
   var root = document.getElementById("app");
 
+  // Halfway-transition state, used during a "session" exercise that has
+  // sideSwap or midpointBeep set (see getTransitionFlags). midpointDone
+  // guards against the halfway check firing more than once per exercise.
+  // sideSwapPause / sideSwapSecondsLeft track the 5s "Switch sides" break:
+  // while sideSwapPause is true, the main exercise countdown is frozen and
+  // a separate short countdown runs instead.
+  var midpointDone = false;
+  var sideSwapPause = false;
+  var sideSwapSecondsLeft = 0;
+  var SIDE_SWAP_PAUSE_SECONDS = 5;
+
   function persist(next) { state = next; saveState(state); }
 
   var audioCtx = null;
@@ -711,21 +740,63 @@
       osc.stop(now + 0.18);
     } catch (e) {}
   }
+  // Transition beep — a distinct lower pitch from the 1046/784Hz countdown
+  // beeps, used for the halfway midpoint beep and for the start/end of a
+  // side-swap pause, so these read as a different kind of cue by ear.
+  var TRANSITION_BEEP_FREQ = 523;
+  function transitionBeep() { beep(TRANSITION_BEEP_FREQ); }
 
   function startTimer() {
     clearInterval(timerHandle);
     timerHandle = setInterval(function () {
+      if (sideSwapPause) {
+        sideSwapSecondsLeft -= 1;
+        if (sideSwapSecondsLeft <= 0) {
+          endSideSwapPause();
+        } else {
+          tick();
+        }
+        return;
+      }
       secondsLeft -= 1;
       if (secondsLeft <= 0) {
         clearInterval(timerHandle);
         advance();
-      } else {
-        if (secondsLeft <= 3) beep(secondsLeft === 1 ? 1046 : 784);
-        tick();
+        return;
       }
+      // Halfway check — only for the "session" (exercise) screen, only once
+      // per exercise, and only for exercises flagged sideSwap/midpointBeep.
+      if (screen === "session" && !midpointDone) {
+        var ex = activeExercises[exIndex];
+        var duration = getDuration(ex, state);
+        var flags = getTransitionFlags(ex, state);
+        if ((flags.sideSwap || flags.midpointBeep) && secondsLeft <= Math.floor(duration / 2)) {
+          midpointDone = true;
+          if (flags.sideSwap) {
+            startSideSwapPause();
+            return;
+          } else {
+            transitionBeep();
+          }
+        }
+      }
+      if (secondsLeft <= 3) beep(secondsLeft === 1 ? 1046 : 784);
+      tick();
     }, 1000);
   }
   function stopTimer() { clearInterval(timerHandle); }
+
+  function startSideSwapPause() {
+    sideSwapPause = true;
+    sideSwapSecondsLeft = SIDE_SWAP_PAUSE_SECONDS;
+    transitionBeep();
+    render();
+  }
+  function endSideSwapPause() {
+    sideSwapPause = false;
+    transitionBeep();
+    render();
+  }
 
   function startSession() {
     unlockAudio();
@@ -737,6 +808,7 @@
   function beginExercise(idx) {
     var ex = activeExercises[idx];
     exIndex = idx; screen = "session"; secondsLeft = getDuration(ex, state); running = true;
+    midpointDone = false; sideSwapPause = false; sideSwapSecondsLeft = 0;
     render(); startTimer();
   }
   function advance() {
@@ -894,6 +966,28 @@
     var ex = activeExercises[exIndex];
     var info = getGuidance(ex, state);
     var duration = getDuration(ex, state);
+
+    if (sideSwapPause) {
+      return (
+        '<div style="display:flex;flex-direction:column;gap:12px">' +
+          '<div class="top-bar">' +
+            '<button id="btn-quit" class="icon-btn">' + iconX(18, "var(--ink-soft)") + '</button>' +
+            buildDots(exIndex, activeExercises.length) +
+            '<div style="width:32px"></div>' +
+          '</div>' +
+          '<div class="col-center" style="gap:2px">' +
+            '<div style="font-size:14px;color:var(--ink-soft)">Switch sides</div>' +
+            '<div class="serif" id="countdown" style="font-size:44px;font-weight:500;color:var(--sage)">' + sideSwapSecondsLeft + '</div>' +
+          '</div>' +
+          buildExercisePreview(ex, info, { animHeight: 150 }) +
+          '<div class="row-center" style="gap:14px;margin-top:4px">' +
+            '<button id="btn-pause" class="pill-btn">' + (running ? iconPause(16, "var(--panel)") : iconPlay(16, "var(--panel)")) + (running ? "Pause" : "Resume") + '</button>' +
+            '<button id="btn-skip" class="pill-btn outline">Skip ' + iconSkip(16, "var(--ink)") + '</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+
     var pct = 1 - secondsLeft / duration;
     return (
       '<div style="display:flex;flex-direction:column;gap:14px">' +
@@ -1002,6 +1096,11 @@
 
   // Lightweight per-second update: just the number + ring, no full re-render (avoids flicker & re-binding cost)
   function tick() {
+    if (sideSwapPause) {
+      var pauseNumEl = document.getElementById("countdown");
+      if (pauseNumEl) pauseNumEl.textContent = sideSwapSecondsLeft;
+      return;
+    }
     var numEl = document.getElementById("countdown");
     if (numEl) numEl.textContent = secondsLeft;
     var ringEl = document.getElementById("ring-progress");
