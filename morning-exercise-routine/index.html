@@ -58,6 +58,29 @@
   @keyframes quadArm{0%,10%,100%{d:path("M102,80 L108,106 L110,132")}45%,64%{d:path("M102,80 L122,104 L144,126")}}
   @keyframes crossArm{0%,12%,100%{d:path("M82,74 L78,100 L76,126")}48%,66%{d:path("M82,74 L104,84 L128,80")}}
   @keyframes crossPull{0%,12%,100%{d:path("M118,74 L122,100 L124,126")}48%,66%{d:path("M118,74 L128,96 L110,88")}}
+  @keyframes sq1Shin{0%,12%{transform:rotate(0deg)}48%,58%{transform:rotate(-24deg)}92%,100%{transform:rotate(0deg)}}
+  @keyframes sq1Thigh{0%,12%{transform:rotate(0deg)}48%,58%{transform:rotate(84deg)}92%,100%{transform:rotate(0deg)}}
+  @keyframes sq1Torso{0%,12%{transform:rotate(0deg)}48%,58%{transform:rotate(-85deg)}92%,100%{transform:rotate(0deg)}}
+  @keyframes pu1Body{0%,12%{transform:rotate(0deg)}48%,60%{transform:rotate(5deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes pu1Arm{0%,12%{transform:rotate(0deg)}48%,60%{transform:rotate(-8deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes pu2Body{0%,12%{transform:rotate(0deg)}48%,60%{transform:rotate(4deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes pu2Arm{0%,12%{transform:rotate(0deg)}48%,60%{transform:rotate(-7deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes cr1Rise{0%,10%{transform:translateY(0)}45%,57%{transform:translateY(-8px)}90%,100%{transform:translateY(0)}}
+  @keyframes cr1FootL{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(-24deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes cr1FootR{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(24deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes cr2Rise{0%,10%{transform:translateY(0)}45%,57%{transform:translateY(-8px)}90%,100%{transform:translateY(0)}}
+  @keyframes cr2Foot{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(24deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes pk1Hold{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-2px) rotate(-0.8deg)}}
+  @keyframes pk2Hold{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+  @keyframes pk2Upper{0%,18%{transform:rotate(0deg)}48%,60%{transform:rotate(-27deg)}86%,100%{transform:rotate(0deg)}}
+  @keyframes pk2Fore{0%,18%{transform:rotate(0deg)}48%,60%{transform:rotate(121deg)}86%,100%{transform:rotate(0deg)}}
+  @keyframes bd0Thigh{0%,18%{transform:rotate(0deg)}50%,62%{transform:rotate(-31.4deg)}88%,100%{transform:rotate(0deg)}}
+  @keyframes bd0Shin{0%,18%{transform:rotate(0deg)}50%,62%{transform:rotate(-33.7deg)}88%,100%{transform:rotate(0deg)}}
+  @keyframes sm0Chest{0%,14%{transform:rotate(0deg)}48%,60%{transform:rotate(14deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes sm0Arm{0%,14%{transform:rotate(0deg)}48%,60%{transform:rotate(12deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes br2Torso{0%,12%{transform:rotate(0deg)}46%,58%{transform:rotate(-26deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes br2Thigh{0%,12%{transform:rotate(0deg)}46%,58%{transform:rotate(61.8deg)}90%,100%{transform:rotate(0deg)}}
+  @keyframes br2Shin{0%,12%{transform:rotate(0deg)}46%,58%{transform:rotate(-23.4deg)}90%,100%{transform:rotate(0deg)}}
   html, body { margin: 0; padding: 0; background: var(--bg); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -122,28 +145,28 @@
     { id: "squat", name: "Squats", category: "Strength",
       levels: [
         { label: "Chair-assisted squat", guidance: "8 slow reps, hands lightly on a chair", duration: 30 },
-        { label: "Bodyweight squat", guidance: "10 reps at a steady pace", duration: 35 },
-        { label: "Paused squat", guidance: "10 reps, pause 2s at the bottom", duration: 45 }
+        { label: "Bodyweight squat", guidance: "10 reps at a steady pace", duration: 35, anim: "squat_l1" },
+        { label: "Paused squat", guidance: "10 reps, pause 2s at the bottom", duration: 45, anim: "squat_l1" }
       ],
       cue: "Keep knees tracking over your toes, chest lifted.", anim: "squat" },
     { id: "pushup", name: "Incline push-ups", category: "Strength",
       levels: [
         { label: "Wall push-up", guidance: "8 reps, hands on a wall", duration: 30 },
-        { label: "Counter push-up", guidance: "10 reps, hands on a counter or table", duration: 35 },
-        { label: "Chair push-up", guidance: "10 reps, hands on a low, stable chair", duration: 35 }
+        { label: "Counter push-up", guidance: "10 reps, hands on a counter or table", duration: 35, anim: "pushup_l1" },
+        { label: "Chair push-up", guidance: "10 reps, hands on a low, stable chair", duration: 35, anim: "pushup_l2" }
       ],
       cue: "Keep a straight line from head to heels.", anim: "pushup" },
     { id: "bridge", name: "Glute bridge", category: "Strength",
       levels: [
         { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
         { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses", duration: 35, transitionAt: 20 },
-        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, sideSwap: true,
+        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, sideSwap: true, anim: "bridge_l2",
           note: "Both hips stay lifted throughout — alternate which foot is off the floor each rep (right, left, right...)." }
       ],
       cue: "Squeeze your glutes at the top — don't arch your lower back.", anim: "bridge" },
     { id: "birddog", name: "Bird-dog", category: "Strength",
       levels: [
-        { label: "Knee lifts", guidance: "5 slow lifts each side, knees stay low", duration: 30,
+        { label: "Knee lifts", guidance: "5 slow lifts each side, knees stay low", duration: 30, anim: "birddog_l0",
           note: "Legs only at this level — alternate knees each rep, no arm movement." },
         { label: "Opposite arm & leg extend", guidance: "5 reps each side", duration: 35,
           note: "Diagonal pairs: right arm with left leg, then left arm with right leg. Alternate the pairing each rep." },
@@ -171,20 +194,20 @@
     { id: "calfraise", name: "Calf raises", category: "Strength",
       levels: [
         { label: "Chair-assisted calf raise", guidance: "12 slow reps, hands lightly on a chair", duration: 30 },
-        { label: "Bodyweight calf raise", guidance: "15 reps at a steady pace", duration: 35 },
-        { label: "Single-leg calf raise", guidance: "8 reps each leg", duration: 35 }
+        { label: "Bodyweight calf raise", guidance: "15 reps at a steady pace", duration: 35, anim: "calfraise_l1" },
+        { label: "Single-leg calf raise", guidance: "8 reps each leg", duration: 35, anim: "calfraise_l2" }
       ],
       cue: "Rise straight up through the big toe — don't let your ankles roll.", anim: "calfraise" },
     { id: "plank", name: "Modified plank", category: "Strength",
       levels: [
         { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
-        { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 25 },
-        { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps", duration: 35 }
+        { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 25, anim: "plank_l1" },
+        { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps", duration: 35, anim: "plank_l2" }
       ],
       cue: "Keep hips level — don't let them sag or pike up.", anim: "plank" },
     { id: "superman", name: "Superman", category: "Strength",
       levels: [
-        { label: "Superman — arms only", guidance: "8 slow reps, lifting chest and arms", duration: 30 },
+        { label: "Superman — arms only", guidance: "8 slow reps, lifting chest and arms", duration: 30, anim: "superman_l0" },
         { label: "Superman — full extension", guidance: "8 reps, arms and legs together", duration: 30 },
         { label: "Superman with hold", guidance: "8 reps, hold 2s at the top", duration: 40 }
       ],
@@ -348,6 +371,21 @@
       return { sideSwap: !!levelObj.sideSwap, transitionAt: levelObj.transitionAt || null };
     }
     return { sideSwap: false, transitionAt: null };
+  }
+
+  // Resolves which ANIMS entry to draw for the exercise's *current* level.
+  // Most exercises show the same diagram at every level (ex.anim), but a
+  // few now have a level-specific variant (e.g. squat looks different once
+  // the chair is gone) — set as an optional `anim` field on that level
+  // object, falling back to the exercise's default when a level doesn't
+  // override it.
+  function getAnim(ex, state) {
+    if (ex.levels) {
+      var lvl = state.levels[ex.id] != null ? state.levels[ex.id] : 0;
+      var levelObj = ex.levels[lvl];
+      return levelObj.anim || ex.anim;
+    }
+    return ex.anim;
   }
 
   function esc(str) {
@@ -684,6 +722,197 @@
         '<path d="M82,74 L78,100 L76,126" style="animation:crossArm calc(4.8s * var(--pace)) ease-in-out infinite"></path>' +
         '<path d="M118,74 L122,100 L124,126" style="animation:crossPull calc(4.8s * var(--pace)) ease-in-out infinite"></path>' +
         '</g></svg>';
+    },
+    squat_l1: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M28,178 L178,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M92,166 L92,176 L76,176"></path>' +
+        '<g style="animation:sq1Shin calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 166px">' +
+        '<path d="M92,166 L92,136"></path>' +
+        '<g style="animation:sq1Thigh calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 136px">' +
+        '<path d="M92,136 L96,104"></path>' +
+        '<g style="animation:sq1Torso calc(4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:96px 104px">' +
+        '<path d="M96,104 L94,62"></path>' +
+        '<path d="M94,62 L91,56"></path>' +
+        '<circle cx="88" cy="48" r="10"></circle>' +
+        '<circle cx="79" cy="50" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M94,64 L74,70 L54,66"></path>' +
+        '</g></g></g></g></svg>';
+    },
+    pushup_l1: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M16,178 L184,178"></path>' +
+        '<path d="M134,104 L190,104"></path>' +
+        '<path d="M140,104 L140,178"></path>' +
+        '<path d="M186,104 L186,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M34,176 L18,178"></path>' +
+        '<g style="animation:pu1Body calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:34px 176px">' +
+        '<path d="M34,176 L74,132 L110,90"></path>' +
+        '<path d="M110,90 L117,84"></path>' +
+        '<circle cx="126" cy="76" r="10"></circle>' +
+        '<circle cx="134" cy="80" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M110,90 L132,100 L150,104" style="animation:pu1Arm calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:150px 104px"></path>' +
+        '</g></svg>';
+    },
+    pushup_l2: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M126,138 L188,138"></path>' +
+        '<path d="M132,138 L132,178"></path>' +
+        '<path d="M184,138 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M26,176 L12,178"></path>' +
+        '<g style="animation:pu2Body calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:26px 176px">' +
+        '<path d="M26,176 L66,150 L104,118"></path>' +
+        '<path d="M104,118 L111,113"></path>' +
+        '<circle cx="120" cy="106" r="10"></circle>' +
+        '<circle cx="128" cy="110" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M104,118 L124,132 L142,138" style="animation:pu2Arm calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:142px 138px"></path>' +
+        '</g></svg>';
+    },
+    calfraise_l1: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M28,178 L178,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:cr1Rise calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92px 174px">' +
+        '<path d="M92,112 L84,144 L82,174"></path>' +
+        '<path d="M92,112 L100,144 L104,174"></path>' +
+        '<path d="M92,112 L92,72"></path>' +
+        '<path d="M76,72 L108,72"></path>' +
+        '<path d="M76,72 L70,98 L70,120"></path>' +
+        '<path d="M108,72 L114,98 L116,120"></path>' +
+        '<path d="M92,70 L92,62"></path>' +
+        '<circle cx="92" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M82,174 L64,177" style="animation:cr1FootL calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:64px 177px"></path>' +
+        '<path d="M104,174 L116,177" style="animation:cr1FootR calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:116px 177px"></path>' +
+        '</g></svg>';
+    },
+    calfraise_l2: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M28,178 L178,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:cr2Rise calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:98px 174px">' +
+        '<path d="M92,112 L96,142 L98,172"></path>' +
+        '<path d="M92,112 L80,134 L88,150"></path>' +
+        '<path d="M88,150 L98,152"></path>' +
+        '<path d="M92,112 L92,72"></path>' +
+        '<path d="M76,72 L108,72"></path>' +
+        '<path d="M76,72 L68,98 L68,120"></path>' +
+        '<path d="M108,72 L116,98 L118,120"></path>' +
+        '<path d="M92,70 L92,62"></path>' +
+        '<circle cx="92" cy="50" r="11"></circle>' +
+        '<circle cx="100" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g>' +
+        '<path d="M98,172 L114,176" style="animation:cr2Foot calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:114px 176px"></path>' +
+        '</g></svg>';
+    },
+    plank_l1: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M22,176 L182,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:pk1Hold calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 150px">' +
+        '<path d="M74,132 L70,174"></path>' +
+        '<path d="M70,174 L44,174"></path>' +
+        '<path d="M74,132 L120,150 L164,168"></path>' +
+        '<path d="M164,168 L174,176"></path>' +
+        '<path d="M74,132 L63,126"></path>' +
+        '<circle cx="54" cy="121" r="10"></circle>' +
+        '<circle cx="46" cy="124" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '</g></g></svg>';
+    },
+    plank_l2: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M22,176 L182,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<g style="animation:pk2Hold calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 150px">' +
+        '<path d="M74,132 L70,174"></path>' +
+        '<path d="M70,174 L44,174"></path>' +
+        '<path d="M74,132 L120,150 L164,168"></path>' +
+        '<path d="M164,168 L174,176"></path>' +
+        '<path d="M74,132 L63,126"></path>' +
+        '<circle cx="54" cy="121" r="10"></circle>' +
+        '<circle cx="46" cy="124" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:pk2Upper calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:74px 132px">' +
+        '<path d="M74,132 L78,154"></path>' +
+        '<g style="animation:pk2Fore calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:78px 154px">' +
+        '<path d="M78,154 L64,168"></path>' +
+        '</g></g>' +
+        '</g></g></svg>';
+    },
+    birddog_l0: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M22,176 L182,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M72,112 L70,142 L70,174"></path>' +
+        '<path d="M72,112 L58,144 L56,174"></path>' +
+        '<path d="M142,112 L140,172 L164,174"></path>' +
+        '<path d="M72,112 Q107,106 142,112"></path>' +
+        '<path d="M72,112 L61,105"></path>' +
+        '<circle cx="52" cy="100" r="10"></circle>' +
+        '<circle cx="43" cy="101" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:bd0Thigh calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:142px 112px">' +
+        '<path d="M142,112 L144,142"></path>' +
+        '<g style="animation:bd0Shin calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:144px 142px">' +
+        '<path d="M144,142 L158,170"></path>' +
+        '</g></g></g></svg>';
+    },
+    superman_l0: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M18,178 L186,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M110,170 L150,175 L178,176"></path>' +
+        '<g style="animation:sm0Chest calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:110px 170px">' +
+        '<path d="M110,170 Q92,174 76,164"></path>' +
+        '<path d="M76,164 L70,160"></path>' +
+        '<circle cx="60" cy="153" r="10"></circle>' +
+        '<circle cx="52" cy="157" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:sm0Arm calc(4.4s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:76px 164px">' +
+        '<path d="M76,164 L58,172 L36,176"></path>' +
+        '</g></g></g></svg>';
+    },
+    bridge_l2: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M20,176 L184,176"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<circle cx="44" cy="166" r="10"></circle>' +
+        '<circle cx="40" cy="157" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M54,165 L64,164"></path>' +
+        '<path d="M64,164 L78,174 L92,176"></path>' +
+        '<g style="animation:br2Torso calc(4.2s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:64px 164px">' +
+        '<path d="M64,164 L112,170"></path>' +
+        '<path d="M112,170 L166,158"></path>' +
+        '<path d="M166,158 L175,153"></path>' +
+        '<g style="animation:br2Thigh calc(4.2s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:112px 170px">' +
+        '<path d="M112,170 L140,146"></path>' +
+        '<g style="animation:br2Shin calc(4.2s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:140px 146px">' +
+        '<path d="M140,146 L146,176"></path>' +
+        '</g></g></g></g></svg>';
     }
   };
 
@@ -946,7 +1175,7 @@
         '<div class="serif" style="font-size:22px;font-weight:500">' + esc(ex.name) + '</div>' +
         variantLine +
       '</div>' +
-      '<div class="anim-box" style="height:' + animHeight + 'px">' + ANIMS[ex.anim]() + '</div>' +
+      '<div class="anim-box" style="height:' + animHeight + 'px">' + ANIMS[getAnim(ex, state)]() + '</div>' +
       '<div style="text-align:center;font-size:16px;line-height:1.4">' + esc(info.guidance) + '</div>' +
       '<div style="text-align:center;font-size:16px;line-height:1.4;color:var(--ink-soft)">' + esc(ex.cue) + '</div>' +
       (info.note ? '<div style="text-align:center;font-size:12px;color:var(--ink-soft)">' + esc(info.note) + '</div>' : "")
