@@ -1009,6 +1009,19 @@ function processFeedback(state, bundle, aiRawResult, dateStr){
     });
   }
 
+  // First-pass exception (section 6): advance the queue only when the skill that just
+  // got a REAL primary result is the one currently at the front — incidental exposure to
+  // another queued skill in this same submission does NOT consume its turn, and a
+  // not-assessable primary result doesn't either ("no other action taken" per section 4).
+  // BUG FIX: this dequeue was previously missing entirely — pickPrimarySkill() read
+  // firstPassRemaining[0] but nothing ever shifted it, so the first pass got stuck
+  // serving the same skill forever instead of advancing through the initial 5.
+  if(!notAssessableSkills.includes(bundle.primarySkill) &&
+     state.firstPassRemaining.length > 0 &&
+     state.firstPassRemaining[0] === bundle.primarySkill){
+    state.firstPassRemaining.shift();
+  }
+
   // Pass check (section 7) — only the primary skill's primaryRepCount could have
   // just changed, so only it needs checking here.
   if(!notAssessableSkills.includes(bundle.primarySkill)){
