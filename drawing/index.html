@@ -147,7 +147,7 @@
   }
   .upload-zone:hover{border-color:var(--ochre); background:#FDF6E8;}
   .upload-zone img{max-width:100%; max-height:260px; border-radius:3px; display:block; margin:0 auto 10px;}
-  .upload-zone input{display:none;}
+  .upload-zone input, input[type="file"]{display:none;}
 
   button{
     font-family:'JetBrains Mono', monospace;
@@ -1550,37 +1550,41 @@ function renderVideoLinksForBank(bank){
 }
 
 function renderDrawingUpload(){
+  const cameraBtn = `<button class="secondary" onclick="document.getElementById('drawingCameraInput').click()">📷 Take photo with camera</button>`;
   if(uploadedImage){
     return `
       <div class="upload-zone" onclick="document.getElementById('drawingFileInput').click()">
         <img src="${uploadedImage.previewUrl}" alt="your practice page"/>
-        <div>Tap to replace photo</div>
-      </div>`;
+        <div>Tap to choose a different photo from your gallery/files</div>
+      </div>${cameraBtn}`;
   }
   return `
     <div class="upload-zone" onclick="document.getElementById('drawingFileInput').click()">
-      📷 Tap to upload a photo of your practice page
-    </div>`;
+      🖼️ Tap to choose a photo of your practice page from your gallery/files
+    </div>${cameraBtn}`;
 }
 
 function renderReferenceUpload(bundle){
   const label = bundle.referencePhoto === 'required' ? 'Reference photo (required)' : 'Reference photo (optional)';
   const hint = bundle.referenceNote ? ` — ${bundle.referenceNote}` : '';
+  const cameraBtn = `<button class="secondary" onclick="document.getElementById('referenceCameraInput').click()">📷 Take reference photo with camera</button>`;
   if(referenceImage){
     return `
       <div class="materials-line" style="margin-top:14px;">📎 <b>${label}</b>${hint}</div>
       <div class="upload-zone" onclick="document.getElementById('referenceFileInput').click()">
         <img src="${referenceImage.previewUrl}" alt="reference photo"/>
-        <div>Tap to replace reference photo</div>
+        <div>Tap to choose a different reference photo from your gallery/files</div>
       </div>
+      ${cameraBtn}
       <button class="secondary" onclick="clearReferenceImage()">Remove reference photo</button>
     `;
   }
   return `
     <div class="materials-line" style="margin-top:14px;">📎 <b>${label}</b>${hint}</div>
     <div class="upload-zone" onclick="document.getElementById('referenceFileInput').click()">
-      📎 Tap to add a reference photo${hint}
+      🖼️ Tap to choose a reference photo from your gallery/files${hint}
     </div>
+    ${cameraBtn}
   `;
 }
 
@@ -1685,8 +1689,9 @@ function renderExerciseCard(){
         <div class="task-box">${bundle.taskText}</div>
         ${bundle.referencePhoto !== 'none' ? renderReferenceUpload(bundle) : ''}
         ${renderDrawingUpload()}
-        <input type="file" id="drawingFileInput" accept="image/*" capture="environment" onchange="handleDrawingFile(this.files[0])"/>
-        ${bundle.referencePhoto !== 'none' ? `<input type="file" id="referenceFileInput" accept="image/*" capture="environment" onchange="handleReferenceFile(this.files[0])"/>` : ''}
+        <input type="file" id="drawingFileInput" accept="image/*" onchange="handleDrawingFile(this.files[0])"/>
+        <input type="file" id="drawingCameraInput" accept="image/*" capture="environment" onchange="handleDrawingFile(this.files[0])"/>
+        ${bundle.referencePhoto !== 'none' ? `<input type="file" id="referenceFileInput" accept="image/*" onchange="handleReferenceFile(this.files[0])"/><input type="file" id="referenceCameraInput" accept="image/*" capture="environment" onchange="handleReferenceFile(this.files[0])"/>` : ''}
         ${feedbackHtml}
         ${error ? `<div class="err">${error}</div>` : ''}
       </div>
