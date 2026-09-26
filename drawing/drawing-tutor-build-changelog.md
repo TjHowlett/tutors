@@ -168,14 +168,149 @@ handoff's build order implied.
 
 Not part of the original design doc at all — added after the initial
 build/deploy, per your request. Both photo inputs (drawing + reference)
-now carry `capture="environment"`, which prompts mobile browsers to offer
-the rear camera directly alongside the normal file/gallery picker.
+were given `capture="environment"`, intended to offer the rear camera
+directly alongside the normal file/gallery picker.
+
+**Superseded by section 11** — on phones that setting turned out to force
+the camera and remove the gallery option entirely, so it was replaced with
+two separate controls.
 
 ---
 
-## Known open item (not yet resolved)
+## 10. Post-launch bug fix (2026-09-19): first-pass exception stuck on the first skill
 
-You flagged after live testing that **incidental-skill feedback may not
-be calling/behaving correctly** — not yet diagnosed. Needs a few more
-real iterations to pin down what's actually happening before treating it
-as a confirmed bug.
+**Symptom you reported:** 4 real submissions in, all 4 had Line confidence
+as the primary skill. Proportion by eye and Drawing from observation vs
+imagination had only appeared as *incidental* skills (via Line
+confidence's own full-exercise variants), never their own primary turn —
+this also explains the "incidental-skill feedback may not be calling
+correctly" item flagged as an open question in the previous version of
+this changelog. There wasn't a separate incidental-feedback bug; it was
+this.
+
+**Root cause:** `pickPrimarySkill()` read `state.firstPassRemaining[0]`
+to decide what to serve next during the first pass, but nothing anywhere
+in the app ever removed an entry from that array once serving it — it was
+set once at state creation and never touched again. So it permanently
+returned the first listed skill (`line-confidence`) forever instead of
+advancing through the initial 5.
+
+**Why the Stage 3 test suite didn't catch it:** the original test for
+this exact behavior manually called `state.firstPassRemaining.shift()`
+itself, to simulate what the app "should" do after each pick — which
+proved the *queue's order* was correct without ever proving the *app*
+advances it. A real gap in the test's design, not just an edge case.
+
+**Fix:** `processFeedback()` now shifts the front entry off
+`firstPassRemaining` once its skill has just received a real primary
+result, with two deliberate exceptions:
+- **Incidental exposure to another queued skill does not consume its
+  turn** — e.g. Line confidence's full-exercise variant touching
+  Proportion by eye incidentally does not count as Proportion by eye's
+  own dedicated turn.
+- **A not-assessable primary result does not consume the turn either**,
+  consistent with section 4's "not-assessable... no other action taken."
+
+The test suite was corrected to go through the real
+`selectNextExercise()` → `processFeedback()` path with no manual
+shifting, plus two new regression tests specifically covering the two
+exceptions above. All 97 assertions pass.
+
+**Status:** fixed and pushed (`TjHowlett/tutors` commit `fd0039c`). You
+confirmed live that it now correctly advances Line confidence → Circle/curve
+control after one rep.
+
+---
+
+## 11. Post-launch bug fix (2026-09-25): photo upload only opened the camera
+
+**Symptom you reported:** after the camera-capture addition (section 9),
+tapping upload on a phone went straight to the camera and there was no way
+to choose an existing photo from the gallery/files.
+
+**Root cause:** `capture="environment"` tells the phone to skip its normal
+picker and open the camera directly. It's a hint that removes the choice,
+not one that adds the camera as an extra option.
+
+**Fix:** each photo (the drawing, and the reference photo where an exercise
+uses one) now has two separate controls:
+- Tapping the upload box opens the normal gallery/file picker (no `capture`).
+- A separate "Take photo with camera" button (and "Take reference photo with
+  camera") opens the camera directly (uses `capture`).
+
+Chosen over simply removing `capture` because two explicit controls behave
+the same on every phone, whereas a single input leaves the choice of
+camera-versus-gallery up to each browser.
+
+**Also fixed in passing:** the raw browser "Choose file" boxes were visible
+on the page (a leftover from Stage 4 — the CSS hid file inputs only inside
+the upload box, and these sat outside it). They're now hidden.
+
+**Verification:** checked in a desktop preview only (each upload box triggers
+the gallery input, each camera button triggers the camera input, no raw
+inputs visible). It has **not** been confirmed on a real phone camera — that
+check was left for you to do on the live site.
+
+**Status:** pushed (`TjHowlett/tutors` commit `f8240eb`).
+
+---
+
+## 12. Enhancement (2026-09-26): saved in-progress exercise + manual re-roll
+
+**Problem:** the exercise chosen by the selection engine only lived in the
+page's memory. Leaving the page (switching apps, closing the tab, a reload)
+lost it — you'd come back to a different exercise and could no longer submit
+the one you'd actually been drawing. Real cost: about an hour of drawing.
+
+**Change 1 — the loaded exercise is now saved.**
+- A new field, `state.activeExercise`, holds the whole exercise bundle
+  (skill, drill/full variant, task text, criteria/assessment wording,
+  incidental skills, reference-photo requirement) the moment it's chosen. It
+  lives inside the existing saved progress, so no extra storage key.
+- Reopening the page restores that exact exercise instead of calling the
+  selection engine again, and **skips the warm-up** (the warm-up itself is
+  still not saved — it runs once when a fresh session starts, as before).
+- The saved exercise **clears** when a submission is recorded, and when the
+  exercise is skipped or re-rolled.
+- **Exception:** if the AI can't judge the photo at all (everything comes
+  back not-assessable), the saved exercise is deliberately kept so the same
+  exercise can be retried.
+- A saved exercise that looks damaged or incomplete is ignored and replaced
+  by a normal fresh one rather than crashing the page. Older saves that
+  predate the new field load normally.
+
+**Change 2 — "↻ Give me a different exercise".**
+- Shown at the bottom of the exercise card until feedback is given.
+- Discards the loaded exercise **without counting a rep or touching any
+  skill data or history**, then re-rolls through the normal selection engine.
+- It retries a few times so you don't get the identical exercise straight
+  back. This is done in the button's own code — the selection and weighting
+  logic itself was not changed, per the brief.
+- If a photo has already been added, it asks you to confirm first, because
+  the photo would be discarded.
+
+**Deliberate limits (things that did not fit the brief as written):**
+- **Photos are still not saved.** Only the exercise is restored, so if you
+  lose the page mid-drawing you'll get the same exercise back but must
+  re-take the photo. Saving photos would be a much bigger change — phone
+  photos are large and browser storage is small — and section 2's earlier
+  decision was that photos are never persisted.
+- **No change** to how submissions are scored or stored.
+- The first time the new version loads, any exercise that was open in the
+  previous version is gone, because the previous version never saved it.
+
+**Verification:** 23 simulated checks (repeated reloads restore the same
+exercise with no warm-up; re-roll changes the exercise, touches no skill data
+and itself survives a reload; submitting clears the saved exercise; damaged
+and old-format saves load safely) plus the existing 97 engine checks, all
+passing. Simulated in a test harness, **not** tested on a real phone.
+
+**Status:** pushed (`TjHowlett/tutors` commit `d113c48`).
+
+---
+
+## Known open items
+
+None outstanding as of 2026-09-26. Still to confirm on a real phone: the two
+camera/gallery paths (section 11) and the reload-restores-same-exercise
+behaviour (section 12) were only verified in simulation.
