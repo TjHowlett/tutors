@@ -268,8 +268,9 @@ the one you'd actually been drawing. Real cost: about an hour of drawing.
   incidental skills, reference-photo requirement) the moment it's chosen. It
   lives inside the existing saved progress, so no extra storage key.
 - Reopening the page restores that exact exercise instead of calling the
-  selection engine again, and **skips the warm-up** (the warm-up itself is
-  still not saved — it runs once when a fresh session starts, as before).
+  selection engine again. (Originally this also skipped the warm-up;
+  **revised the next day, see the follow-up below** — the warm-up now runs
+  on every page open.)
 - The saved exercise **clears** when a submission is recorded, and when the
   exercise is skipped or re-rolled.
 - **Exception:** if the AI can't judge the photo at all (everything comes
@@ -290,6 +291,16 @@ the one you'd actually been drawing. Real cost: about an hour of drawing.
   the photo would be discarded.
 
 **Deliberate limits (things that did not fit the brief as written):**
+- **Warm-up follow-up (2026-09-26, same day as the change above): warm-up now
+  runs on every page open**, whether or not a saved exercise is waiting. A
+  restored exercise is shown after the warm-up is dismissed — the same saved
+  exercise, untouched. The warm-up is still a fresh random pick each time and
+  is still not saved; no "session" boundary is defined, it simply fires on
+  load. This supersedes the earlier "skips the warm-up when restoring" and
+  the older "once per newly-initiated lesson" reading in section 5.
+  (Verified with 14 simulated checks: warm-up shows on repeated opens, the
+  saved exercise stays intact behind it, and the same exercise appears after
+  it; reroll persistence unaffected.)
 - **Photos are still not saved.** Only the exercise is restored, so if you
   lose the page mid-drawing you'll get the same exercise back but must
   re-take the photo. Saving photos would be a much bigger change — phone

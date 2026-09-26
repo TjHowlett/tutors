@@ -1416,10 +1416,8 @@ function loadState(){
       const parsed = JSON.parse(raw);
       if(parsed && parsed.version === 2){
         state = Object.assign(createInitialState(), parsed); // fills in fields older saves don't have yet (e.g. activeExercise)
-        // reopening mid-exercise goes straight back to it — no warmup, no new roll
-        if(isValidBundle(state.activeExercise)){
-          warmupDone = true;
-        }
+        // warmup deliberately runs on every page open, even when a saved exercise is waiting —
+        // startExercises() then hands back that same saved exercise (see ensureCurrentBundle)
       }
       // any other/missing version is an incompatible (pre-v2) shape — ignored, start fresh
     }
