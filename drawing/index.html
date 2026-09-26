@@ -1093,6 +1093,10 @@ function createInitialState(){
 
     pendingPassConfirmation: null,  // skill id awaiting the in-session confirm/decline decision, or null
 
+    activeExercise: null,           // the loaded-but-not-yet-submitted exercise bundle, so a reload/tab switch
+                                     // restores the SAME exercise instead of re-rolling. Cleared on submission
+                                     // or when the exercise is deliberately skipped/re-rolled. Photos are NOT stored.
+
     submissions: []             // full history, newest first (unshift) — see per-submission shape in design
                                  // doc section 5. NOTE: does not include photos — those are never persisted,
                                  // only used transiently to get AI feedback (confirmed decision, not an oversight).
@@ -1141,10 +1145,50 @@ function startExercises(){
   render();
 }
 
+function isValidBundle(b){
+  if(!b || typeof b !== 'object' || !SKILL_META[b.primarySkill]) return false;
+  if(!b.taskText || (b.kind !== 'drill' && b.kind !== 'full')) return false;
+  if(!Array.isArray(b.incidentalSkills) || !b.criteriaText) return false;
+  return [b.primarySkill, ...b.incidentalSkills].every(id => SKILL_META[id] && Array.isArray(b.criteriaText[id]));
+}
+
+// Restores the saved in-progress exercise if there is one (and it looks intact);
+// otherwise asks the selection engine for a new one and saves it straight away.
 function ensureCurrentBundle(){
-  if(!currentBundle && !state.pendingPassConfirmation){
-    currentBundle = selectNextExercise(state);
+  if(currentBundle || state.pendingPassConfirmation) return;
+  if(isValidBundle(state.activeExercise)){
+    currentBundle = state.activeExercise;
+    return;
   }
+  currentBundle = selectNextExercise(state);
+  state.activeExercise = currentBundle;
+  saveState();
+}
+
+function clearActiveExercise(){
+  state.activeExercise = null;
+  saveState();
+}
+
+// Manual "give me a different exercise" — discards the loaded exercise WITHOUT
+// counting a rep or touching any skill data, then re-rolls through the normal
+// selection engine. Tries a few times so it doesn't hand back the identical exercise.
+function rerollExercise(){
+  if((uploadedImage || referenceImage) && !confirm('Swap to a different exercise? The photo you have added here will be discarded.')) return;
+  const old = currentBundle;
+  currentBundle = null;
+  uploadedImage = null;
+  referenceImage = null;
+  feedback = null;
+  error = null;
+  let next = selectNextExercise(state);
+  for(let i = 0; i < 10 && old && next.primarySkill === old.primarySkill && next.variantId === old.variantId; i++){
+    next = selectNextExercise(state);
+  }
+  currentBundle = next;
+  state.activeExercise = next;
+  saveState();
+  render();
 }
 
 function readImageFile(file, onDone){
@@ -1317,6 +1361,11 @@ async function getFeedback(){
     const rawResult = adaptAiResponseToRaw(bundle, aiJson);
     const processResult = processFeedback(state, bundle, rawResult);
     feedback = { rawResult, processResult, tip: aiJson.tip || null };
+    // a genuine result is now recorded, so the saved in-progress exercise is done with. But if the
+    // photo could not be judged at all, keep it so the same exercise can be retried.
+    if(!processResult.fullyNotAssessable){
+      state.activeExercise = null;
+    }
     saveState();
   }catch(e){
     const msg = String(e.message || '');
@@ -1338,6 +1387,8 @@ function nextExercise(){
   referenceImage = null;
   feedback = null;
   error = null;
+  state.activeExercise = null;
+  saveState();
   render();
 }
 
@@ -1364,7 +1415,11 @@ function loadState(){
     if(raw){
       const parsed = JSON.parse(raw);
       if(parsed && parsed.version === 2){
-        state = parsed;
+        state = Object.assign(createInitialState(), parsed); // fills in fields older saves don't have yet (e.g. activeExercise)
+        // reopening mid-exercise goes straight back to it — no warmup, no new roll
+        if(isValidBundle(state.activeExercise)){
+          warmupDone = true;
+        }
       }
       // any other/missing version is an incompatible (pre-v2) shape — ignored, start fresh
     }
@@ -1694,6 +1749,7 @@ function renderExerciseCard(){
         ${bundle.referencePhoto !== 'none' ? `<input type="file" id="referenceFileInput" accept="image/*" onchange="handleReferenceFile(this.files[0])"/><input type="file" id="referenceCameraInput" accept="image/*" capture="environment" onchange="handleReferenceFile(this.files[0])"/>` : ''}
         ${feedbackHtml}
         ${error ? `<div class="err">${error}</div>` : ''}
+        ${(!feedback && !loading) ? `<div class="reset-link" style="margin-top:18px;"><a onclick="rerollExercise()">↻ Give me a different exercise</a></div>` : ''}
       </div>
     </div>
   `;
