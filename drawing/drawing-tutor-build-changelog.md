@@ -114,7 +114,8 @@ Two further implementation decisions not explicitly covered by the doc:
 - **Warmup timing**: runs once per newly-initiated lesson/session (your
   clarification), tracked as in-memory (non-persisted) state — not once
   per page load as I'd first guessed, and not tied to any fixed calendar
-  cadence.
+  cadence. **Superseded by section 13:** the warm-up now runs on every page
+  open.
 - **The old fixed-lesson-position progress bar (pegs) is gone**, replaced
   with a simple "X/16 skills passed" counter in the header, since there's
   no single linear position left to show a bar for.
@@ -268,9 +269,8 @@ the one you'd actually been drawing. Real cost: about an hour of drawing.
   incidental skills, reference-photo requirement) the moment it's chosen. It
   lives inside the existing saved progress, so no extra storage key.
 - Reopening the page restores that exact exercise instead of calling the
-  selection engine again. (Originally this also skipped the warm-up;
-  **revised the next day, see the follow-up below** — the warm-up now runs
-  on every page open.)
+  selection engine again. (As first built, this also skipped the warm-up;
+  that was changed later the same day — see section 13.)
 - The saved exercise **clears** when a submission is recorded, and when the
   exercise is skipped or re-rolled.
 - **Exception:** if the AI can't judge the photo at all (everything comes
@@ -291,16 +291,6 @@ the one you'd actually been drawing. Real cost: about an hour of drawing.
   the photo would be discarded.
 
 **Deliberate limits (things that did not fit the brief as written):**
-- **Warm-up follow-up (2026-09-26, same day as the change above): warm-up now
-  runs on every page open**, whether or not a saved exercise is waiting. A
-  restored exercise is shown after the warm-up is dismissed — the same saved
-  exercise, untouched. The warm-up is still a fresh random pick each time and
-  is still not saved; no "session" boundary is defined, it simply fires on
-  load. This supersedes the earlier "skips the warm-up when restoring" and
-  the older "once per newly-initiated lesson" reading in section 5.
-  (Verified with 14 simulated checks: warm-up shows on repeated opens, the
-  saved exercise stays intact behind it, and the same exercise appears after
-  it; reroll persistence unaffected.)
 - **Photos are still not saved.** Only the exercise is restored, so if you
   lose the page mid-drawing you'll get the same exercise back but must
   re-take the photo. Saving photos would be a much bigger change — phone
@@ -311,17 +301,46 @@ the one you'd actually been drawing. Real cost: about an hour of drawing.
   previous version is gone, because the previous version never saved it.
 
 **Verification:** 23 simulated checks (repeated reloads restore the same
-exercise with no warm-up; re-roll changes the exercise, touches no skill data
-and itself survives a reload; submitting clears the saved exercise; damaged
-and old-format saves load safely) plus the existing 97 engine checks, all
+exercise; re-roll changes the exercise, touches no skill data and itself
+survives a reload; submitting clears the saved exercise; damaged and
+old-format saves load safely) plus the existing 97 engine checks, all
 passing. Simulated in a test harness, **not** tested on a real phone.
 
 **Status:** pushed (`TjHowlett/tutors` commit `d113c48`).
 
 ---
 
+## 13. Follow-up (2026-09-26, later the same day): warm-up on every page open
+
+**Change:** section 12 originally skipped the warm-up whenever a saved
+exercise was being restored. That was reversed: the warm-up now runs **every
+time the page is opened**, whether or not a saved exercise is waiting.
+
+**Behaviour now:**
+- Opening the page always shows a warm-up first. It's a fresh random pick each
+  time and is still not saved.
+- After the warm-up is dismissed, the same saved exercise appears, untouched.
+- No "session" boundary is defined; the warm-up simply fires on load.
+
+**This supersedes** two earlier statements: section 12's "skips the warm-up
+when restoring", and section 5's reading that the warm-up runs "once per
+newly-initiated lesson/session".
+
+**Not changed:** the exercise saving and the "↻ Give me a different exercise"
+button behave exactly as described in section 12.
+
+**Verification:** 14 simulated checks (the warm-up shows on repeated opens, the
+saved exercise stays intact behind it, the same exercise appears after it, and
+a re-rolled exercise still survives a reload). Simulated only, **not** tested
+on a real phone.
+
+**Status:** pushed (`TjHowlett/tutors` commit `8c0e77a`).
+
+---
+
 ## Known open items
 
 None outstanding as of 2026-09-26. Still to confirm on a real phone: the two
-camera/gallery paths (section 11) and the reload-restores-same-exercise
-behaviour (section 12) were only verified in simulation.
+camera/gallery paths (section 11), and the reload-restores-same-exercise and
+warm-up-on-every-open behaviour (sections 12 and 13) were only verified in
+simulation.
