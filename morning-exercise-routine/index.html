@@ -146,7 +146,7 @@
       levels: [
         { label: "Chair-assisted squat", guidance: "8 slow reps, hands lightly on a chair", duration: 30 },
         { label: "Bodyweight squat", guidance: "10 reps at a steady pace", duration: 35, anim: "squat_l1" },
-        { label: "Paused squat", guidance: "10 reps, pause 2s at the bottom", duration: 45, anim: "squat_l1" }
+        { label: "Paused squat", guidance: "10 reps, pause 2s at the bottom", duration: 50, anim: "squat_l1" }
       ],
       cue: "Keep knees tracking over your toes, chest lifted.", anim: "squat" },
     { id: "pushup", name: "Incline push-ups", category: "Strength",
@@ -158,9 +158,9 @@
       cue: "Keep a straight line from head to heels.", anim: "pushup" },
     { id: "bridge", name: "Glute bridge", category: "Strength",
       levels: [
-        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
+        { label: "Bridge hold", guidance: "Hold 15s, lower, repeat", duration: 35, transitionAt: 15 },
         { label: "Bridge + pulses", guidance: "Hold 20s, then 5 small pulses", duration: 35, transitionAt: 20 },
-        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, sideSwap: true, anim: "bridge_l2",
+        { label: "Alternating single-leg bridge", guidance: "Lift one foot at a time, 5 each side", duration: 40, anim: "bridge_l2",
           note: "Both hips stay lifted throughout — alternate which foot is off the floor each rep (right, left, right...)." }
       ],
       cue: "Squeeze your glutes at the top — don't arch your lower back.", anim: "bridge" },
@@ -195,13 +195,13 @@
       levels: [
         { label: "Chair-assisted calf raise", guidance: "12 slow reps, hands lightly on a chair", duration: 30 },
         { label: "Bodyweight calf raise", guidance: "15 reps at a steady pace", duration: 35, anim: "calfraise_l1" },
-        { label: "Single-leg calf raise", guidance: "8 reps each leg", duration: 35, anim: "calfraise_l2" }
+        { label: "Single-leg calf raise", guidance: "8 reps each leg", duration: 40, sideSwap: true, anim: "calfraise_l2" }
       ],
       cue: "Rise straight up through the big toe — don't let your ankles roll.", anim: "calfraise" },
     { id: "plank", name: "Modified plank", category: "Strength",
       levels: [
-        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 30, transitionAt: 15 },
-        { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 25, anim: "plank_l1" },
+        { label: "Knee plank hold", guidance: "Hold 15s, lower, repeat", duration: 35, transitionAt: 15 },
+        { label: "Full forearm plank hold", guidance: "Hold 20s", duration: 20, anim: "plank_l1" },
         { label: "Plank with shoulder taps", guidance: "Hold the plank, 10 alternating taps", duration: 35, anim: "plank_l2" }
       ],
       cue: "Keep hips level — don't let them sag or pike up.", anim: "plank" },
@@ -214,9 +214,9 @@
       cue: "Lengthen through the crown of your head — don't crank your neck back.", anim: "superman" },
     { id: "sideleg", name: "Side-lying leg raises", category: "Strength",
       levels: [
-        { label: "Small raises", guidance: "8 reps each side, small controlled lift", duration: 30, sideSwap: true },
-        { label: "Full raises", guidance: "10 reps each side", duration: 35, sideSwap: true },
-        { label: "Raises with pulse", guidance: "10 reps each side, pulse at the top", duration: 40, sideSwap: true }
+        { label: "Small raises", guidance: "8 reps each side, small controlled lift", duration: 35, sideSwap: true },
+        { label: "Full raises", guidance: "10 reps each side", duration: 40, sideSwap: true },
+        { label: "Raises with pulse", guidance: "10 reps each side, pulse at the top", duration: 50, sideSwap: true }
       ],
       note: "Split the reps between sides — do about half lying on each side, then switch.",
       cue: "Keep the moving leg in line with your body — don't let it drift forward.", anim: "sideleg" },
@@ -1101,7 +1101,11 @@
     var streak = computeStreak(state.history);
     var upcomingLetter = getNextSetLetter(state);
     var upcomingExercises = SETS[upcomingLetter];
-    var totalSec = upcomingExercises.reduce(function (a, e) { return a + getDuration(e, state); }, 0) + REST_SECONDS * (upcomingExercises.length - 1);
+    var totalSec = upcomingExercises.reduce(function (a, e) {
+      // Add the 5s "Switch sides" pause for exercises that have one.
+      var pause = getTransitionFlags(e, state).sideSwap ? SIDE_SWAP_PAUSE_SECONDS : 0;
+      return a + getDuration(e, state) + pause;
+    }, 0) + REST_SECONDS * (upcomingExercises.length - 1);
     var totalMin = Math.round(totalSec / 60);
     var streakHtml = streak > 0
       ? '<div style="display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--ink-soft);margin-bottom:8px">' +
