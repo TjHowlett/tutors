@@ -2640,7 +2640,7 @@ code, pre { font-family: var(--font-code); }
 <script>
 // Deep Jade button sweep, hold version (deep-jade-theme.md, section 4): this page redraws on every tap,
 // so a tap starts the sweep and runs the button's action SWEEP_HOLD_MS later. Set it to 0 to remove the pause.
-var SWEEP_HOLD_MS = 450;
+var SWEEP_HOLD_MS = 240;
 document.addEventListener('click', function (e) {
   var b = e.target.closest('.button');
   if (!b) return;

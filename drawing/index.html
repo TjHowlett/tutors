@@ -2244,7 +2244,7 @@ loadState();
 // 2. Most taps in this tool redraw the whole page, which replaces the button before a sweep can
 //    be seen. So a tap now starts the sweep and runs the button's action SWEEP_HOLD_MS later.
 //    Set SWEEP_HOLD_MS to 0 to remove the pause (the sweep then only shows on buttons that stay put).
-var SWEEP_HOLD_MS = 450;
+var SWEEP_HOLD_MS = 240;
 document.addEventListener('click', function (e) {
   var b = e.target.closest('.button');
   if (!b) return;
