@@ -5,277 +5,405 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sketchbook — a drawing tutor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%8F%EF%B8%8F</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper: #F1ECE0;
-    --paper-line: #D8D0BC;
-    --graphite: #2B2A28;
-    --graphite-soft: #6B6459;
-    --red-pen: #B23A2E;
-    --ochre: #C68A2E;
-    --sage: #6E7C59;
-    --card-shadow: 0 1px 0 rgba(43,42,40,0.06);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:
-      repeating-linear-gradient(var(--paper) 0 27px, var(--paper-line) 27px 28px),
-      var(--paper);
-    color:var(--graphite);
-    font-family:'Source Serif 4', Georgia, serif;
-    min-height:100vh;
-    padding: 28px 16px 60px;
-  }
-  .wrap{max-width:640px; margin:0 auto;}
-  header{margin-bottom:22px;}
-  .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--graphite-soft);
-    display:flex; justify-content:space-between; align-items:baseline;
-  }
-  h1{
-    font-size:30px;
-    margin:4px 0 2px;
-    font-weight:600;
-    letter-spacing:-0.01em;
-  }
-  .tagline{color:var(--graphite-soft); font-size:14px; margin:0;}
+/* ============================================================
+   Deep Jade theme - pasted unchanged from deep-jade-theme.css
+   ============================================================ */
+/* Deep Jade - personal theme for TJ's HTML tools
+   Dark is the default. The light (silver) version switches on automatically
+   when the device is set to light mode. */
 
-  .progress-row{display:flex; gap:5px; margin-top:14px;}
-  .peg{
-    flex:1; height:6px; border-radius:3px;
-    background: var(--paper-line);
-  }
-  .peg.done{background: var(--sage);}
-  .peg.current{background: var(--ochre);}
-  .peg.clickable{cursor:pointer;}
-  .peg.revisiting{background: var(--red-pen); outline:2px solid var(--red-pen); outline-offset:1px;}
+:root {
+  color-scheme: dark light;
 
-  .card{
-    background: #FBF9F2;
-    border:1px solid var(--paper-line);
-    border-radius:3px;
-    padding:20px 20px 22px;
-    margin-bottom:18px;
-    box-shadow: var(--card-shadow);
-    position:relative;
-  }
-  .card::before{
-    content:"";
-    position:absolute; left:0; top:14px; bottom:14px; width:3px;
-    background: var(--ochre);
-    border-radius:2px;
-  }
-  .card.remedial::before{background: var(--red-pen);}
-  .card.revisit::before{background: var(--sage);}
-  .card-inner{padding-left:14px;}
+  /* fonts */
+  --font-body: "Inter Tight", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-code: ui-monospace, Consolas, "Courier New", monospace;
+  --font-weight-body: 400;
+  --font-weight-heading: 600;
+  --font-weight-button: 500;
+  --letter-spacing-heading: -0.01em;
 
-  .lesson-num{
-    font-family:'JetBrains Mono', monospace;
-    font-size:12px; color:var(--ochre); font-weight:500;
-    text-transform:uppercase; letter-spacing:0.08em;
-  }
-  .lesson-num.remedial{color:var(--red-pen);}
-  .lesson-num.revisit{color:var(--sage);}
-  h2{margin:4px 0 10px; font-size:22px;}
-  .why{
-    font-size:14.5px; color:var(--graphite-soft); line-height:1.5;
-    margin:0 0 14px; font-style:italic;
-  }
-  .task-box{
-    background: var(--paper);
-    border:1px dashed var(--paper-line);
-    border-radius:3px;
-    padding:14px 16px;
-    font-size:15px;
-    line-height:1.5;
-  }
-  .task-box b{color:var(--graphite);}
+  /* corners and spacing */
+  --radius-card: 8px;
+  --radius-button: 8px;
+  --radius-input: 8px;
+  --space-card-padding: 14px;
+  --space-row-padding: 8px 12px;
+  --space-gap: 8px;
 
-  .remedial-banner{
-    background: #FBEDE9;
-    border:1px solid #E4B7AC;
-    color: var(--red-pen);
-    border-radius:3px;
-    padding:10px 14px;
-    font-size:13.5px;
-    line-height:1.45;
-    margin-bottom:14px;
-    font-family:'JetBrains Mono', monospace;
-  }
+  /* page, cards and words */
+  --color-background: #000000;
+  --background-page: #000000;
+  --color-surface: #0E0F10;
+  --background-card: #0E0F10;
+  --color-surface-raised: #17191A;
+  --color-text: #ECECF1;
+  --color-text-muted: #A3A3AB;
+  --color-edge: #1F6B55;
+  --color-glow: #1F8A63;
+  --shadow-card: inset 0 0 22px rgba(70, 170, 140, 0.22);
 
-  .video-links{margin:12px 0 4px; display:flex; flex-direction:column; gap:6px;}
-  .video-link{
-    display:flex; align-items:center; gap:8px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:12.5px;
-    color:var(--sage);
-    text-decoration:none;
-    border:1px solid var(--paper-line);
-    background:#F6F3E9;
-    border-radius:3px;
-    padding:8px 10px;
-    transition: border-color .15s, background .15s;
-  }
-  .video-link:hover{border-color:var(--sage); background:#EFF1E6;}
-  .video-link .play{font-size:13px; flex-shrink:0;}
+  /* buttons */
+  --color-button-text: #F2F2F2;
+  --color-button-light: #176049;
+  --color-button-mid: #0B4D3A;
+  --color-button-dark: #04241B;
+  --color-button-rim-active: #1F8A63;
+  --shadow-button-rest: inset 0 0 16px rgba(70, 170, 140, 0.32), 0 0 10px rgba(46, 154, 120, 0.25);
+  --shadow-button-active: inset 0 1px 0 rgba(31, 138, 99, 0.9), inset 0 -2px 0 rgba(31, 138, 99, 0.9), 0 0 16px rgba(31, 138, 99, 0.6);
+  --sweep-duration: 1.4s;
 
-  .materials-line{
-    font-size:13.5px; line-height:1.5; color:var(--graphite-soft);
-    margin:2px 0 12px; padding:8px 12px;
-    background:#F6F3E9; border:1px solid var(--paper-line); border-radius:3px;
-  }
-  .materials-line b{color:var(--graphite);}
+  /* typing boxes */
+  --color-input-background: #0A0B0C;
+  --color-input-edge: #6B7278;
+  --color-input-placeholder: #8A8F94;
+  --color-input-edge-active: #2E9A78;
+  --shadow-input-active: 0 0 0 3px rgba(46, 154, 120, 0.25), 0 0 14px rgba(31, 138, 99, 0.55), inset 0 1px 0 rgba(120, 200, 170, 0.3);
 
-  .upload-zone{
-    margin-top:16px;
-    border:2px dashed var(--paper-line);
-    border-radius:4px;
-    padding:22px;
-    text-align:center;
-    cursor:pointer;
-    transition: border-color .15s, background .15s;
-    font-family:'JetBrains Mono', monospace;
-    font-size:12.5px;
-    color:var(--graphite-soft);
-  }
-  .upload-zone:hover{border-color:var(--ochre); background:#FDF6E8;}
-  .upload-zone img{max-width:100%; max-height:260px; border-radius:3px; display:block; margin:0 auto 10px;}
-  .upload-zone input, input[type="file"]{display:none;}
+  /* messages (same in dark and light) */
+  --color-message-text: #F5F5F7;
+  --color-success-top: #137A55;
+  --color-success-bottom: #0F6B4A;
+  --color-warning-top: #946108;
+  --color-warning-bottom: #8A5A0B;
+  --color-error-top: #9A2033;
+  --color-error-bottom: #7F1626;
+}
 
-  button{
-    font-family:'JetBrains Mono', monospace;
-    font-size:13px;
-    letter-spacing:0.02em;
-    border:none;
-    border-radius:3px;
-    padding:12px 18px;
-    cursor:pointer;
-    background: var(--graphite);
-    color: var(--paper);
-    width:100%;
-    margin-top:10px;
-    transition: transform .1s, opacity .15s;
-  }
-  button:hover{opacity:0.88;}
-  button:active{transform: scale(0.99);}
-  button:disabled{opacity:0.4; cursor:not-allowed;}
-  button.secondary{background:transparent; color:var(--graphite); border:1px solid var(--paper-line);}
-  button.accent{background: var(--sage);}
-  .btn-row{display:flex; gap:8px;}
-  .btn-row button{margin-top:10px;}
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background: #DEDFE3;
+    --background-page: linear-gradient(160deg, #ECEDF0, #C9CBD1 55%, #DEDFE3);
+    --color-surface: #E2E4E8;
+    --background-card: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 50%), #E2E4E8;
+    --color-surface-raised: #EDEFF2;
+    --color-text: #14181A;
+    --color-text-muted: #444D57;
+    --color-edge: #1F7A5A;
+    --color-glow: #1F7A5A;
+    --shadow-card: none;
 
-  .loading{
-    display:flex; align-items:center; gap:8px;
-    font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--graphite-soft);
-    margin-top:14px;
-  }
-  .pencil-spin{
-    width:14px; height:14px; border-radius:50%;
-    border:2px solid var(--paper-line); border-top-color:var(--ochre);
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg);}}
+    --color-button-rim-active: #1F7A5A;
+    --shadow-button-active: inset 0 1px 0 rgba(31, 122, 90, 0.9), inset 0 -2px 0 rgba(31, 122, 90, 0.9), 0 0 14px rgba(31, 122, 90, 0.55);
 
-  .note{
-    font-family:'Caveat', cursive;
-    font-size:22px;
-    line-height:1.35;
-    color:var(--red-pen);
-    margin:16px 0 4px;
-    transform: rotate(-0.4deg);
+    --color-input-background: #F1F2F4;
+    --color-input-edge: #6F7782;
+    --color-input-placeholder: #5B636D;
+    --color-input-edge-active: #1F7A5A;
+    --shadow-input-active: 0 0 0 3px rgba(31, 122, 90, 0.28), 0 0 12px rgba(31, 122, 90, 0.35), inset 0 1px 0 #FFFFFF;
   }
-  .note-label{
-    font-family:'JetBrains Mono', monospace;
-    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--graphite-soft); margin-top:16px; display:block;
-  }
-  .strength-line{
-    font-size:14.5px; line-height:1.5; margin:4px 0;
-    padding-left:16px; position:relative;
-  }
-  .strength-line::before{content:"+"; position:absolute; left:0; color:var(--sage); font-weight:700;}
-  .focus-line{
-    font-size:14.5px; line-height:1.5; margin:4px 0;
-    padding-left:16px; position:relative;
-  }
-  .focus-line::before{content:"→"; position:absolute; left:0; color:var(--red-pen);}
+}
 
-  .tag{
-    display:inline-block;
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    background: #FDF6E8;
-    border:1px solid var(--paper-line);
-    color: var(--graphite-soft);
-    padding:4px 9px;
-    border-radius:12px;
-    margin:3px 5px 3px 0;
-  }
-  .tag b{color:var(--red-pen); font-weight:600;}
+/* ---------- Component starting points (use the variables above) ---------- */
 
-  .history-item{
-    border-top:1px solid var(--paper-line);
-    padding:10px 0;
-    font-size:13.5px;
-    display:flex; justify-content:space-between; gap:10px;
-    color: var(--graphite-soft);
-  }
-  .history-item span:first-child{color:var(--graphite); font-weight:600;}
-  .history-item .kind{
-    font-family:'JetBrains Mono', monospace; font-size:10px;
-    text-transform:uppercase; letter-spacing:0.05em;
-  }
-  .history-item .kind.remedial{color:var(--red-pen);}
-  .history-item .kind.rep{color:var(--ochre);}
-  .history-item .kind.revisit{color:var(--sage);}
-  .history-detail{
-    padding:4px 0 14px 4px;
-    border-bottom:1px solid var(--paper-line);
-  }
-  .history-detail.empty{
-    font-family:'JetBrains Mono', monospace; font-size:12.5px;
-    color:var(--graphite-soft); padding-bottom:14px;
-  }
+body {
+  background: var(--background-page);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-body);
+}
 
-  .empty{
-    text-align:center; color:var(--graphite-soft); font-size:13.5px;
-    font-family:'JetBrains Mono', monospace; padding:10px 0;
-  }
-  .err{
-    color:var(--red-pen); font-size:13px; font-family:'JetBrains Mono', monospace;
-    margin-top:10px;
-  }
-  .reset-link{text-align:center; margin-top:30px;}
-  .reset-link a{
-    color:var(--graphite-soft); font-size:12px; font-family:'JetBrains Mono', monospace;
-    text-decoration:underline; cursor:pointer;
-  }
+h1, h2, h3 {
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+}
 
-  .settings-row{
-    display:flex; gap:8px; align-items:center;
-    font-family:'JetBrains Mono', monospace; font-size:11px;
-    color:var(--graphite-soft);
-  }
-  .settings-row a{color:var(--sage); cursor:pointer; text-decoration:underline;}
-  .key-input{
-    width:100%; font-family:'JetBrains Mono', monospace; font-size:13px;
-    padding:10px 12px; border:1px solid var(--paper-line); border-radius:3px;
-    background:#fff; margin-top:8px;
-  }
-  .key-note{font-size:12px; color:var(--graphite-soft); line-height:1.5; margin:8px 0 0;}
-  .key-status{
-    font-family:'JetBrains Mono', monospace; font-size:11px;
-    margin-top:8px;
-  }
-  .key-status.ok{color:var(--sage);}
-  .key-status.missing{color:var(--red-pen);}
+.card {
+  background: var(--background-card);
+  border: 1px solid var(--color-edge);
+  border-radius: var(--radius-card);
+  padding: var(--space-card-padding);
+  box-shadow: var(--shadow-card);
+}
+
+.muted { color: var(--color-text-muted); }
+
+.row {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-input);
+  padding: var(--space-row-padding);
+  margin-bottom: var(--space-gap);
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-input-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-edge);
+  border-radius: var(--radius-input);
+  padding: var(--space-row-padding);
+  font: inherit;
+  outline: none;
+}
+.input::placeholder { color: var(--color-input-placeholder); }
+.input:focus,
+.input:not(:placeholder-shown) {
+  border-color: var(--color-input-edge-active);
+  box-shadow: var(--shadow-input-active);
+}
+
+.button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--color-button-text);
+  font: inherit;
+  font-weight: var(--font-weight-button);
+  padding: 7px 20px;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--color-edge);
+  background:
+    linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.12) 50%, transparent 60%),
+    radial-gradient(ellipse at 50% 130%, var(--color-button-light), var(--color-button-mid) 55%, var(--color-button-dark));
+  box-shadow: var(--shadow-button-rest);
+}
+.button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  transform: translateX(-130%) skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  pointer-events: none;
+}
+/* Active: bright rim and halo. The standing diagonal shine is removed so it
+   never stacks with the sweep (stacked, the button words would fail contrast). */
+.button:active,
+.button.is-sweeping {
+  border-color: var(--color-button-rim-active);
+  background: radial-gradient(ellipse at 50% 130%, var(--color-button-light), var(--color-button-mid) 55%, var(--color-button-dark));
+  box-shadow: var(--shadow-button-active);
+}
+.button.is-sweeping::after { animation: sweep var(--sweep-duration) ease-out; }
+@keyframes sweep {
+  from { transform: translateX(-130%) skewX(-20deg); }
+  to   { transform: translateX(330%) skewX(-20deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button.is-sweeping::after { animation: none; }
+}
+
+.message {
+  display: flex;
+  gap: var(--space-gap);
+  align-items: center;
+  color: var(--color-message-text);
+  padding: var(--space-row-padding);
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+.message--success { background: linear-gradient(180deg, var(--color-success-top), var(--color-success-bottom)); }
+.message--warning { background: linear-gradient(180deg, var(--color-warning-top), var(--color-warning-bottom)); }
+.message--error   { background: linear-gradient(180deg, var(--color-error-top), var(--color-error-bottom)); }
+
+/* ============================================================
+   Drawing tutor styles
+   Layout, sizes and structure are the original tool's. Colours, fonts,
+   corners and gaps come from the Deep Jade variables above.
+   ============================================================ */
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  min-height:100vh;
+  padding: 28px 16px 60px;
+}
+.wrap{max-width:640px; margin:0 auto;}
+header{margin-bottom:22px;}
+.eyebrow{
+  font-family:var(--font-code);
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--color-text-muted);
+  display:flex; justify-content:space-between; align-items:baseline;
+}
+h1{
+  font-size:30px;
+  margin:4px 0 2px;
+}
+.tagline{color:var(--color-text-muted); font-size:14px; margin:0;}
+
+/* Cards: the theme's .card look, with the tool's original padding and spacing kept */
+.card{
+  padding:20px 20px 22px;
+  margin-bottom:18px;
+  position:relative;
+}
+
+.lesson-num{
+  font-family:var(--font-code);
+  font-size:12px; color:var(--color-text-muted); font-weight:var(--font-weight-button);
+  text-transform:uppercase; letter-spacing:0.08em;
+}
+h2{margin:4px 0 10px; font-size:22px;}
+.why{
+  font-size:14.5px; color:var(--color-text-muted); line-height:1.5;
+  margin:0 0 14px; font-style:italic;
+}
+.task-box{
+  background: var(--color-surface-raised);
+  border:1px dashed var(--color-edge);
+  border-radius:var(--radius-input);
+  padding:14px 16px;
+  font-size:15px;
+  line-height:1.5;
+}
+.task-box b{color:var(--color-text);}
+
+.video-links{margin:12px 0 4px; display:flex; flex-direction:column; gap:6px;}
+.video-link{
+  display:flex; align-items:center; gap:var(--space-gap);
+  font-family:var(--font-code);
+  font-size:12.5px;
+  color:var(--color-text);
+  text-decoration:none;
+  border:1px solid var(--color-edge);
+  background:var(--color-surface-raised);
+  border-radius:var(--radius-input);
+  padding:8px 10px;
+  transition: border-color .15s, background .15s;
+}
+.video-link:hover{border-color:var(--color-input-edge-active);}
+.video-link .play{font-size:13px; flex-shrink:0;}
+
+.materials-line{
+  font-size:13.5px; line-height:1.5; color:var(--color-text-muted);
+  margin:2px 0 12px; padding:var(--space-row-padding);
+  background:var(--color-surface-raised); border:1px solid var(--color-edge); border-radius:var(--radius-input);
+}
+.materials-line b{color:var(--color-text);}
+
+.upload-zone{
+  margin-top:16px;
+  border:2px dashed var(--color-input-edge);
+  border-radius:var(--radius-input);
+  padding:22px;
+  text-align:center;
+  cursor:pointer;
+  transition: border-color .15s, background .15s;
+  font-family:var(--font-code);
+  font-size:12.5px;
+  color:var(--color-text-muted);
+}
+.upload-zone:hover{border-color:var(--color-input-edge-active); background:var(--color-surface-raised);}
+.upload-zone img{max-width:100%; max-height:260px; border-radius:var(--radius-input); display:block; margin:0 auto 10px;}
+.upload-zone input, input[type="file"]{display:none;}
+
+/* Buttons: the theme's .button look, full width as in the original layout */
+.button{
+  font-size:13px;
+  letter-spacing:0.02em;
+  padding:12px 18px;
+  width:100%;
+  margin-top:10px;
+  transition: transform .1s, opacity .15s;
+}
+.button:hover{opacity:0.88;}
+.button:active{transform: scale(0.99);}
+.button:disabled{opacity:0.4; cursor:not-allowed;}
+.btn-row{display:flex; gap:var(--space-gap);}
+.btn-row .button{margin-top:10px;}
+
+.loading{
+  display:flex; align-items:center; gap:var(--space-gap);
+  font-family:var(--font-code); font-size:13px; color:var(--color-text-muted);
+  margin-top:14px;
+}
+.pencil-spin{
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid var(--color-input-edge); border-top-color:var(--color-glow);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.note{
+  font-size:15px;
+  font-style:italic;
+  line-height:1.4;
+  margin:16px 0 4px;
+}
+.note-label{
+  font-family:var(--font-code);
+  font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--color-text-muted); margin-top:16px; display:block;
+}
+.strength-line{
+  font-size:14.5px; line-height:1.5; margin:4px 0;
+  padding-left:16px; position:relative;
+}
+.strength-line::before{content:"+"; position:absolute; left:0; color:var(--color-glow); font-weight:700;}
+.focus-line{
+  font-size:14.5px; line-height:1.5; margin:4px 0;
+  padding-left:16px; position:relative;
+}
+.focus-line::before{content:"→"; position:absolute; left:0; color:var(--color-text-muted);}
+
+.tag{
+  display:inline-block;
+  font-family:var(--font-code);
+  font-size:11px;
+  background: var(--color-surface-raised);
+  border:1px solid var(--color-edge);
+  color: var(--color-text-muted);
+  padding:4px 9px;
+  border-radius:12px;
+  margin:3px 5px 3px 0;
+}
+
+.history-item{
+  border-top:1px solid var(--color-edge);
+  padding:10px 0;
+  font-size:13.5px;
+  display:flex; justify-content:space-between; gap:10px;
+  color: var(--color-text-muted);
+}
+.history-item span:first-child{color:var(--color-text); font-weight:var(--font-weight-heading);}
+.history-item .kind{
+  font-family:var(--font-code); font-size:10px;
+  text-transform:uppercase; letter-spacing:0.05em;
+}
+.history-detail{
+  padding:4px 0 14px 4px;
+  border-bottom:1px solid var(--color-edge);
+}
+
+.empty{
+  text-align:center; color:var(--color-text-muted); font-size:13.5px;
+  font-family:var(--font-code); padding:10px 0;
+}
+.reset-link{text-align:center; margin-top:30px;}
+.reset-link a{
+  color:var(--color-text-muted); font-size:12px; font-family:var(--font-code);
+  text-decoration:underline; cursor:pointer;
+}
+
+/* Messages: the theme's .message banners, kept inline where the old notices were */
+.message{margin:var(--space-gap) 0 14px; font-size:13.5px; line-height:1.45;}
+.message.err{margin:10px 0 0; font-size:13px;}
+.message-icon{font-weight:700; flex-shrink:0;}
+
+.settings-row{
+  display:flex; gap:var(--space-gap); align-items:center;
+  font-family:var(--font-code); font-size:11px;
+  color:var(--color-text-muted);
+}
+.settings-row a{color:var(--color-text); cursor:pointer; text-decoration:underline;}
+.key-input{
+  font-family:var(--font-code); font-size:13px;
+  padding:10px 12px;
+  margin-top:8px;
+}
+.key-note{font-size:12px; color:var(--color-text-muted); line-height:1.5; margin:8px 0 0;}
+.key-status{
+  font-family:var(--font-code); font-size:11px;
+  margin-top:8px;
+}
+.key-status.ok{color:var(--color-text);}
+.key-status.missing{color:var(--color-text-muted);}
 </style>
 </head>
 <body>
@@ -1537,7 +1665,7 @@ function exportBackup(){
 }
 
 function showFallbackBackup(text){
-  backupMessage = "Couldn't auto-copy — select and copy this manually: <br><textarea class=\"key-input\" rows=\"4\" readonly onclick=\"this.select()\">" + text + "</textarea>";
+  backupMessage = "Couldn't auto-copy — select and copy this manually: <br><textarea class=\"input key-input\" placeholder=\"Backup text\" rows=\"4\" readonly onclick=\"this.select()\">" + text + "</textarea>";
   render();
 }
 
@@ -1588,9 +1716,9 @@ function renderKeySettings(){
   }
   return `
     <div class="settings-row"><a onclick="toggleKeySettings()">Hide API key settings</a></div>
-    <input class="key-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." value="${keyInputDraft.replace(/"/g,'')}"/>
-    <input class="key-input" id="workspaceIdInput" type="text" placeholder="wrkspc_... (only needed for some keys)" value="${workspaceInputDraft.replace(/"/g,'')}"/>
-    <button class="secondary" onclick="saveApiKey()">Save to this device</button>
+    <input class="input key-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." value="${keyInputDraft.replace(/"/g,'')}"/>
+    <input class="input key-input" id="workspaceIdInput" type="text" placeholder="wrkspc_... (only needed for some keys)" value="${workspaceInputDraft.replace(/"/g,'')}"/>
+    <button class="button secondary" onclick="saveApiKey()">Save to this device</button>
     <p class="key-note">Stored only in this browser's local storage on this device — never sent anywhere except directly to Anthropic's API when you request feedback. Get a key at console.anthropic.com (Settings → API Keys), with billing set up under Settings → Billing. If your key is scoped to "all workspaces" rather than one specific workspace, also paste its Workspace ID from Settings → Workspaces — otherwise leave that field blank.</p>
   `;
 }
@@ -1603,7 +1731,7 @@ function renderVideoLinksForBank(bank){
 }
 
 function renderDrawingUpload(){
-  const cameraBtn = `<button class="secondary" onclick="document.getElementById('drawingCameraInput').click()">📷 Take photo with camera</button>`;
+  const cameraBtn = `<button class="button secondary" onclick="document.getElementById('drawingCameraInput').click()">📷 Take photo with camera</button>`;
   if(uploadedImage){
     return `
       <div class="upload-zone" onclick="document.getElementById('drawingFileInput').click()">
@@ -1620,7 +1748,7 @@ function renderDrawingUpload(){
 function renderReferenceUpload(bundle){
   const label = bundle.referencePhoto === 'required' ? 'Reference photo (required)' : 'Reference photo (optional)';
   const hint = bundle.referenceNote ? ` — ${bundle.referenceNote}` : '';
-  const cameraBtn = `<button class="secondary" onclick="document.getElementById('referenceCameraInput').click()">📷 Take reference photo with camera</button>`;
+  const cameraBtn = `<button class="button secondary" onclick="document.getElementById('referenceCameraInput').click()">📷 Take reference photo with camera</button>`;
   if(referenceImage){
     return `
       <div class="materials-line" style="margin-top:14px;">📎 <b>${label}</b>${hint}</div>
@@ -1629,7 +1757,7 @@ function renderReferenceUpload(bundle){
         <div>Tap to choose a different reference photo from your gallery/files</div>
       </div>
       ${cameraBtn}
-      <button class="secondary" onclick="clearReferenceImage()">Remove reference photo</button>
+      <button class="button secondary" onclick="clearReferenceImage()">Remove reference photo</button>
     `;
   }
   return `
@@ -1651,7 +1779,7 @@ function renderFeedbackDetail(feedbackObj, bundle){
     const title = skillTitle(skillId);
     const role = skillId === bundle.primarySkill ? 'primary' : 'incidental';
     if(processResult.notAssessableSkills.includes(skillId)){
-      html += `<div class="materials-line">🔍 <b>${title}</b> — couldn't be judged from this photo (blurry, cropped, or a missing/mismatched reference photo). No rep counted here — it'll come up again another time.</div>`;
+      html += `<div class="message message--warning" role="status"><span class="message-icon" aria-hidden="true">!</span><span><b>Warning</b> — <b>${title}</b> couldn't be judged from this photo (blurry, cropped, or a missing/mismatched reference photo). No rep counted here — it'll come up again another time.</span></div>`;
       return;
     }
     const meta = SKILL_META[skillId];
@@ -1679,7 +1807,7 @@ function renderWarmupCard(){
         <h2>Loosen up first</h2>
         <p class="why">Quick and unscored — no photo, no feedback, doesn't touch your progress. Just a few reps to warm your hand up before today's real exercise.</p>
         ${tasks.map(t => `<div class="task-box" style="margin-bottom:10px;"><b>${t.title}:</b> ${t.text}</div>`).join('')}
-        <button class="accent" onclick="startExercises()">Done warming up — start today's exercise</button>
+        <button class="button accent" onclick="startExercises()">Done warming up — start today's exercise</button>
       </div>
     </div>
   `;
@@ -1697,12 +1825,13 @@ function renderPassConfirmationCard(){
         <div class="lesson-num revisit">Pass check</div>
         <h2>${title}</h2>
         ${feedbackBlock}
-        <div class="remedial-banner" style="color:var(--sage); background:#EFF1E6; border-color:#C9D4BD;">
-          🎯 You've now logged ${PASS_RULE.minPrimaryReps}+ reps of "${title}" with no failed criteria in the last ${PASS_RULE.recentWindow}. Pass it, or keep working on it a while longer?
+        <div class="message message--success" role="status">
+          <span class="message-icon" aria-hidden="true">✓</span>
+          <span><b>Success</b> — You've now logged ${PASS_RULE.minPrimaryReps}+ reps of "${title}" with no failed criteria in the last ${PASS_RULE.recentWindow}. Pass it, or keep working on it a while longer?</span>
         </div>
         <div class="btn-row">
-          <button class="accent" onclick="resolvePassConfirm(true)">Yes — pass this skill</button>
-          <button class="secondary" onclick="resolvePassConfirm(false)">Not yet — keep practicing</button>
+          <button class="button accent" onclick="resolvePassConfirm(true)">Yes — pass this skill</button>
+          <button class="button secondary" onclick="resolvePassConfirm(false)">Not yet — keep practicing</button>
         </div>
         <p class="key-note">Choosing "keep practicing" resets this skill's rep count to 0 for a genuine fresh run at it — your submission history isn't deleted, just the pass-progress counter.</p>
       </div>
@@ -1722,13 +1851,13 @@ function renderExerciseCard(){
     feedbackHtml = `
       ${renderFeedbackDetail(feedback, bundle)}
       <div class="btn-row">
-        <button class="accent" onclick="nextExercise()">Continue to next exercise</button>
+        <button class="button accent" onclick="nextExercise()">Continue to next exercise</button>
       </div>
     `;
   } else if(uploadedImage){
     feedbackHtml = `
-      <button onclick="getFeedback()">Get feedback on this page</button>
-      <button class="secondary" onclick="nextExercise()">Skip feedback, just get another exercise</button>
+      <button class="button" onclick="getFeedback()">Get feedback on this page</button>
+      <button class="button secondary" onclick="nextExercise()">Skip feedback, just get another exercise</button>
     `;
   }
 
@@ -1746,7 +1875,7 @@ function renderExerciseCard(){
         <input type="file" id="drawingCameraInput" accept="image/*" capture="environment" onchange="handleDrawingFile(this.files[0])"/>
         ${bundle.referencePhoto !== 'none' ? `<input type="file" id="referenceFileInput" accept="image/*" onchange="handleReferenceFile(this.files[0])"/><input type="file" id="referenceCameraInput" accept="image/*" capture="environment" onchange="handleReferenceFile(this.files[0])"/>` : ''}
         ${feedbackHtml}
-        ${error ? `<div class="err">${error}</div>` : ''}
+        ${error ? `<div class="message message--error err" role="alert"><span class="message-icon" aria-hidden="true">✕</span><span><b>Error</b> — ${error}</span></div>` : ''}
         ${(!feedback && !loading) ? `<div class="reset-link" style="margin-top:18px;"><a onclick="rerollExercise()">↻ Give me a different exercise</a></div>` : ''}
       </div>
     </div>
@@ -1885,12 +2014,12 @@ function render(){
         <h2 style="font-size:18px;">Move progress between devices/browsers</h2>
         <p class="key-note">Progress is tied to this exact page's origin (the URL/path it's opened from). If you ever open the file a different way and your progress looks reset, use this to carry it across — it does not include your API key.</p>
         <div class="btn-row">
-          <button class="secondary" onclick="exportBackup()">Copy backup to clipboard</button>
-          <button class="secondary" onclick="toggleImport()">Restore from backup</button>
+          <button class="button secondary" onclick="exportBackup()">Copy backup to clipboard</button>
+          <button class="button secondary" onclick="toggleImport()">Restore from backup</button>
         </div>
         ${showImport ? `
-          <textarea id="importBox" class="key-input" rows="4" placeholder="Paste your backup text here"></textarea>
-          <button onclick="importBackup()">Restore this backup</button>
+          <textarea id="importBox" class="input key-input" rows="4" placeholder="Paste your backup text here"></textarea>
+          <button class="button" onclick="importBackup()">Restore this backup</button>
         ` : ''}
         ${backupMessage ? `<p class="key-note">${backupMessage}</p>` : ''}
       </div>
@@ -1901,6 +2030,33 @@ function render(){
 }
 
 loadState();
+</script>
+<script>
+// Deep Jade button sweep (theme report, section 3.3), changed in two ways:
+// 1. It does nothing when the device has "reduce motion" turned on.
+// 2. Most taps in this tool redraw the whole page, which replaces the button before a sweep can
+//    be seen. So a tap now starts the sweep and runs the button's action SWEEP_HOLD_MS later.
+//    Set SWEEP_HOLD_MS to 0 to remove the pause (the sweep then only shows on buttons that stay put).
+var SWEEP_HOLD_MS = 450;
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('.button');
+  if (!b) return;
+  if (b.__sweepReplay) { b.__sweepReplay = false; return; }          // the delayed repeat of the tap: let it through
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  e.stopImmediatePropagation();                                       // hold the real action back for a moment
+  e.preventDefault();
+  if (b.__sweepPending) return;                                       // ignore taps while one is waiting
+  b.__sweepPending = true;
+  b.classList.remove('is-sweeping');
+  void b.offsetWidth;                                                 // restart the animation
+  b.classList.add('is-sweeping');
+  setTimeout(function () {
+    b.__sweepPending = false;
+    b.__sweepReplay = true;
+    b.click();                                                        // now run the button's real action
+  }, SWEEP_HOLD_MS);
+  setTimeout(function () { b.classList.remove('is-sweeping'); }, 1500);
+}, true);
 </script>
 </body>
 </html>
