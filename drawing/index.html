@@ -205,6 +205,9 @@ h1, h2, h3 {
    Layout, sizes and structure are the original tool's. Colours, fonts,
    corners and gaps come from the Deep Jade variables above.
    ============================================================ */
+/* The theme's code font ends with "Courier New", which Android phones swap for a serif typewriter
+   font. This tool leaves it out so phones use their own plain monospaced font instead. */
+:root{ --font-code: ui-monospace, Consolas, monospace; }
 *{box-sizing:border-box;}
 body{
   margin:0;
