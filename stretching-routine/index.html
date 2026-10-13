@@ -1238,7 +1238,7 @@ code, pre { font-family: var(--font-code); }
      App state + render loop
   ---------------------------------------------------------------- */
   var state = loadState();
-  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | done | dropped | backup
+  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | done | dropped | backup | resetConfirm
   var exIndex = 0;
   var secondsLeft = 0;
   var running = true;
@@ -1680,6 +1680,22 @@ code, pre { font-family: var(--font-code); }
     );
   }
 
+  // "Are you sure?" step before progress is wiped. Cancel changes nothing.
+  function buildResetConfirm() {
+    return (
+      '<div class="col-center" style="justify-content:center;min-height:420px;gap:14px">' +
+        '<div class="serif" style="font-size:24px;font-weight:500">Reset all progress?</div>' +
+        '<div style="font-size:14px;color:var(--ink-soft);max-width:280px;line-height:1.5">This clears your saved steps, hold times, dropped exercises and session history on this device. It can\'t be undone.</div>' +
+        '<div style="font-size:13px;color:var(--ink-soft);max-width:280px;line-height:1.5">Want a copy first? Use Back up first, then come back.</div>' +
+        '<div class="row-center" style="gap:12px;margin-top:6px">' +
+          '<button id="btn-reset-cancel" class="button">Cancel</button>' +
+          '<button id="btn-reset-yes" class="button button--secondary">Yes, reset</button>' +
+        '</div>' +
+        '<button id="btn-backup-open" class="btn-link" style="margin-top:6px">Back up first</button>' +
+      '</div>'
+    );
+  }
+
   function buildDropped() {
     var rows = state.dropped.map(function (id) {
       var ex = null;
@@ -1743,6 +1759,7 @@ code, pre { font-family: var(--font-code); }
     else if (screen === "dropped") html = buildDropped();
     else if (screen === "done") html = buildDone();
     else if (screen === "backup") html = buildBackup();
+    else if (screen === "resetConfirm") html = buildResetConfirm();
     else html = "";
     root.innerHTML = html;
     bind();
@@ -1771,7 +1788,9 @@ code, pre { font-family: var(--font-code); }
   function bind() {
     var byId = function (id) { return document.getElementById(id); };
     if (byId("btn-start")) byId("btn-start").addEventListener("click", startSession);
-    if (byId("btn-reset")) byId("btn-reset").addEventListener("click", resetProgress);
+    if (byId("btn-reset")) byId("btn-reset").addEventListener("click", function () { screen = "resetConfirm"; render(); });
+    if (byId("btn-reset-cancel")) byId("btn-reset-cancel").addEventListener("click", function () { screen = "home"; render(); });
+    if (byId("btn-reset-yes")) byId("btn-reset-yes").addEventListener("click", resetProgress);
     if (byId("btn-quit")) byId("btn-quit").addEventListener("click", quitSession);
     if (byId("btn-pause")) byId("btn-pause").addEventListener("click", togglePause);
     if (byId("btn-skip")) byId("btn-skip").addEventListener("click", skip);
