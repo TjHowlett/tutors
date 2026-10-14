@@ -2033,11 +2033,11 @@ code, pre { font-family: var(--font-code); }
   function ring(pct, size, innerHtml) {
     var r = (size - 10) / 2;
     var c = 2 * Math.PI * r;
-    var offset = c * (1 - pct);
+    var offset = -c * pct;
     return '<svg width="' + size + '" height="' + size + '" style="transform:rotate(-90deg)">' +
-      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--line)" stroke-width="8"/>' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--color-input-edge)" stroke-opacity=".45" stroke-width="8"/>' +
       '<circle id="ring-progress" cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--amber)" stroke-width="8" stroke-linecap="round" ' +
-      'stroke-dasharray="' + c + '" stroke-dashoffset="' + offset + '" style="transition:stroke-dashoffset .9s linear"/>' +
+      'stroke-dasharray="' + c + '" stroke-dashoffset="' + offset + '"/>' +
       '<foreignObject x="0" y="0" width="' + size + '" height="' + size + '" style="transform:rotate(90deg);transform-origin:center">' +
       '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">' + innerHtml + '</div>' +
       '</foreignObject></svg>';
@@ -2068,6 +2068,44 @@ code, pre { font-family: var(--font-code); }
   var sideSwapPause = false;
   var sideSwapSecondsLeft = 0;
   var SIDE_SWAP_PAUSE_SECONDS = 5;
+
+  // Smooth timer ring. The countdown number changes once a second, but the
+  // ring is redrawn on every screen frame so it drains without stopping.
+  // ringElapsed is the seconds used so far in this exercise, kept between
+  // the last whole-second tick and the next one so the ring can never drift
+  // away from the number. It stands still while paused or on the
+  // "Switch sides" screen.
+  var ringElapsed = 0;
+  var ringLast = 0;
+  var ringRaf = 0;
+  function ringFraction(duration) {
+    var lo = duration - secondsLeft;
+    var hi = Math.min(duration, lo + 1);
+    if (ringElapsed < lo) ringElapsed = lo;
+    if (ringElapsed > hi) ringElapsed = hi;
+    return ringElapsed / duration;
+  }
+  function ringFrame(ts) {
+    if (screen !== "session") { ringRaf = 0; return; }
+    ringRaf = requestAnimationFrame(ringFrame);
+    var dt = ringLast ? (ts - ringLast) / 1000 : 0;
+    ringLast = ts;
+    var ex = activeExercises[exIndex];
+    if (!ex) return;
+    var duration = getDuration(ex, state);
+    if (running && !sideSwapPause) ringElapsed += Math.min(dt, 0.25);
+    var pct = ringFraction(duration);
+    var el = document.getElementById("ring-progress");
+    if (el) {
+      var c = 2 * Math.PI * parseFloat(el.getAttribute("r"));
+      el.setAttribute("stroke-dashoffset", -c * pct);
+    }
+  }
+  function startRingLoop() {
+    ringElapsed = 0;
+    ringLast = 0;
+    if (!ringRaf) ringRaf = requestAnimationFrame(ringFrame);
+  }
 
   function persist(next) { state = next; saveState(state); }
 
@@ -2175,6 +2213,7 @@ code, pre { font-family: var(--font-code); }
     var ex = activeExercises[idx];
     exIndex = idx; screen = "session"; secondsLeft = getDuration(ex, state); running = true;
     midpointDone = false; sideSwapPause = false; sideSwapSecondsLeft = 0;
+    startRingLoop();
     render(); startTimer();
   }
   function advance() {
@@ -2387,7 +2426,7 @@ code, pre { font-family: var(--font-code); }
       );
     }
 
-    var pct = 1 - secondsLeft / duration;
+    var pct = ringFraction(duration);
     return (
       '<div style="display:flex;flex-direction:column;gap:14px">' +
         '<div class="top-bar">' +
@@ -2573,7 +2612,7 @@ code, pre { font-family: var(--font-code); }
     bind();
   }
 
-  // Lightweight per-second update: just the number + ring, no full re-render (avoids flicker & re-binding cost)
+  // Lightweight per-second update: just the number, no full re-render (avoids flicker & re-binding cost)
   function tick() {
     if (sideSwapPause) {
       var pauseNumEl = document.getElementById("countdown");
@@ -2582,15 +2621,6 @@ code, pre { font-family: var(--font-code); }
     }
     var numEl = document.getElementById("countdown");
     if (numEl) numEl.textContent = secondsLeft;
-    var ringEl = document.getElementById("ring-progress");
-    if (ringEl && screen === "session") {
-      var ex = activeExercises[exIndex];
-      var duration = getDuration(ex, state);
-      var pct = 1 - secondsLeft / duration;
-      var r = parseFloat(ringEl.getAttribute("r"));
-      var c = 2 * Math.PI * r;
-      ringEl.setAttribute("stroke-dashoffset", c * (1 - pct));
-    }
   }
 
   function bind() {
