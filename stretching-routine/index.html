@@ -1300,6 +1300,83 @@ code, pre { font-family: var(--font-code); }
 
   function persist(next) { state = next; saveState(state); }
 
+  /* ---------------------------------------------------------------
+     In-progress session
+     The session lives in memory, so minimising the window (or the
+     browser dropping the page while it's hidden) used to wipe it.
+     It's now saved on every screen change and every second, held
+     (timer stopped) while the window is hidden, and put back on
+     load. It's cleared when the session is finished (after the
+     feedback step) or quit with the X.
+  ---------------------------------------------------------------- */
+  var SESSION_KEY = "stretching-routine-session";
+  var SESSION_SCREENS = { ready: true, session: true, rest: true, feedback: true, feedbackPick: true };
+  var resumeOnReturn = false;
+
+  function saveSession() {
+    try {
+      if (!SESSION_SCREENS[screen]) { window.localStorage.removeItem(SESSION_KEY); return; }
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify({
+        date: todayStr(),
+        setLetter: activeSetLetter,
+        screen: screen === "feedbackPick" ? "feedback" : screen,
+        exIndex: exIndex,
+        secondsLeft: secondsLeft,
+        running: running,
+        midpointDone: midpointDone,
+        sideSwapPause: sideSwapPause,
+        sideSwapSecondsLeft: sideSwapSecondsLeft,
+        ringElapsed: ringElapsed
+      }));
+    } catch (e) {}
+  }
+
+  // Put back a saved session. Returns true if one was restored.
+  function restoreSession() {
+    try {
+      var raw = window.localStorage.getItem(SESSION_KEY);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      if (!s || s.date !== todayStr() || !SESSION_SCREENS[s.screen]) return false;
+      var exercises = getSet(s.setLetter);
+      if (!exercises.length || s.exIndex < 0 || s.exIndex >= exercises.length) return false;
+      activeSetLetter = s.setLetter;
+      activeExercises = exercises;
+      exIndex = s.exIndex;
+      screen = s.screen;
+      secondsLeft = s.secondsLeft;
+      midpointDone = !!s.midpointDone;
+      sideSwapPause = !!s.sideSwapPause;
+      sideSwapSecondsLeft = s.sideSwapSecondsLeft || 0;
+      if (screen === "session") {
+        startRingLoop();
+        ringElapsed = s.ringElapsed || 0;
+        running = false;          // come back paused, with Resume showing
+      } else if (screen === "ready" || screen === "rest") {
+        running = true;           // short screens with no pause button: carry on
+        resumeOnReturn = true;    // the timer starts once the window is visible
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // Window hidden: stop the clock so no time passes unseen.
+  function holdSession() {
+    if (screen !== "ready" && screen !== "session" && screen !== "rest") return;
+    if (running) {
+      stopTimer();
+      if (screen === "session") running = false;
+      else resumeOnReturn = true;
+    }
+    saveSession();
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { holdSession(); return; }
+    if (resumeOnReturn) { resumeOnReturn = false; startTimer(); }
+    if (screen === "session") render();
+  });
+  window.addEventListener("pagehide", holdSession);
+
   var audioCtx = null;
   function unlockAudio() {
     try {
@@ -1802,6 +1879,7 @@ code, pre { font-family: var(--font-code); }
     else html = "";
     root.innerHTML = html;
     bind();
+    saveSession();
   }
 
   // Lightweight per-second update: just the number, no full re-render (avoids flicker & re-binding cost)
@@ -1809,10 +1887,12 @@ code, pre { font-family: var(--font-code); }
     if (sideSwapPause) {
       var pauseNumEl = document.getElementById("countdown");
       if (pauseNumEl) pauseNumEl.textContent = sideSwapSecondsLeft;
+      saveSession();
       return;
     }
     var numEl = document.getElementById("countdown");
     if (numEl) numEl.textContent = secondsLeft;
+    saveSession();
   }
 
   function bind() {
@@ -1875,7 +1955,9 @@ code, pre { font-family: var(--font-code); }
     });
   }
 
+  restoreSession();
   render();
+  if (resumeOnReturn && !document.hidden) { resumeOnReturn = false; startTimer(); }
 })();
 </script>
 <script>
