@@ -598,119 +598,21 @@ code, pre { font-family: var(--font-code); }
   88%, 100% { d: path("M121.5,134.8 L117.7,155.5 L122,176"); }
 }
 
-/* 2. birddog_elbowknee (7s) */
-@keyframes birddogElbowkneeArmU {
-  0%, 8% { transform: rotate(0deg); }
-  24%, 30% { transform: rotate(-90deg); }
-  46%, 52% { transform: rotate(41.8deg); }
-  66%, 72% { transform: rotate(-90deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-@keyframes birddogElbowkneeArmF {
-  0%, 8% { transform: rotate(0deg); }
-  24%, 30% { transform: rotate(0deg); }
-  46%, 52% { transform: rotate(-61.8deg); }
-  66%, 72% { transform: rotate(0deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-@keyframes birddogElbowkneeLegT {
-  0%, 8% { transform: rotate(0deg); }
-  24%, 30% { transform: rotate(90deg); }
-  46%, 52% { transform: rotate(-68.9deg); }
-  66%, 72% { transform: rotate(90deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-@keyframes birddogElbowkneeLegS {
-  0%, 8% { transform: rotate(0deg); }
-  24%, 30% { transform: rotate(-90deg); }
-  46%, 52% { transform: rotate(33.9deg); }
-  66%, 72% { transform: rotate(-90deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-
-/* 3. plank_legraise (6s) */
-@keyframes plankLegraiseA {
-  0%, 10% { transform: rotate(0deg); }
-  24%, 32% { transform: rotate(10deg); }
-  44%, 100% { transform: rotate(0deg); }
-}
-@keyframes plankLegraiseB {
-  0%, 54% { transform: rotate(0deg); }
-  68%, 76% { transform: rotate(10deg); }
-  88%, 100% { transform: rotate(0deg); }
-}
-
-/* 4. superman_swimmer (6s) */
-@keyframes supermanSwimmerArm1 {
-  0%, 10% { transform: rotate(0deg); }
-  24%, 33% { transform: rotate(15.3deg); }
-  45%, 100% { transform: rotate(0deg); }
-}
-@keyframes supermanSwimmerLeg2 {
-  0%, 10% { transform: rotate(0deg); }
-  24%, 33% { transform: rotate(-9.2deg); }
-  45%, 100% { transform: rotate(0deg); }
-}
-@keyframes supermanSwimmerArm2 {
-  0%, 52% { transform: rotate(0deg); }
-  66%, 75% { transform: rotate(15.3deg); }
-  87%, 100% { transform: rotate(0deg); }
-}
-@keyframes supermanSwimmerLeg1 {
-  0%, 52% { transform: rotate(0deg); }
-  66%, 75% { transform: rotate(-9.2deg); }
-  87%, 100% { transform: rotate(0deg); }
-}
-
-/* 5. sideplank_toplift (5.5s) */
-@keyframes sideplankToplift {
-  0%, 12% { transform: rotate(0deg); }
-  36%, 48% { transform: rotate(25deg); }
-  86%, 100% { transform: rotate(0deg); }
-}
-
-/* 6. balance_free_turn (6s) */
-@keyframes balanceFreeTurnLift {
-  0%, 8% { transform: rotate(0deg); }
-  20%, 78% { transform: rotate(55deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-@keyframes balanceFreeTurnDot {
-  0%, 22% { transform: translateX(0px); }
-  36%, 40% { transform: translateX(-14px); }
-  58%, 62% { transform: translateX(3.5px); }
-  76%, 100% { transform: translateX(0px); }
-}
-
-/* 7. balance_towel (5.5s) */
-@keyframes balanceTowelLift {
-  0%, 10% { transform: rotate(0deg); }
-  30%, 58% { transform: rotate(55deg); }
-  88%, 100% { transform: rotate(0deg); }
-}
-@keyframes balanceTowelSway {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(0.7deg); }
-  75% { transform: rotate(-0.7deg); }
-}
-
-/* 8. balance_towel_turn (6s) */
-@keyframes balanceTowelTurnSway {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(0.7deg); }
-  75% { transform: rotate(-0.7deg); }
-}
-@keyframes balanceTowelTurnLift {
-  0%, 8% { transform: rotate(0deg); }
-  20%, 78% { transform: rotate(55deg); }
-  90%, 100% { transform: rotate(0deg); }
-}
-@keyframes balanceTowelTurnDot {
-  0%, 22% { transform: translateX(0px); }
-  36%, 40% { transform: translateX(-14px); }
-  58%, 62% { transform: translateX(3.5px); }
-  76%, 100% { transform: translateX(0px); }
-}
+/* Batch 4 diagrams redrawn to match their neighbours (2 Nov 2026) */
+@keyframes balanceFreeTurnFxLeg{0%,6%{d:path("M104,110 L102,143 L98,175 L108,175")}20%,86%{d:path("M104,110 L108,142 L88,166 L98,170")}96%,100%{d:path("M104,110 L102,143 L98,175 L108,175")}}
+@keyframes balanceFreeTurnFxDot{0%,6%{transform:translateX(0px)}26%,32%{transform:translateX(-14px)}56%,62%{transform:translateX(3px)}88%,100%{transform:translateX(0px)}}
+@keyframes balanceTowelFxLeg{0%,8%{d:path("M104,110 L102,143 L98,175 L108,175")}26%,76%{d:path("M104,110 L108,142 L88,166 L98,170")}94%,100%{d:path("M104,110 L102,143 L98,175 L108,175")}}
+@keyframes balanceTowelTurnFxLeg{0%,6%{d:path("M104,110 L102,143 L98,175 L108,175")}20%,86%{d:path("M104,110 L108,142 L88,166 L98,170")}96%,100%{d:path("M104,110 L102,143 L98,175 L108,175")}}
+@keyframes balanceTowelTurnFxDot{0%,6%{transform:translateX(0px)}26%,32%{transform:translateX(-14px)}56%,62%{transform:translateX(3px)}88%,100%{transform:translateX(0px)}}
+@keyframes supermanSwimmerFxArmA{0%,20%{transform:rotate(0deg)}24%,33%{transform:rotate(15deg)}45%,100%{transform:rotate(0deg)}}
+@keyframes supermanSwimmerFxLegB{0%,20%{transform:rotate(0deg)}24%,33%{transform:rotate(-12deg)}45%,100%{transform:rotate(0deg)}}
+@keyframes supermanSwimmerFxArmB{0%,62%{transform:rotate(0deg)}66%,75%{transform:rotate(15deg)}87%,100%{transform:rotate(0deg)}}
+@keyframes supermanSwimmerFxLegA{0%,62%{transform:rotate(0deg)}66%,75%{transform:rotate(-12deg)}87%,100%{transform:rotate(0deg)}}
+@keyframes plankLegraiseFxA{0%,20%{transform:rotate(0deg)}24%,32%{transform:rotate(-12deg)}44%,100%{transform:rotate(0deg)}}
+@keyframes plankLegraiseFxB{0%,62%{transform:rotate(0deg)}68%,76%{transform:rotate(-12deg)}88%,100%{transform:rotate(0deg)}}
+@keyframes sideplankTopliftFx{0%,12%{transform:rotate(0deg)}36%,48%{transform:rotate(-22deg)}86%,100%{transform:rotate(0deg)}}
+@keyframes birddogElbowkneeFxArm{0%,8%{d:path("M72,112 L58,126 L46,134")}24%,30%{d:path("M72,112 L54,124 L30,118")}46%,54%{d:path("M72,112 L91.2,121.8 L98,146")}70%,76%{d:path("M72,112 L54,124 L30,118")}92%,100%{d:path("M72,112 L58,126 L46,134")}}
+@keyframes birddogElbowkneeFxLeg{0%,8%{d:path("M142,112 L156,130 L168,140")}24%,30%{d:path("M142,112 L164,106 L188,100")}46%,54%{d:path("M142,112 L121.7,122.4 L115,146")}70%,76%{d:path("M142,112 L164,106 L188,100")}92%,100%{d:path("M142,112 L156,130 L168,140")}}
 </style>
 </head>
 <body>
@@ -813,7 +715,7 @@ code, pre { font-family: var(--font-code); }
           note: "Diagonal pairs, alternating each rep. Keep your neck long and hips level." },
         { label: "Slow reach, longer hold", guidance: "3 reps each side, 3s out, hold 8s, 3s back", duration: 90,
           note: "Diagonal pairs, alternating each rep. Keep your neck long and hips level." },
-        { label: "Elbow-to-knee", guidance: "3 reps each side: reach out 3s, draw elbow and knee together, reach out again, 3s back", duration: 85, anim: "birddog_elbowknee",
+        { label: "Elbow-to-knee", guidance: "3 reps each side: reach out 3s, draw elbow and knee towards each other, reach out again, 3s back", duration: 85, anim: "birddog_elbowknee",
           note: "Diagonal pairs, alternating each rep. Keep the movement small and your hips level." }
       ],
       cue: "Keep hips level and move slowly — no rushing.", anim: "birddog" },
@@ -2241,59 +2143,63 @@ code, pre { font-family: var(--font-code); }
     birddog_elbowknee: function () {
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
-        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M22,176 L182,176"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<path d="M84,136 L136,134 L141.8,127.1"></path>' +
-        '<circle cx="148.9" cy="118.7" r="10"></circle>' +
-        '<circle cx="156.9" cy="116.7" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '<path d="M136,134 L136,176"></path>' +
-        '<path d="M84,136 L84,176 L52,176"></path>' +
-        '<g style="animation:birddogElbowkneeArmU calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:136px 134px">' +
-        '<path d="M136,134 L136,156"></path>' +
-        '<g style="animation:birddogElbowkneeArmF calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:136px 156px">' +
-        '<path d="M136,156 L136,176"></path>' +
-        '</g>' +
-        '</g>' +
-        '<g style="animation:birddogElbowkneeLegT calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:84px 136px">' +
-        '<path d="M84,136 L84,176"></path>' +
-        '<g style="animation:birddogElbowkneeLegS calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:84px 176px">' +
-        '<path d="M84,176 L52,176"></path>' +
-        '</g>' +
-        '</g>' +
+        '<path d="M142,112 L140,172 L164,174"></path>' +
+        '<path d="M72,112 L70,142 L70,174"></path>' +
+        '<path d="M72,112 Q107,106 142,112"></path>' +
+        '<path d="M72,112 L61,105"></path>' +
+        '<circle cx="52" cy="100" r="10"></circle>' +
+        '<circle cx="43" cy="101" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M72,112 L58,126 L46,134" style="animation:birddogElbowkneeFxArm calc(7s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M142,112 L156,130 L168,140" style="animation:birddogElbowkneeFxLeg calc(7s * var(--pace)) ease-in-out infinite"></path>' +
         '</g>' +
         '</svg>';
     },
     plank_legraise: function () {
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
-        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M22,176 L182,176"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<path d="M145.2,150 L145.2,176 L169,176"></path>' +
-        '<path d="M94.4,160.9 L145.2,150 L154,148.1"></path>' +
-        '<circle cx="164.8" cy="145.8" r="10"></circle>' +
-        '<circle cx="172.8" cy="148.8" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '<path d="M94.4,160.9 L24,176" style="animation:plankLegraiseA calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:94.4px 160.9px"></path>' +
-        '<path d="M94.4,160.9 L24,176" style="animation:plankLegraiseB calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:94.4px 160.9px"></path>' +
+        '<path d="M74,132 L70,174"></path>' +
+        '<path d="M70,174 L44,174"></path>' +
+        '<path d="M74,132 L120,150"></path>' +
+        '<path d="M74,132 L63,126"></path>' +
+        '<circle cx="54" cy="121" r="10"></circle>' +
+        '<circle cx="46" cy="124" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:plankLegraiseFxA calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:120px 150px">' +
+        '<path d="M120,150 L164,168 L174,176"></path>' +
+        '</g>' +
+        '<g style="animation:plankLegraiseFxB calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:120px 150px">' +
+        '<path d="M120,150 L164,168 L174,176"></path>' +
+        '</g>' +
         '</g>' +
         '</svg>';
     },
     superman_swimmer: function () {
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
-        '<path d="M14,178 L186,178"></path>' +
-        '<path d="M14,171 L186,171"></path>' +
+        '<path d="M18,178 L186,178"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<path d="M112,168 L54,166"></path>' +
-        '<path d="M54,166 L52,164"></path>' +
-        '<circle cx="44" cy="161" r="10"></circle>' +
-        '<circle cx="38" cy="164" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '<path d="M56,167 L14,168" style="animation:supermanSwimmerArm1 calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:56px 167px"></path>' +
-        '<path d="M56,167 L14,168" style="animation:supermanSwimmerArm2 calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:56px 167px"></path>' +
-        '<path d="M112,168 L184,168" style="animation:supermanSwimmerLeg1 calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:112px 168px"></path>' +
-        '<path d="M112,168 L184,168" style="animation:supermanSwimmerLeg2 calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:112px 168px"></path>' +
+        '<path d="M74,166 Q104,168 132,166"></path>' +
+        '<path d="M74,166 L60,163"></path>' +
+        '<circle cx="50" cy="160" r="10"></circle>' +
+        '<circle cx="43" cy="164" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<g style="animation:supermanSwimmerFxArmA calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:74px 166px">' +
+        '<path d="M74,166 L54,175 L30,176"></path>' +
+        '</g>' +
+        '<g style="animation:supermanSwimmerFxArmB calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:74px 166px">' +
+        '<path d="M74,166 L54,175 L30,176"></path>' +
+        '</g>' +
+        '<g style="animation:supermanSwimmerFxLegA calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:132px 166px">' +
+        '<path d="M132,166 L154,175 L178,176"></path>' +
+        '</g>' +
+        '<g style="animation:supermanSwimmerFxLegB calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:132px 166px">' +
+        '<path d="M132,166 L154,175 L178,176"></path>' +
+        '</g>' +
         '</g>' +
         '</svg>';
     },
@@ -2303,13 +2209,16 @@ code, pre { font-family: var(--font-code); }
         '<path d="M14,178 L186,178"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<path d="M26,176 L96.3,160.6"></path>' +
-        '<path d="M96.3,160.6 L135.4,152 L144.2,150.1"></path>' +
-        '<circle cx="154.9" cy="147.7" r="10"></circle>' +
-        '<circle cx="160.9" cy="150.7" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '<path d="M135.4,152 L135.4,176 L149,176"></path>' +
-        '<path d="M135.4,152 L116,142 L101,156.5"></path>' +
-        '<path d="M26,176 L96.3,160.6" style="animation:sideplankToplift calc(5.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:96.3px 160.6px"></path>' +
+        '<path d="M46,147 L46,173 L28,173"></path>' +
+        '<path d="M46,147 L92.7,158.2"></path>' +
+        '<path d="M92.7,158.2 L125.8,166.2 L160,174.4 L170,172"></path>' +
+        '<path d="M46,147 L40.2,145.6"></path>' +
+        '<circle cx="32.4" cy="143.8" r="10.5"></circle>' +
+        '<circle cx="24.4" cy="142.8" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M46,147 L68,141 L93,152"></path>' +
+        '<g style="animation:sideplankTopliftFx calc(5.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:92.7px 158.2px">' +
+        '<path d="M92.7,158.2 L125.8,166.2 L160,174.4 L170,172"></path>' +
+        '</g>' +
         '</g>' +
         '</svg>';
     },
@@ -2317,22 +2226,19 @@ code, pre { font-family: var(--font-code); }
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
         '<path d="M14,178 L186,178"></path>' +
-        '<path d="M100,104 L188,104"></path>' +
-        '<path d="M100,104 L100,113"></path>' +
-        '<path d="M108,113 L108,178"></path>' +
-        '<path d="M182,113 L182,178"></path>' +
+        '<path d="M136,104 L190,104"></path>' +
+        '<path d="M136,104 L136,114"></path>' +
+        '<path d="M148,104 L148,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<path d="M62,104 L62,66 L62,60"></path>' +
-        '<circle cx="62" cy="50" r="10"></circle>' +
-        '<path d="M62,68 L69,92 L78,123"></path>' +
-        '<path d="M62,68 L55,92 L46,123"></path>' +
-        '<path d="M62,104 L66,140 L62,176"></path>' +
-        '<path d="M56,176 L78,176"></path>' +
-        '<g style="animation:balanceFreeTurnLift calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:66px 140px">' +
-        '<path d="M66,140 L62,176 L78,176"></path>' +
-        '</g>' +
-        '<circle cx="69" cy="53" r="2.6" style="fill:var(--accent);stroke:none;animation:balanceFreeTurnDot calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
+        '<path d="M104,110 L107,143 L104,176 L116,176"></path>' +
+        '<path d="M104,110 L102,143 L98,175 L108,175" style="animation:balanceFreeTurnFxLeg calc(6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,66 L113,86 L121,102"></path>' +
+        '<path d="M104,66 L94,84 L84,98"></path>' +
+        '<path d="M104,110 L104,62"></path>' +
+        '<circle cx="104" cy="50" r="10.5"></circle>' +
+        '<circle cx="110" cy="52" r="2.6" style="fill:var(--accent);stroke:none;animation:balanceFreeTurnFxDot calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
         '</g>' +
         '</svg>';
     },
@@ -2340,26 +2246,21 @@ code, pre { font-family: var(--font-code); }
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
         '<path d="M14,178 L186,178"></path>' +
-        '<path d="M100,104 L188,104"></path>' +
-        '<path d="M100,104 L100,113"></path>' +
-        '<path d="M108,113 L108,178"></path>' +
-        '<path d="M182,113 L182,178"></path>' +
-        '<path d="M54,173 L82,173" style="stroke-width:6px"></path>' +
+        '<path d="M136,104 L190,104"></path>' +
+        '<path d="M136,104 L136,114"></path>' +
+        '<path d="M148,104 L148,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '<path d="M94,173 L126,173" style="stroke-width:6px"></path>' +
         '</g>' +
-        '<g transform="translate(0 -6)">' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<g style="animation:balanceTowelSway calc(5.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:70px 176px">' +
-        '<path d="M62,104 L62,66 L62,60"></path>' +
-        '<circle cx="62" cy="50" r="10"></circle>' +
-        '<circle cx="69" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '<path d="M62,68 L69,92 L78,123"></path>' +
-        '<path d="M62,68 L55,92 L46,123"></path>' +
-        '<path d="M62,104 L66,140 L62,176"></path>' +
-        '<path d="M56,176 L78,176"></path>' +
-        '<g style="animation:balanceTowelLift calc(5.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:66px 140px">' +
-        '<path d="M66,140 L62,176 L78,176"></path>' +
-        '</g>' +
-        '</g>' +
+        '<g transform="translate(0 -6)">' +
+        '<path d="M104,110 L107,143 L104,176 L116,176"></path>' +
+        '<path d="M104,110 L102,143 L98,175 L108,175" style="animation:balanceTowelFxLeg calc(5s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,66 L113,86 L121,102"></path>' +
+        '<path d="M104,66 L94,84 L84,98"></path>' +
+        '<path d="M104,110 L104,62"></path>' +
+        '<circle cx="104" cy="50" r="10.5"></circle>' +
+        '<circle cx="112" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
         '</g>' +
         '</g>' +
         '</svg>';
@@ -2368,26 +2269,21 @@ code, pre { font-family: var(--font-code); }
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
         '<path d="M14,178 L186,178"></path>' +
-        '<path d="M100,104 L188,104"></path>' +
-        '<path d="M100,104 L100,113"></path>' +
-        '<path d="M108,113 L108,178"></path>' +
-        '<path d="M182,113 L182,178"></path>' +
-        '<path d="M54,173 L82,173" style="stroke-width:6px"></path>' +
+        '<path d="M136,104 L190,104"></path>' +
+        '<path d="M136,104 L136,114"></path>' +
+        '<path d="M148,104 L148,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '<path d="M94,173 L126,173" style="stroke-width:6px"></path>' +
         '</g>' +
-        '<g transform="translate(0 -6)">' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
-        '<g style="animation:balanceTowelTurnSway calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:70px 176px">' +
-        '<path d="M62,104 L62,66 L62,60"></path>' +
-        '<circle cx="62" cy="50" r="10"></circle>' +
-        '<circle cx="69" cy="53" r="2.6" style="fill:var(--accent);stroke:none;animation:balanceTowelTurnDot calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
-        '<path d="M62,68 L69,92 L78,123"></path>' +
-        '<path d="M62,68 L55,92 L46,123"></path>' +
-        '<path d="M62,104 L66,140 L62,176"></path>' +
-        '<path d="M56,176 L78,176"></path>' +
-        '<g style="animation:balanceTowelTurnLift calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:66px 140px">' +
-        '<path d="M66,140 L62,176 L78,176"></path>' +
-        '</g>' +
-        '</g>' +
+        '<g transform="translate(0 -6)">' +
+        '<path d="M104,110 L107,143 L104,176 L116,176"></path>' +
+        '<path d="M104,110 L102,143 L98,175 L108,175" style="animation:balanceTowelTurnFxLeg calc(6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,66 L113,86 L121,102"></path>' +
+        '<path d="M104,66 L94,84 L84,98"></path>' +
+        '<path d="M104,110 L104,62"></path>' +
+        '<circle cx="104" cy="50" r="10.5"></circle>' +
+        '<circle cx="110" cy="52" r="2.6" style="fill:var(--accent);stroke:none;animation:balanceTowelTurnFxDot calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
         '</g>' +
         '</g>' +
         '</svg>';
