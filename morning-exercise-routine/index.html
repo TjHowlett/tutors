@@ -613,6 +613,61 @@ code, pre { font-family: var(--font-code); }
 @keyframes sideplankTopliftFx{0%,12%{transform:rotate(0deg)}36%,48%{transform:rotate(-22deg)}86%,100%{transform:rotate(0deg)}}
 @keyframes birddogElbowkneeFxArm{0%,8%{d:path("M72,112 L58,126 L46,134")}24%,30%{d:path("M72,112 L54,124 L30,118")}46%,54%{d:path("M72,112 L91.2,121.8 L98,146")}70%,76%{d:path("M72,112 L54,124 L30,118")}92%,100%{d:path("M72,112 L58,126 L46,134")}}
 @keyframes birddogElbowkneeFxLeg{0%,8%{d:path("M142,112 L156,130 L168,140")}24%,30%{d:path("M142,112 L164,106 L188,100")}46%,54%{d:path("M142,112 L121.7,122.4 L115,146")}70%,76%{d:path("M142,112 L164,106 L188,100")}92%,100%{d:path("M142,112 L156,130 L168,140")}}
+  /* Batch 5 corrections: diagrams for the hands-on-hips lunge and hinge, deeper wall sit, straight-leg dead bug (2 Nov 2026) */
+@keyframes squatL6Body{0%,10%{transform:translate(0px,0px)}
+42%,54%{transform:translate(-18px,5px)}
+88%,100%{transform:translate(0px,0px)}}
+@keyframes squatL6Back{0%,10%{d:path("M110,110 L106,143 L102,176 L114,176")}
+42%,54%{d:path("M92,115 L82,147 L54,163 L64,175")}
+88%,100%{d:path("M110,110 L106,143 L102,176 L114,176")}}
+@keyframes squatL6Front{0%,10%{d:path("M110,110 L112,143 L112,176 L124,176")}
+42%,54%{d:path("M92,115 L112,142 L112,176 L124,176")}
+88%,100%{d:path("M110,110 L112,143 L112,176 L124,176")}}
+@keyframes squatL7Body{0%,8%{transform:translate(0px,0px)}
+50%,64%{transform:translate(-18px,5px)}
+92%,100%{transform:translate(0px,0px)}}
+@keyframes squatL7Back{0%,8%{d:path("M110,110 L106,143 L102,176 L114,176")}
+50%,64%{d:path("M92,115 L82,147 L54,163 L64,175")}
+92%,100%{d:path("M110,110 L106,143 L102,176 L114,176")}}
+@keyframes squatL7Front{0%,8%{d:path("M110,110 L112,143 L112,176 L124,176")}
+50%,64%{d:path("M92,115 L112,142 L112,176 L124,176")}
+92%,100%{d:path("M110,110 L112,143 L112,176 L124,176")}}
+@keyframes hingeL6Body{0%,10%{transform:translate(0px,0px)}
+42%,54%{transform:translate(-16px,6px)}
+90%,100%{transform:translate(0px,0px)}}
+@keyframes hingeL6Torso{0%,10%{transform:rotate(0deg)}
+42%,54%{transform:rotate(40deg)}
+90%,100%{transform:rotate(0deg)}}
+@keyframes hingeL6Free{0%,10%{d:path("M104,110 L101,143 L97,175 L107,175")}
+42%,54%{d:path("M88,116 L63,137 L38,158 L47,163")}
+90%,100%{d:path("M104,110 L101,143 L97,175 L107,175")}}
+@keyframes hingeL6Stand{0%,10%{d:path("M104,110 L108,143 L104,176 L116,176")}
+42%,54%{d:path("M88,116 L109.4,142.4 L104,176 L116,176")}
+90%,100%{d:path("M104,110 L108,143 L104,176 L116,176")}}
+@keyframes hingeL7Body{0%,8%{transform:translate(0px,0px)}
+48%,58%{transform:translate(-16px,6px)}
+92%,100%{transform:translate(0px,0px)}}
+@keyframes hingeL7Torso{0%,8%{transform:rotate(0deg)}
+48%,58%{transform:rotate(40deg)}
+92%,100%{transform:rotate(0deg)}}
+@keyframes hingeL7Free{0%,8%{d:path("M104,110 L101,143 L97,175 L107,175")}
+48%,58%{d:path("M88,116 L63,137 L38,158 L47,163")}
+92%,100%{d:path("M104,110 L101,143 L97,175 L107,175")}}
+@keyframes hingeL7Stand{0%,8%{d:path("M104,110 L108,143 L104,176 L116,176")}
+48%,58%{d:path("M88,116 L109.4,142.4 L104,176 L116,176")}
+92%,100%{d:path("M104,110 L108,143 L104,176 L116,176")}}
+@keyframes wallsitDeeperBody{0%,8%{transform:translate(0px,0px)}
+28%,72%{transform:translate(0px,17px)}
+92%,100%{transform:translate(0px,0px)}}
+@keyframes wallsitDeeperLeg{0%,8%{d:path("M66,115 L84,147 L96,176 L108,176")}
+28%,72%{d:path("M66,132 L97,143 L97,176 L109,176")}
+92%,100%{d:path("M66,115 L84,147 L96,176 L108,176")}}
+@keyframes deadbugL5Arm{0%,8%{transform:rotate(0deg)}
+40%,56%{transform:rotate(-50deg)}
+92%,100%{transform:rotate(0deg)}}
+@keyframes deadbugL5Leg{0%,8%{transform:rotate(0deg)}
+40%,56%{transform:rotate(45deg)}
+92%,100%{transform:rotate(0deg)}}
 </style>
 </head>
 <body>
@@ -640,9 +695,9 @@ code, pre { font-family: var(--font-code); }
           note: "Most of your weight stays on the front foot. Swap which foot is back halfway." },
         { label: "Single-leg hinge", guidance: "5 reps each side, one hand on the counter or wall", duration: 55, sideSwap: true, anim: "hinge_l5",
           note: "The free leg lifts behind you as you lean forward. Keep it low and your back flat. Swap legs halfway." },
-        { label: "Single-leg hinge, hands free", guidance: "5 reps each side, hands on hips, counter within reach", duration: 55, sideSwap: true, anim: "hinge_l5",
+        { label: "Single-leg hinge, hands free", guidance: "5 reps each side, hands on hips, counter within reach", duration: 55, sideSwap: true, anim: "hinge_l6",
           note: "Keep the free leg low and your back flat. Swap legs halfway." },
-        { label: "Slow single-leg hinge", guidance: "5 reps each side, 3s down and 3s up, hands on hips", duration: 65, sideSwap: true, anim: "hinge_l5",
+        { label: "Slow single-leg hinge", guidance: "5 reps each side, 3s down and 3s up, hands on hips", duration: 65, sideSwap: true, anim: "hinge_l7",
           note: "The free leg can lift a little higher than before. Stay in control and keep your back flat. Swap legs halfway." }
       ],
       cue: "Keep your back flat and knees soft — the bend comes from your hips.", anim: "hinge" },
@@ -657,9 +712,9 @@ code, pre { font-family: var(--font-code); }
           note: "Short step back, shallow depth. Swap legs halfway." },
         { label: "Reverse lunge", name: "Reverse lunges", guidance: "6 reps each side, fingertips on the counter", duration: 50, sideSwap: true, anim: "squat_l5",
           note: "Short step back, shallow depth. Swap legs halfway." },
-        { label: "Reverse lunge, hands free", name: "Reverse lunges", guidance: "6 reps each side, hands on your hips, counter within reach", duration: 55, sideSwap: true, anim: "squat_l5",
+        { label: "Reverse lunge, hands free", name: "Reverse lunges", guidance: "6 reps each side, hands on your hips, counter within reach", duration: 55, sideSwap: true, anim: "squat_l6",
           note: "Short step back, shallow depth. Swap legs halfway." },
-        { label: "Slow reverse lunge", name: "Reverse lunges", guidance: "6 reps each side, 3s down, pause 1s at the bottom", duration: 70, sideSwap: true, anim: "squat_l5",
+        { label: "Slow reverse lunge", name: "Reverse lunges", guidance: "6 reps each side, 3s down, pause 1s at the bottom", duration: 70, sideSwap: true, anim: "squat_l7",
           note: "Short step back, shallow depth, front knee over your ankle. Swap legs halfway." }
       ],
       cue: "Keep knees tracking over your toes, chest lifted.", anim: "squat" },
@@ -792,7 +847,7 @@ code, pre { font-family: var(--font-code); }
           note: "Same shallow depth — hold for longer, not lower." },
         { label: "Shallow wall sit, 50s", guidance: "Hold 50s", duration: 50, anim: "wallsit",
           note: "Same shallow depth — hold for longer, not lower." },
-        { label: "Slightly deeper wall sit", guidance: "Hold 40s, slide down a little further than before", duration: 40, anim: "wallsit",
+        { label: "Slightly deeper wall sit", guidance: "Hold 40s, slide down a little further than before", duration: 40, anim: "wallsit_deeper",
           note: "Thighs still sloping, not level. Keep your knees over your ankles." }
       ],
       cue: "Keep your knees over your ankles and breathe normally.", anim: "wallsit" },
@@ -846,7 +901,7 @@ code, pre { font-family: var(--font-code); }
           note: "Lower the opposite arm and leg together and hold. Your lower back stays pressed down." },
         { label: "Slow dead bug with hold", guidance: "5 reps each side, 3s down, hold 3s", duration: 80, anim: "deadbug_l4",
           note: "Lower the opposite arm and leg together, slowly, and hold. Your lower back stays pressed down." },
-        { label: "Straight-leg dead bug", guidance: "5 reps each side, lower the straight leg and opposite arm", duration: 65, anim: "deadbug_l4",
+        { label: "Straight-leg dead bug", guidance: "5 reps each side, lower the straight leg and opposite arm", duration: 65, anim: "deadbug_l5",
           note: "Lower the opposite arm and leg together. If your lower back lifts, bend the knee more." }
       ],
       cue: "Keep your lower back pressed to the floor and breathe out as you lower.", anim: "deadbug" },
@@ -2284,6 +2339,136 @@ code, pre { font-family: var(--font-code); }
         '<path d="M104,110 L104,62"></path>' +
         '<circle cx="104" cy="50" r="10.5"></circle>' +
         '<circle cx="110" cy="52" r="2.6" style="fill:var(--accent);stroke:none;animation:balanceTowelTurnFxDot calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    squat_l6: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M128,104 L190,104"></path>' +
+        '<path d="M128,104 L128,114"></path>' +
+        '<path d="M140,104 L140,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M110,110 L106,143 L102,176 L114,176" style="animation:squatL6Back calc(4.5s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M110,110 L112,143 L112,176 L124,176" style="animation:squatL6Front calc(4.5s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:squatL6Body calc(4.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:0px 0px">' +
+        '<path d="M110,110 L110,62"></path>' +
+        '<circle cx="110" cy="50" r="10.5"></circle>' +
+        '<circle cx="118" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M110,66 L98,88 L110,108"></path>' +
+        '<path d="M110,66 L102,88 L111,108"></path>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    squat_l7: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M128,104 L190,104"></path>' +
+        '<path d="M128,104 L128,114"></path>' +
+        '<path d="M140,104 L140,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M110,110 L106,143 L102,176 L114,176" style="animation:squatL7Back calc(7s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M110,110 L112,143 L112,176 L124,176" style="animation:squatL7Front calc(7s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:squatL7Body calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:0px 0px">' +
+        '<path d="M110,110 L110,62"></path>' +
+        '<circle cx="110" cy="50" r="10.5"></circle>' +
+        '<circle cx="118" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M110,66 L98,88 L110,108"></path>' +
+        '<path d="M110,66 L102,88 L111,108"></path>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    hinge_l6: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M128,104 L190,104"></path>' +
+        '<path d="M128,104 L128,114"></path>' +
+        '<path d="M140,104 L140,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M104,110 L101,143 L97,175 L107,175" style="animation:hingeL6Free calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,110 L108,143 L104,176 L116,176" style="animation:hingeL6Stand calc(4.6s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:hingeL6Body calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:0px 0px">' +
+        '<g style="animation:hingeL6Torso calc(4.6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:104px 110px">' +
+        '<path d="M104,110 L104,62"></path>' +
+        '<circle cx="104" cy="50" r="10.5"></circle>' +
+        '<circle cx="112" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M104,66 L92,88 L103,108"></path>' +
+        '<path d="M104,66 L96,88 L105,108"></path>' +
+        '</g>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    hinge_l7: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M128,104 L190,104"></path>' +
+        '<path d="M128,104 L128,114"></path>' +
+        '<path d="M140,104 L140,178"></path>' +
+        '<path d="M184,104 L184,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M104,110 L101,143 L97,175 L107,175" style="animation:hingeL7Free calc(7s * var(--pace)) ease-in-out infinite"></path>' +
+        '<path d="M104,110 L108,143 L104,176 L116,176" style="animation:hingeL7Stand calc(7s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:hingeL7Body calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:0px 0px">' +
+        '<g style="animation:hingeL7Torso calc(7s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:104px 110px">' +
+        '<path d="M104,110 L104,62"></path>' +
+        '<circle cx="104" cy="50" r="10.5"></circle>' +
+        '<circle cx="112" cy="53" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M104,66 L92,88 L103,108"></path>' +
+        '<path d="M104,66 L96,88 L105,108"></path>' +
+        '</g>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    wallsit_deeper: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '<path d="M56,30 L56,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<path d="M66,115 L84,147 L96,176 L108,176" style="animation:wallsitDeeperLeg calc(5s * var(--pace)) ease-in-out infinite"></path>' +
+        '<g style="animation:wallsitDeeperBody calc(5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:0px 0px">' +
+        '<path d="M66,115 L66,67"></path>' +
+        '<circle cx="68" cy="54" r="10.5"></circle>' +
+        '<circle cx="76" cy="57" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M66,70 L68,92 L68,112"></path>' +
+        '</g>' +
+        '</g>' +
+        '</svg>';
+    },
+    deadbug_l5: function () {
+      return '<svg viewBox="0 0 200 190">' +
+        '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
+        '<path d="M14,178 L186,178"></path>' +
+        '</g>' +
+        '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
+        '<circle cx="40" cy="167" r="10"></circle>' +
+        '<circle cx="40" cy="157.5" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
+        '<path d="M50,168 L61,173"></path>' +
+        '<path d="M61,173 L113,174"></path>' +
+        '<path d="M113,174 L113,140 L113,106 L105,106"></path>' +
+        '<path d="M65,173 L64,150 L66,128"></path>' +
+        '<g style="animation:deadbugL5Arm calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:60px 173px">' +
+        '<path d="M60,173 L59,150 L61,128"></path>' +
+        '</g>' +
+        '<g style="animation:deadbugL5Leg calc(6s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:108px 174px">' +
+        '<path d="M108,174 L108,140 L108,106 L100,106"></path>' +
         '</g>' +
         '</g>' +
         '</svg>';
