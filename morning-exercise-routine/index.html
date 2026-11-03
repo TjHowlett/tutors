@@ -3283,6 +3283,12 @@ code, pre { font-family: var(--font-code); }
     screen = "feedbackPick";
     render();
   }
+  // One adjustment per exercise per session: once an exercise has been ticked in
+  // any round (too easy, too hard or felt pain), it can't be ticked again until
+  // the next session.
+  function adjustedThisSession(id) {
+    return adjustments.some(function (a) { return a.ids && a.ids.indexOf(id) >= 0; });
+  }
   function togglePick(id) {
     if (pickSelected[id]) delete pickSelected[id]; else pickSelected[id] = true;
     render();
@@ -3292,7 +3298,7 @@ code, pre { font-family: var(--font-code); }
   // Each Apply is saved at once, and today's history entry is written each time,
   // so nothing is lost if the app is closed before Done.
   function applyPicked() {
-    var ids = Object.keys(pickSelected);
+    var ids = Object.keys(pickSelected).filter(function (id) { return !adjustedThisSession(id); });
     if (!ids.length) { screen = "feedback"; render(); return; }
     var res = applyPick(state, pickKind, ids, activeExercises);
     if (!res.changed.length) { screen = "feedback"; render(); return; }
@@ -3582,11 +3588,13 @@ code, pre { font-family: var(--font-code); }
       if (state.dropped.indexOf(ex.id) >= 0) return false;
       return pickKind === "pain" ? true : hasSteps(ex);
     }).map(function (ex) {
-      var disabled = !canMove(ex, pickKind);
-      var selected = !!pickSelected[ex.id];
+      var already = adjustedThisSession(ex.id);
+      var disabled = already || !canMove(ex, pickKind);
+      var selected = !!pickSelected[ex.id] && !already;
       var info = getGuidance(ex, state);
       var sub = info.label && info.label !== displayName(ex, info) ? info.label : ex.category;
-      if (disabled) sub = pickKind === "easy" ? "Already at the top step" : "Already at the easiest step";
+      if (already) sub = "Already adjusted this session";
+      else if (disabled) sub = pickKind === "easy" ? "Already at the top step" : "Already at the easiest step";
       return '<button class="button button--secondary pick-row' + (selected ? ' selected' : '') + '" data-pick="' + ex.id + '"' + (disabled ? ' disabled' : '') + '>' +
         '<span class="pick-box">' + (selected ? iconCheck(14, "var(--color-button-text)") : '') + '</span>' +
         '<span class="pick-text"><span>' + esc(displayName(ex, info)) + '</span><span class="sub">' + esc(sub) + '</span></span>' +
