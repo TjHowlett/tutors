@@ -443,7 +443,7 @@ li:last-child { margin-bottom: 0; }
 .message svg { flex: 0 0 22px; width: 22px; height: 22px; }
 
 /* tabs along the bottom */
-.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--color-surface); border-top: 1px solid var(--color-edge); display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--color-surface); border-top: 1px solid var(--color-edge); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom); }
 .tab { background: none; border: 0; border-top: 4px solid transparent; color: var(--color-text-muted); font: inherit; font-size: 15px; min-height: 60px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .tab svg { width: 22px; height: 22px; }
 .tab.on { color: var(--color-text); border-top-color: var(--color-input-edge-active); font-weight: var(--font-weight-heading); }
@@ -565,7 +565,8 @@ var ICON = {
   path: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20c0-5 14-5 14-10S5 7 5 4"/><circle cx="5" cy="20" r="1.6"/><circle cx="5" cy="4" r="1.6"/></svg>',
   warm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.5 1 2 2 2 0-3-1-5 1-8z"/></svg>',
   prog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
-  set: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>'
+  set: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
+  gym: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>'
 };
 function banner(kind, word, text) {
   return '<div class="message message--' + kind + '">' + (kind === 'success' ? ICON.ok : kind === 'error' ? ICON.err : ICON.warn) + '<span><b>' + word + '.</b> ' + text + '</span></div>';
@@ -575,8 +576,8 @@ function banner(kind, word, text) {
 var storageOK = true;
 function defaults() {
   return {
-    v: 1,
-    setup: { done: false, modeHS: 2, modeMini: 2, f: { alt: false, headless: false, speed: false, onekey: false, trim: false, flips: false }, minutes: 5, room: 'medium', stopHS: '', stopMini: '' },
+    v: 2,
+    setup: { done: false, modeHS: 2, modeMini: 2, f: { alt: false, headless: false, speed: false, onekey: false, trim: false, flips: false, noland: false }, minutes: 5, room: 'medium', stopHS: '', stopMini: '' },
     safetySeen: false, done: {}, unlocked: {}, attempts: [], lastBackup: null
   };
 }
@@ -938,8 +939,350 @@ var LESSONS = [
   dia: ['forward:up', 'yaw:right'],
   extras: function () { return []; },
   carries: 'Smooth blends like these are what make flying the Mini SE feel graceful. The sticks and the feel are the same.'
+},
+{
+  id: 13, title: 'Turn variety and snap turns',
+  why: 'Lesson 5 taught a slow turn that stays in place. Real flying needs more: slow turns, quick turns, and turns that stop exactly where you want. Snap turns train your thumb to start and stop a turn cleanly, and that fine control carries into everything else.',
+  setup: function (r) { return 'Same 1 m circle and height marker as lesson 3. Put a marker (a cup or a bit of tape) on the wall in each direction: ahead, right, behind and left, so you can see 90° and 180° headings. Stand at least 2 m behind the circle with the area clear. ' + CEIL; },
+  steps: function () { return [
+    'Hover at your height marker with the nose on the far wall marker. Settle for 2 seconds.',
+    'Slow turn: a fingernail of turn stick, a quarter-turn to the right wall marker (about 8 seconds). Then slowly back to the far wall. Do the same to the left.',
+    'Quick turn: about a quarter of the stick for a quarter-turn in about 2 seconds. Ease the stick back to the centre a little BEFORE the nose reaches the marker, because the drone keeps turning for a moment after you let go.',
+    'Snap turn 90°: a quick turn right that stops with the nose on the right wall marker. Pause 1 second. Check the nose and the drone’s position over the floor. Snap back to the far wall. Then the same to the left.',
+    'Snap turn 180°: a quick turn that stops with the nose on the wall behind you. That leaves the nose pointing at you, so stay at least 2 m back and only turn, don’t move it. Pause, then snap back.',
+    'Mixed: call the turn out loud before each one (“right 90”, “back 180”, “left 90”), then do it. Five in a row, with only a one-second check between them.',
+    'At every pause, glance at the height marker and the circle. Fix any drift with the small nudges from lesson 4. ' + NOSEIN
+  ]; },
+  good: function () { return 'Five snap turns in a row (a mix of 90° and 180°, both directions). Each one stops with the nose within a hand-width of the wall marker (about 15°), and the drone stays inside the 1 m circle and within 30 cm of your height marker.'; },
+  mistakes: [
+    ['Letting go of the stick only when the nose arrives, so it overshoots.', 'Ease the stick back to the centre a little early. The drone keeps turning for a moment.'],
+    ['Pushing the turn stick too far, so the turn is wild and the drone slides.', 'A quarter of the stick is plenty for a quick turn. A bigger push is not better control.'],
+    ['Fixing an overshoot with another snap the other way.', 'Use a slow fingernail turn to fix it. Snaps are for the big moves.'],
+    ['Losing height during a turn.', 'Glance at the height marker at every pause.']
+  ],
+  dia: ['yaw:left', 'yaw:right'],
+  extras: function () { return []; },
+  carries: 'Starting a turn smoothly and ending it with a small early release is exactly the same on the Mini SE. It lets you point the drone where you want without a wobble.'
+},
+{
+  id: 14, title: 'Curved turns and S-curves',
+  why: 'Lesson 12 had you hold one curve. Here you change the curve: wider, tighter, then left and right. It is how you fly smoothly round corners without stopping, and it trains you to move two sticks together.',
+  setup: function (r) { return 'Mark a start spot and an end spot ' + num(r.line) + ' m apart in a straight line. Halfway along, put a tape mark ' + num(r.sw) + ' m to the right of the line, and another ' + num(r.sw) + ' m to the left, a little further along. Four marks in all. Stand behind the start spot. ' + CEIL; },
+  steps: function () { return [
+    'Warm up with one slow circle each way, as in lesson 12.',
+    'Wide curve: a fingernail of forward and a tiny bit of turn right. The nose should swing about 45° over the length of the line. Then ease the turn stick back to the centre so the nose straightens. Repeat to the left.',
+    'Tight curve: the same forward, about double the turn. Change one stick at a time, a fingernail each time.',
+    'Straightening out: ease the turn stick back to the centre slowly, like the hand of a clock. Snapping it back makes the drone wobble.',
+    'S-curve: swing out to the right mark, come back across the line, swing out to the left mark, then finish on the end spot. That is a turn right, a smooth pass through the centre, then a turn left.',
+    'Do it both ways (right first, then left first), wide first, then tight. Keep the forward stick steady the whole way. The turn stick shapes the path.',
+    'Look a second ahead of the drone, along the path, not at the drone’s nose.'
+  ]; },
+  good: function (r) { return 'Fly the ' + num(r.line) + ' m S-curve right-first and left-first without stopping on the way. Pass within 30 cm of both side marks, finish within 50 cm of the end spot with the nose along the path, and keep height within 30 cm. Then a tight version each way. Four clean runs.'; },
+  mistakes: [
+    ['Letting the forward speed change through the curve.', 'Hold the forward stick steady and shape the path with the turn stick.'],
+    ['Snapping the turn stick through the middle at the crossing.', 'Pass the centre slowly, like a slow clock hand.'],
+    ['Tight curves that slide wide or lose height.', 'Tight curves need a little less forward, not a lot more turn. Slow down first.'],
+    ['Watching the nose instead of the path.', 'Look where the drone will be in a second.']
+  ],
+  dia: ['forward:up', 'yaw:left', 'yaw:right'],
+  extras: function () { return []; },
+  carries: 'Easing two sticks together is the heart of smooth flying on the Mini SE as well. Shaping the path with the turn stick works the same way.'
+},
+{
+  id: 15, title: 'Recovery: wobbles, bearings and settling',
+  why: 'Everything goes wrong sometimes: a gust, a wobble, or a moment when you can’t tell which way the nose points. A reliable routine stops you panicking and mashing the sticks, which is when crashes happen. Come back to this lesson whenever flying feels shaky.',
+  setup: function () { return 'Same circle and height marker as lesson 3, plus the four wall markers from lesson 5 (ahead, right, behind, left). Stand at least 2 m back. Find the front of your drone (coloured props or lights; check your manual) so you can always tell where the nose is. ' + CEIL; },
+  steps: function () { return [
+    'Stop-and-settle: hover, then fly a short forward move (about 1 m, a fingernail of stick). Let go of both sticks and count the seconds until the drone is still, within a shoe-length of where it stopped. Put that time in your note.',
+    'Wobble catch: when the drone starts to slide or bob, do four things in order. (1) Hands off. (2) Say the direction. (3) One fingernail nudge the opposite way for half a second. (4) Hands off again and watch.',
+    'Repeat steps 1 and 2 until your settle time is 3 seconds or less.',
+    'Bearings: hover nose away. Make a turn of a random size (a quarter, a half or three-quarters) with a quick turn, then let go. Before doing anything else, say which wall marker the nose faces. Check.',
+    'Lost bearings routine: let go of the sticks. Give the turn stick a fingernail to the right for half a second and watch which way the nose swings. Now you know which way is which. Turn slowly until the nose points away from you, then carry on. If the nose is pointing at you, don’t fly forward.',
+    'Reset drill: fly any move, call “reset”, let go of both sticks and count to 3. Then check in this order: height, position, heading. Fix one at a time.',
+    'Never chase the drone with big moves. If it heads for a wall, an object or a person: let go of the sticks, then press the land button.'
+  ]; },
+  good: function () { return 'After a short forward move and a let-go, the drone is still within 3 seconds and within a shoe-length of where it stopped, five times in a row. Then name the nose heading correctly (to the nearest wall marker) after five random turns in a row.'; },
+  mistakes: [
+    ['A big opposite stick when it wobbles.', 'Hands off first. Then one fingernail nudge. Big corrections start the next wobble.'],
+    ['Moving on before the drone has settled.', 'Count to 3 with the sticks in the centre, then decide.'],
+    ['Turning blindly when you’ve lost the nose.', 'Let go, make one tiny turn and watch which way the nose swings.'],
+    ['Hunting in every direction when you panic.', 'Check in order: height, position, heading. Fix one at a time.']
+  ],
+  dia: ['forward:up', 'forward:down', 'yaw:left', 'yaw:right'],
+  extras: function () { return []; },
+  carries: 'Let go, settle, then check height, position and heading is the first thing to do on any drone, including the Mini SE.',
+  differs: 'Because the Mini SE holds its own position (see lesson 3), letting go of the sticks is an even stronger reset there, as long as it has a good position fix. The habit is the same, but it should settle faster than the HS210.'
+},
+{
+  id: 16, title: 'Nose-in box',
+  why: 'Lesson 8 flew the box with the nose away. Flown nose-in, every left and right is flipped, which is where most people struggle. Building it up one side at a time stops it feeling like a puzzle.',
+  setup: function (r) { return 'Use the same ' + num(r.box) + ' m box as lesson 8: A (far left), B (far right), C (near right), D (near left), seen from where you stand. Stand at least 2 m back from the near edge. The drone’s nose points at you for the whole lesson. ' + NOSEIN + ' ' + CEIL; },
+  steps: function () { return [
+    'Hover nose-in over D for 10 seconds. Say “drone’s right” and “drone’s left” out loud to remind yourself.',
+    'Side one, D to C (to your right): the drone must slide to ITS left, so the sideways stick goes left. Stop at C. Pause 2 seconds.',
+    'Side two, C to B (away from you): the drone is moving backwards from its point of view, so the forward/back stick goes back. Stop at B.',
+    'Side three, B to A (to your left): the drone slides to ITS right, so the sideways stick goes right. Stop at A.',
+    'Side four, A to D (toward you): the forward/back stick goes forward. Tiny taps, and stop early. Keep at least 2 m between you and the drone.',
+    'Do each side on its own until it is clean twice. Then join two sides, then three, then the whole lap.',
+    'Two laps one way, then two laps the other way. Check the nose at every corner and put it back on you with a fingernail of turn stick.'
+  ]; },
+  good: function (r) { return 'Two laps of the ' + num(r.box) + ' m box nose-in, stopping within 50 cm of every corner with a 1-second pause, the nose within about 15° of pointing at you, and no stick pushed the wrong way. Then two laps the other way round.'; },
+  mistakes: [
+    ['Pushing as if the drone were facing away.', 'Say “drone’s left” or “drone’s right” out loud before each slide.'],
+    ['Letting the drone come too close on the near edge.', 'Stand 2 m beyond the edge and use tiny taps. If it comes close, let go of the sticks and step back.'],
+    ['Losing the nose direction.', 'A fingernail of turn stick at each corner puts the nose back on you.'],
+    ['Flying the whole lap before the sides are solid.', 'One side at a time, clean twice, then join them.']
+  ],
+  dia: ['sideways:left', 'sideways:right', 'forward:up', 'forward:down'],
+  extras: function (f) { return f.headless ? ['Headless mode ticked: leave it off for this lesson. Headless modes usually make the sticks follow the direction the drone was facing at start-up, which would hide the reversal you’re here to learn.'] : []; },
+  carries: 'The nose-in box is the same mental flip on the Mini SE: the drone’s right is still the drone’s right.',
+  differs: 'DJI says the Mini SE does not have obstacle avoidance, so it won’t stop itself if you push it toward something. Leave generous room and stay well back when you practise this on it.'
+},
+{
+  id: 17, title: 'Nose-in circle and figure-8',
+  why: 'A circle flown with the nose on you feels completely different from the one in lesson 12, because everything is mirrored. Building it up from a four-point diamond turns it from a puzzle into a routine.',
+  setup: function (r) { return 'Use a ' + num(r.circ) + ' m ring on the floor, as in lesson 12, with a tape mark at the far, right, near and left points (as seen from where you stand). For the figure-8, add a second ring touching the first. Stand at least 2 m back from the near edge. The nose stays on you. ' + NOSEIN + ' ' + CEIL; },
+  steps: function () { return [
+    'Hover nose-in over the far point of the ring. Settle for 2 seconds.',
+    'Diamond: fly point to point (far, your right, near, your left, far), one stick at a time, with a stop at each point. Say “drone’s left” at the point on your right.',
+    'Round the corners: start the next move a moment before the last one has fully stopped, so two sticks overlap briefly and the corner softens.',
+    'Circle: use the sideways and forward/back sticks together, smoothly, with the nose staying on you. Go slowly, about 20 seconds for one lap.',
+    'Fly it the other way round.',
+    'Figure-8: one circle each way, with a smooth hand-over at the crossing point.',
+    'Check the nose at each point and put it back on you with a fingernail of turn stick. Keep at least 2 m between you and the drone.'
+  ]; },
+  good: function (r) { return 'Fly the ' + num(r.circ) + ' m ring with the nose staying on you (within about 15°), finishing within 50 cm of where you started. Two circles each way in a row, then one clean figure-8.'; },
+  mistakes: [
+    ['Pushing the wrong way at the left and right points.', 'Say “drone’s left” or “drone’s right” out loud, and go back to the diamond for a few goes.'],
+    ['Jerky corners when joining the diamond up.', 'Start the next stick before the last one is fully back in the centre, and keep both small.'],
+    ['The nose swinging round during the loop.', 'Keep the turn thumb relaxed. A fingernail of turn stick puts the nose back on you.'],
+    ['The drone drifting toward you.', 'Stay 2 m back. If it comes close, let go of the sticks and step back.']
+  ],
+  dia: ['sideways:left', 'sideways:right', 'forward:up', 'forward:down'],
+  extras: function (f) { return f.headless ? ['Headless mode ticked: leave it off for this lesson so the sticks keep following the nose.'] : []; },
+  carries: 'Smooth nose-in curves are the same skill on the Mini SE. Practising them slowly and indoors makes the real thing less stressful.'
+},
+{
+  id: 18, title: 'Orbit: slide and turn together',
+  why: 'An orbit means sliding sideways while turning the other way, so the nose stays on a marker in the middle. It joins your slide and your turn in a way a plain circle doesn’t, and it is the best test of whether your two thumbs really work separately.',
+  setup: function (r) { return 'Put a cup on the floor as the centre marker. Put four small tape marks around it at ' + num(r.orb) + ' m from the cup (in front, behind, left and right), so you can see how far round you are. Stand at least 2 m outside the ring with the area clear. ' + CEIL + ' ' + ABORT; },
+  steps: function () { return [
+    'Take off over the mark nearest you with the nose pointing at the cup. Settle for 2 seconds.',
+    'Slide a fingernail to the right. Notice that the nose stays pointing the same way, so it slides away from the cup. That is the problem to fix.',
+    'Add a fingernail of turn to the LEFT while you slide right. Sliding right means turning left, because the nose has to swing toward the cup. Say it out loud before you start.',
+    'If the drone spirals outwards, add a tiny bit of forward (toward the cup). If it spirals inwards, add a tiny bit of back.',
+    'Quarter orbit: to the next mark, stop, settle and check. Then a half orbit, then a full orbit.',
+    'Do it the other way round: slide left and turn right.',
+    'Start the slide and the turn together, and stop them together. ' + ABORT
+  ]; },
+  good: function (r) { return 'Orbit the cup at about ' + num(r.orb) + ' m, staying within 30 cm of the ring, with the nose within about 20° of the cup the whole way. One full orbit each way, twice in a row.'; },
+  mistakes: [
+    ['Turning the same way as the slide.', 'Slide right means turn left. Say it out loud first.'],
+    ['Spiralling outwards.', 'A tiny bit of forward brings it back. If it spirals in, a tiny bit of back.'],
+    ['Turning faster than you slide, so the nose gets ahead of the cup.', 'Match them: a slow slide needs a slow turn.'],
+    ['Starting with both sticks big.', 'Begin with a fingernail on each and grow them slowly.']
+  ],
+  dia: ['sideways:right', 'yaw:left'],
+  extras: function () { return []; },
+  carries: 'Sliding while turning uses the same sticks and the same coordination on the Mini SE.'
+},
+{
+  id: 19, title: 'Slalom: weaving around markers',
+  why: 'Weaving between markers teaches you to steer smoothly, look ahead and plan your path, instead of stopping at every obstacle.',
+  setup: function (r) { return 'Put three markers (cups on the floor, or tape crosses) in a straight line, ' + num(r.slal) + ' m apart. Add a start spot ' + num(r.slal) + ' m before the first and an end spot ' + num(r.slal) + ' m after the last. Markers stay on the floor or low down. Stand behind the start spot. ' + CEIL + ' ' + ABORT; },
+  steps: function () { return [
+    'Walk the path first, with your finger: pass left of marker 1, right of marker 2, left of marker 3.',
+    'Fly the line once with no weaving, to check your start and stop.',
+    'Slide-weave: fly forward slowly and slide left and right to go round each marker. The nose stays pointing down the line.',
+    'Turn-weave: use curves (lesson 14) with the nose along the path. Start the curve before you reach each marker.',
+    'Fly back through the markers the other way (right of 3, left of 2, right of 1).',
+    'Look at the next gap, not at the marker you are passing.',
+    ABORT
+  ]; },
+  good: function (r) { return 'Weave through 3 markers ' + num(r.slal) + ' m apart without stopping, passing at least a hand-width clear of each, in both directions, with height within 30 cm. Three clean runs in a row: slide-weave first, then turn-weave.'; },
+  mistakes: [
+    ['Stopping at each marker.', 'Plan the next marker early and start the move before you reach the one you’re passing.'],
+    ['Staring at the marker you are passing.', 'Look at the next gap.'],
+    ['Cutting too close to a marker.', 'Aim for the middle of each gap. A near miss means widen the line.'],
+    ['Swinging too wide after each marker.', 'Ease the stick back as the drone passes the marker, not after.']
+  ],
+  dia: ['forward:up', 'sideways:left', 'sideways:right'],
+  extras: function () { return []; },
+  carries: 'Planning a smooth path past obstacles works the same way on the Mini SE.'
+},
+{
+  id: 20, title: 'Tight spaces: passing through a gap',
+  why: 'A gap is where small mistakes show. Learning to line up, slow down, and decide before you commit keeps the drone and your furniture safe.',
+  setup: function () { return 'Make a gap with two chairs or boxes (a doorway-sized gap is a similar idea). Measure your drone across its guards or props and call that W. Set the two sides of the gap 4 × W apart. Put a tape line 1 m before the gap and another 1 m after it. Keep the gap clear of walls. Fly at about the height of the middle of the chair backs. ' + CEIL; },
+  steps: function () { return [
+    'Take off at the first tape line, centred on the gap. Hover and look from behind: is the drone exactly in line with the middle of the gap? This is the step most people skip.',
+    'Settle for 2 seconds. Decide before the gap, not in it. If you are not lined up or the drone is still moving, don’t go: back off and start again.',
+    'Creep forward a fingernail at a time. Use tiny sideways nudges to stay on line.',
+    'Look at the middle of the gap and the far tape line, not at the nearest edge.',
+    'Once through, stop at the far tape line and settle for 2 seconds.',
+    'Fly back through the gap the same way, backwards, with the nose still pointing the same way.',
+    'Only narrow the gap (to 3 × W) after three clean runs. ABORT RULE: if anything goes wrong once you are at the gap, let go of the sticks, then press the land button.'
+  ]; },
+  good: function () { return 'Three clean runs in a row through a gap 4 × W wide (W is your drone’s width across the guards): lined up before you start, no touching, stopping within 50 cm of the far tape line.'; },
+  mistakes: [
+    ['Going in without being lined up and hoping.', 'Stop 30 cm before the gap. Line up, settle, then go. Not lined up means back off.'],
+    ['Speeding up near the gap.', 'Go slower near the gap. Slow is steady.'],
+    ['Staring at the nearest chair.', 'Look at the middle of the gap and at the far tape line.'],
+    ['Pushing on once it has gone wrong.', 'Let go of the sticks, then press the land button. Backing off before the gap is also always fine.']
+  ],
+  dia: ['forward:up', 'sideways:left', 'sideways:right'],
+  extras: function () { return []; },
+  carries: 'Lining up, going slowly and deciding before you commit work the same way on the Mini SE.',
+  differs: 'DJI says the Mini SE has no obstacle avoidance, so it will not stop itself if it is heading for the edge of a gap. Leave far more room around it than you do here.'
+},
+{
+  id: 21, title: 'Three-way moves, built up in steps',
+  why: 'Real flying often uses three sticks at once: for example, drop, turn and slide to make a tight 180 with a descent. The only safe way to learn it is one stick at a time, each a fingernail wide.',
+  setup: function (r) { return 'Same circle and height marker as lesson 3. Put a cup on the floor about ' + num(r.side * 0.7) + ' m to the right of the circle as the finishing marker. Start each move at about 1.2 m, and keep the drone at least half a metre below the ceiling, so check your ceiling height first. Stand at least 2 m back. ' + ABORT; },
+  steps: function () { return [
+    'Warm up with pairs: descend + turn (lesson 10), turn + slide (lesson 18), descend + slide. Three clean tries of each.',
+    'Move A, a tight 180 with a drop: hover at 1.2 m, nose away. Start the descent and the turn together, a fingernail each. When the nose is about half-way round, add the slide toward the cup.',
+    'Finish Move A about 0.5 m lower, nose pointing back the way it came, over the cup. Bring the sticks back to the centre one at a time, not all at once, so you can see what each one does.',
+    'Move B, climb + turn + forward (a rising curve): start at 0.5 m. Begin with forward and turn, then bring in the climb halfway through. Finish about 1.2 m up after a quarter-turn.',
+    'Move C, a sinking slide: descend + forward + slide for a diagonal drop toward a spot.',
+    'Always say the plan out loud before you start (“down, turn right, slide left”). One new stick every second or so.',
+    'If it goes wrong, let go of every stick and let it settle. Neutral is the reset. If it heads for the ceiling, a wall or you, let go and press the land button.'
+  ]; },
+  good: function (r) { return 'Move A: a tight 180° turn with a drop of about 0.5 m and a slide of about ' + num(r.side * 0.7) + ' m, finishing within 50 cm of the cup with the nose pointing back the way it came, and never within half a metre of the ceiling. Three clean runs in a row, then Move B.'; },
+  mistakes: [
+    ['Starting all three sticks at once.', 'Start one, add the second after a second, add the third halfway through.'],
+    ['Letting the drop get away.', 'If it is dropping faster than you meant, ease the height stick back to the centre first.'],
+    ['Letting go of all the sticks at once and being surprised.', 'Return them to the centre one at a time so you see what each one does.'],
+    ['Mixing up which way to turn and slide.', 'Say the plan aloud first: “down, turn right, slide left”.']
+  ],
+  dia: ['throttle:down', 'yaw:right', 'sideways:left'],
+  extras: function () { return []; },
+  carries: 'Building a three-stick move one stick at a time is the way to learn it on the Mini SE too.'
+},
+{
+  id: 22, title: 'Landing variations with the land button',
+  why: 'Landing from the same direction every time is easy. The real skill is landing on your spot from wherever you happen to be: from the side, nose-in, or straight after a turn.',
+  setup: function (r) { return 'Use the A4 target from lesson 9. Put three tape marks as start spots, each ' + num(r.side) + ' m from the target: one to the left, one to the right, and one on the far side. Stand at least 2 m back from the target. ' + CEIL; },
+  steps: function () { return [
+    'Remember the base routine from lesson 9: hover over the target, settle, check position, press the land button, then judge where it ended up.',
+    'Side approach: take off at the left mark and slide to the target with the nose still pointing ahead. Stop, settle for 2 seconds, check, land. Then the same from the right mark.',
+    'Nose-in approach: take off at the far mark, turn the nose toward you, then bring the drone over the target with nose-in moves (tiny taps). Settle longer than usual. ' + NOSEIN,
+    'After-a-turn approach: hover over the target, then do a snap 90° turn. A turn leaves drift, so settle again, check position, then land.',
+    'Hands off for 2 seconds before every landing. Press the button only when the drone sits still over the paper.',
+    'After each landing, write which way it missed and by how much. Expect the same miss next time and correct for it before you press.'
+  ]; },
+  good: function () { return 'Land with the whole drone body on the A4 sheet, 4 times out of 6, using at least three different approaches (from the left, from the right, nose-in, or after a turn).'; },
+  mistakes: [
+    ['Pressing land straight after a move.', 'Moves leave drift. Hands off for 2 seconds, then check.'],
+    ['Rushing the nose-in approach because it feels odd.', 'Say “drone’s left” or “drone’s right” out loud and settle longer.'],
+    ['Not noting where it ended up.', 'The direction of the miss tells you what to correct next time.'],
+    ['Steering after pressing the button.', 'Thumbs off the sticks once you have pressed it.']
+  ],
+  dia: ['sideways:left', 'sideways:right', 'yaw:right'],
+  extras: function () { return []; },
+  carries: 'The approach, the settle and the position check are the same on the Mini SE, however it touches down. Hand-landing skills carry over to the DJI too.',
+  differs: 'The Mini SE can be landed by hand with the height stick, and the DJI Fly app also has a land button. Everything before the touchdown (the approach, the settle, the position check) is the same either way.'
+},
+{
+  id: 23, title: 'Compact mixed course',
+  why: 'Now you put it together in a short course that uses most of what you’ve learned, without needing a big space.',
+  setup: function (r) { return 'Use the ' + num(r.box) + ' m box from lesson 8: D (near left), A (far left), B (far right), C (near right), plus a cup in the centre (call it M). Five markers in all, on the floor. Stand at least 2 m behind the near edge. ' + CEIL + ' ' + ABORT; },
+  steps: function () { return [
+    'Take off at D, nose to the far wall. Hover at your height marker and settle for 2 seconds.',
+    'Leg 1: forward to A. Stop, settle for 1 second.',
+    'Leg 2: snap turn 90° right (lesson 13), so the nose points at B. Fly forward to B. Stop, settle.',
+    'Leg 3: a curved turn to the right (lesson 14) down toward C, with the nose along the path. Stop near C.',
+    'Leg 4: a quarter orbit round the centre cup (lesson 18) from C to D, with the nose on the cup. Keep the drone at least 2 m from you at all times.',
+    'Leg 5: settle over D. Turn the nose away from you if needed. Check position, press the land button, then judge where it ended up (lesson 22).',
+    'Fly it slowly once, then twice more with shorter pauses. Then fly it the other way round.',
+    'If it goes wrong at any leg: let go of the sticks, settle, and carry on from the nearest marker. If it heads for something: let go, then press the land button.'
+  ]; },
+  good: function (r) { return 'Fly the whole course (D to A, B, C, a quarter orbit round the cup, then land at D), with every stop within 50 cm, the orbit within 30 cm of its ring, height within 30 cm, and the landing within 30 cm of D. Three complete courses in a row.'; },
+  mistakes: [
+    ['Rushing the changes between legs.', 'Settle for a second at every marker until it is clean, then shorten the pauses.'],
+    ['Forgetting which stick comes next.', 'Say the next leg out loud at each marker.'],
+    ['Getting sloppy late in the battery.', 'Fly the course once or twice per battery, stop when you start to wobble, and rate honestly.'],
+    ['Fixing a mistake with a big move.', 'Let go, settle, and continue from the nearest marker.']
+  ],
+  dia: ['forward:up', 'yaw:right', 'sideways:left', 'sideways:right'],
+  extras: function () { return []; },
+  carries: 'A course like this is close to how flying the Mini SE feels: one clear plan and a series of smooth moves with a settle between them.'
 }
 ];
+/* ---------- shared wording for lessons 13 and up ---------- */
+var CEIL = 'Keep the drone at least half a metre below the ceiling, and keep faces and hands well away from the props.';
+var NOSEIN = 'Never fly the drone toward your face. If it comes close, let go of the sticks and step back.';
+var ABORT = 'If anything goes wrong, let go of the sticks, then press the land button.';
+// how far (in metres) each room size gives us for the new drills
+ROOMS.small.slal = 0.8;  ROOMS.small.orb = 0.6;  ROOMS.small.sw = 0.4;
+ROOMS.medium.slal = 1;   ROOMS.medium.orb = 0.9; ROOMS.medium.sw = 0.5;
+ROOMS.large.slal = 1.2;  ROOMS.large.orb = 1.2;  ROOMS.large.sw = 0.6;
+
+/* ---------- landing by the land button (Setup tick "can't be landed by hand") ----------
+   Lessons 2 and 9 keep their original text exactly. These wrappers swap in the land-button
+   version only when the tick is on, so with the tick off nothing about these lessons changes. */
+function val(x, f) { return typeof x === 'function' ? x(f) : x; }
+(function () {
+  var MINI_LAND = 'On the Mini SE you can land by hand with the height stick, and the DJI Fly app also has a land button. Your HS210 can’t be landed by hand, so this is a real difference between your two drones.';
+  function swap(id, o) {
+    var l = lesson(id), orig = { steps: l.steps, mistakes: l.mistakes, dia: l.dia, extras: l.extras, carries: l.carries, differs: l.differs };
+    l.steps = function (r, f) { var s = orig.steps(r, f); return f && f.noland ? o.steps(s) : s; };
+    l.mistakes = function (f) { return f && f.noland ? o.mistakes(orig.mistakes) : orig.mistakes; };
+    l.dia = function (f) { return f && f.noland ? o.dia : orig.dia; };
+    l.extras = function (f) { return f && f.noland ? o.extras(f, orig.extras) : orig.extras(f); };
+    l.carries = function (f) { return f && f.noland ? o.carries : orig.carries; };
+    l.differs = function (f) { return f && f.noland ? MINI_LAND : orig.differs; };
+  }
+  swap(2, {
+    steps: function (s) {
+      var out = [];
+      s.forEach(function (t) {
+        if (t.indexOf('To land,') === 0) {
+          out.push('To land, hover at about knee height over the circle and ease the sticks to neutral. Let it settle for 2 seconds, then check from behind that it is over the circle.');
+          out.push('Press the land button once. Keep your thumbs off the sticks and let the drone come down by itself. If it drifts badly, let go and wait, don’t chase it.');
+        } else if (t.indexOf('Let the props stop') === 0) {
+          out.push(t);
+          out.push('Judge the landing: was it inside the circle, did it bounce, did it tip? Write what you see in your note.');
+        } else out.push(t);
+      });
+      return out;
+    },
+    mistakes: function (m) {
+      var out = m.slice();
+      out[1] = ['Pressing the land button while the drone is still drifting or bobbing.', 'Hands off, wait 2 seconds until it settles, check it is over the circle, then press the button.'];
+      out.push(['Pushing the sticks while it comes down.', 'Once you have pressed the button, thumbs off the sticks.']);
+      return out;
+    },
+    dia: ['throttle:up'],
+    extras: function (f, orig) {
+      var a = orig(f).slice(1);
+      a.unshift('Landing here is by the land button, so “by hand” landing isn’t practised on your drone. This lesson trains the settle, the position check and judging where it landed instead. The lift-off steps stay the same.');
+      return a;
+    },
+    carries: 'A calm lift-off, a settle and a position check before touching down all carry over to the Mini SE. So do hand-landing skills: the Mini SE can be landed by hand with the height stick, so the slow, straight descent is still worth learning when you fly the DJI.'
+  });
+  swap(9, {
+    steps: function (s) {
+      return s.slice(0, 3).concat([
+        'Settle: take your thumbs off the sticks for 2 seconds. If it slides off the middle, correct with a tiny nudge and settle again.',
+        'Check position from behind: is the drone over the middle of the paper? Only press the land button when it is. If it isn’t, don’t press. Correct and settle again. Not landing is a good decision, not a failure.',
+        'Press the land button once and keep your thumbs off the sticks while it comes down.',
+        'When the props have stopped, judge it: how much of the drone is on the paper, and which way did it miss? The direction of the miss shows which way it drifted on the way down. Write it in your note.'
+      ]);
+    },
+    mistakes: function () {
+      return [
+        ['Pressing the land button while the drone is still drifting.', 'Hands off for 2 seconds first. Only press when it sits still over the paper.'],
+        ['Pressing the button without checking position.', 'Look at the drone over the paper, not at the remote, right before you press.'],
+        ['Steering while it comes down.', 'After you press the button, thumbs off. A late stick nudge usually makes the miss bigger.'],
+        ['Not noting where it ended up.', 'The direction of the miss tells you which way to expect a drift next time, so allow for it before you press.']
+      ];
+    },
+    dia: [],
+    extras: function () { return ['You land with the land button, so this lesson is about the settle and the position check before you press it, then judging where it ended up. The stick-landing steps are swapped out.']; },
+    carries: 'Stop, settle, check position, then land is the same plan on the Mini SE. Hand-landing skills carry over to the DJI too, since the Mini SE can be landed by hand with the height stick. A marked pad helps you judge a straight descent.'
+  });
+})();
 function lesson(id) { return LESSONS.filter(function (l) { return l.id === id; })[0]; }
 function isUnlocked(id) { return id === 1 || !!S.done[id - 1] || !!S.unlocked[id]; }
 
@@ -949,17 +1292,18 @@ var FEATURES = [
   ['speed', 'Speed settings', 'A slow and fast setting you can switch between.'],
   ['onekey', 'One-key takeoff and landing', 'One button lifts off or lands for you.'],
   ['trim', 'Trim buttons', 'Small buttons that nudge the drone to stop it drifting when the sticks are centred.'],
-  ['flips', 'Flips', 'The drone can do a flip when you press a button.']
+  ['flips', 'Flips', 'The drone can do a flip when you press a button.'],
+  ['noland', 'My drone can’t be landed by hand (I use the land button)', 'Hand-landing doesn’t work on it, so it is landed with the takeoff/land button. Lessons 2 and 9 then teach landing with the button.']
 ];
 
 /* ---------- progress maths ---------- */
 function attemptsFor(id) { return S.attempts.filter(function (a) { return a.lesson === id; }); }
 function stats(id) {
-  var all = attemptsFor(id), last5 = all.slice(-5);
+  var all = attemptsFor(id), clean = all.filter(isClean), last5 = clean.slice(-5);
   var c = function (arr, r) { return arr.filter(function (a) { return a.rating === r; }).length; };
   var score = last5.length ? (c(last5, 'nailed') + 0.5 * c(last5, 'close')) / last5.length : null;
   return { n: all.length, nailed: c(all, 'nailed'), close: c(all, 'close'), missed: c(all, 'missed'),
-    r5: last5.length, n5: c(last5, 'nailed'), m5: c(last5, 'missed'), score: score, last: all.length ? all[all.length - 1] : null, all: all };
+    r5: last5.length, n5: c(last5, 'nailed'), m5: c(last5, 'missed'), score: score, last: all.length ? all[all.length - 1] : null, all: all, clean: clean };
 }
 function currentLessonId() {
   for (var i = 0; i < LESSONS.length; i++) { var l = LESSONS[i]; if (!S.done[l.id] && isUnlocked(l.id)) return l.id; }
@@ -982,12 +1326,12 @@ function suggestion() {
     var l = LESSONS[i];
     if (l.id < 2 || !S.done[l.id]) continue;
     var st = stats(l.id);
-    if (st.n >= 3) { var l3 = st.all.slice(-3); if (l3.every(function (a) { return a.rating === 'missed'; })) {
+    if (st.clean.length >= 3) { var l3 = st.clean.slice(-3); if (l3.every(function (a) { return a.rating === 'missed'; })) {
       return { text: 'Lesson ' + l.id + ' (' + l.title + ') went badly in its last 3 attempts. Revisit it and re-read the common mistakes.', label: 'Open lesson ' + l.id, act: 'open', arg: l.id };
     } }
   }
   var cur = currentLessonId();
-  if (cur == null) return { text: 'All 12 lessons are marked done. Keep sharp with a warm-up, and revisit whichever lesson felt shakiest.', label: 'Open the warm-up', act: 'go', arg: 'warmup' };
+  if (cur == null) return { text: 'All ' + LESSONS.length + ' lessons are marked done. Keep sharp with the Skills gym, and revisit whichever lesson felt shakiest.', label: 'Open the Skills gym', act: 'go', arg: 'gym' };
   var L = lesson(cur), s = stats(cur);
   if (s.n === 0) return { text: 'Next up is lesson ' + cur + ': ' + L.title + '. Read it, set up the room, then do your first drill.', label: 'Open lesson ' + cur, act: 'open', arg: cur };
   if (s.r5 >= 3 && s.n5 >= 3) return { text: 'Lesson ' + cur + ' is looking solid: ' + s.n5 + ' “nailed it” in your last ' + s.r5 + '. If it feels right, mark it done and move on.', label: 'Open lesson ' + cur, act: 'open', arg: cur };
@@ -999,7 +1343,7 @@ function suggestion() {
 }
 
 function buildWarmup() {
-  var ids = LESSONS.filter(function (l) { return l.id >= 2 && S.done[l.id]; }).map(function (l) { return l.id; });
+  var ids = LESSONS.filter(function (l) { return l.id >= 2 && l.id <= 12 && S.done[l.id]; }).map(function (l) { return l.id; });
   if (!ids.length) return [];
   var items = [];
   function add(id, why) { if (!items.some(function (x) { return x.id === id; })) items.push({ id: id, why: why }); }
@@ -1009,6 +1353,259 @@ function buildWarmup() {
   if (weak) add(weak.id, weak.score < 0.6 ? 'This one needs the most work lately.' : 'Keeps it fresh.');
   add(ids[ids.length - 1], 'Your most recently finished lesson.');
   return items.slice(0, 3);
+}
+
+/* =====================================================================
+   Skills gym. Drills built from the lessons, 3 levels each.
+   Nothing extra is saved for it: a drill's level is worked out from the attempts
+   (kind 'gym', with a drill id and a level). So backups and "reset progress" cover it.
+   ===================================================================== */
+function isClean(a) { return !a.draught; }   // an attempt flagged "draught got me" is kept, but not counted
+
+function landLine(f) {
+  return f.noland ? 'Hover over the spot, hands off for 2 seconds, check position, press the land button, then judge where it ended up.'
+    : 'Settle over the spot, check position, then lower slowly (pause a hand-width up and recheck) and land.';
+}
+
+// n = the lesson that must be marked done to unlock it. easy = can be today's confidence-builder.
+var DRILLS = [
+{ id: 'calm', n: 2, title: 'Calm lift-off and landing', secs: 45, easy: true,
+  how: function (r, f) { return 'Lift off gently, hold just above knee height, then land. ' + (f.noland ? 'Press the land button once and keep your thumbs off the sticks.' : 'Lower slowly and pause a hand-width up.') + ' Judge where it ended up.'; },
+  lv: [function () { return 'Hold at knee height for 5 seconds, then land inside a 1 m circle with no bounce.'; },
+       function () { return 'Hold for 8 seconds, then land inside a 60 cm circle with no bounce.'; },
+       function () { return 'Hold for 10 seconds with your thumbs completely off the sticks, then land inside a 50 cm circle.'; }] },
+{ id: 'hover', n: 3, title: 'Hover at a set height', secs: 45, easy: true,
+  how: function () { return 'Lift off, climb to your height marker, ease the stick to neutral and hold. Tiny nudges only.'; },
+  lv: [function () { return 'Hold 20 seconds inside a 1 m circle, within 30 cm of your height marker.'; },
+       function () { return 'Hold 30 seconds inside a 60 cm circle, within 20 cm of your height marker.'; },
+       function () { return 'Hold 40 seconds inside a 50 cm circle, within 15 cm of your height marker, with no stick move bigger than a quarter.'; }] },
+{ id: 'drift', n: 4, title: 'Catching drift', secs: 50, easy: false,
+  how: function () { return 'Hover. Say the direction the moment it drifts, give a fingernail nudge the other way for half a second, then neutral.'; },
+  lv: [function () { return 'Hover 30 seconds inside a 1 m circle with no more than 3 stick moves bigger than halfway.'; },
+       function () { return 'Hover 45 seconds inside a 60 cm circle with at most 1 stick move bigger than halfway.'; },
+       function () { return 'Hover 60 seconds inside a 50 cm circle with no stick move bigger than halfway.'; }] },
+{ id: 'turn', n: 5, title: 'Turn on the spot', secs: 60, easy: true,
+  how: function () { return 'Hover at your height marker and turn slowly on the spot. Eyes on where the drone is over the floor, not on the nose.'; },
+  lv: [function () { return 'Two full turns each way, about 10 seconds each, inside a 1 m circle, height within 30 cm.'; },
+       function () { return 'Two full turns each way, about 8 seconds each, inside a 60 cm circle, height within 20 cm.'; },
+       function () { return 'Two full turns each way, about 6 seconds each, inside a 50 cm circle, height within 15 cm.'; }] },
+{ id: 'line', n: 6, title: 'Straight line and stop', secs: 60, easy: true,
+  how: function (r) { return 'One round trip along your ' + num(r.line) + ' m line. Release early and let it glide in.'; },
+  lv: [function (r) { return 'One round trip of ' + num(r.line) + ' m: stop within 50 cm of each mark, pause 2 seconds at each end, height within 30 cm.'; },
+       function (r) { return 'One round trip of ' + num(r.line) + ' m: stop within 30 cm of each mark, pause 1 second at each end.'; },
+       function (r) { return 'One round trip of ' + num(r.line) + ' m: stop within 20 cm of each mark with no pause, and no more than one tiny back tap per stop.'; }] },
+{ id: 'slide', n: 7, title: 'Slide left and right', secs: 60, easy: true,
+  how: function (r) { return 'One round trip sliding ' + num(r.side) + ' m, with the nose staying on the far wall marker.'; },
+  lv: [function (r) { return 'One round trip of ' + num(r.side) + ' m: stop within 50 cm of each mark, nose within 15° of the wall marker.'; },
+       function (r) { return 'One round trip of ' + num(r.side) + ' m: stop within 30 cm of each mark, nose within 10°.'; },
+       function (r) { return 'Two round trips of ' + num(r.side) + ' m in a row: stop within 25 cm of each mark with no pause, nose within 10°.'; }] },
+{ id: 'box', n: 8, title: 'Box, nose forward', secs: 80, easy: false,
+  how: function (r) { return 'Fly the ' + num(r.box) + ' m box one stick at a time, nose on the far wall.'; },
+  lv: [function () { return 'One lap: stop within 50 cm of every corner with a 1-second pause, nose within 15° of the far wall.'; },
+       function () { return 'Two laps in a row: stop within 30 cm of every corner with a 1-second pause.'; },
+       function () { return 'Two laps in a row with no pauses: stops within 30 cm, nose within 10°, height within 30 cm.'; }] },
+{ id: 'spot', n: 9, title: 'Landing on a marked spot', secs: 50, easy: false,
+  how: function (r, f) { return 'Fly from your start spot to the A4 sheet. ' + landLine(f); },
+  lv: [function () { return 'Land with the whole drone body on the A4 sheet, no bounce.'; },
+       function () { return 'Land with the middle of the drone within 10 cm of the centre of the A4 sheet, no bounce.'; },
+       function () { return 'Land with the middle of the drone within 7 cm of the centre of the A4 sheet, no bounce, with only one settle before you land.'; }] },
+{ id: 'combo', n: 10, title: 'Climb and turn together', secs: 60, easy: false,
+  how: function () { return 'A slow spiral up, then back down. Add the second stick halfway through. Keep half a metre below the ceiling.'; },
+  lv: [function () { return 'Climb from about 0.5 m to 1.2 m during a half-turn, finishing within 50 cm of where you started.'; },
+       function () { return 'The same climb, then come down turning back, finishing within 30 cm of where you started.'; },
+       function () { return 'Climb and half-turn, then descend and half-turn back, all in about 15 seconds, finishing within 30 cm of the start and never within half a metre of the ceiling.'; }] },
+{ id: 'nosein', n: 11, title: 'Nose-in hover and slides', secs: 60, easy: false, nose: true,
+  how: function () { return 'Turn the nose toward you, at least 2 m away. Say “drone’s right” before each slide.'; },
+  lv: [function () { return 'Nose-in hover 15 seconds in a 1 m circle, then 3 slides of about 1 m each way, no stick pushed the wrong way.'; },
+       function () { return 'Nose-in hover 20 seconds in a 60 cm circle, then 4 slides of about 1 m, stopping within 30 cm of the marks.'; },
+       function () { return 'Nose-in hover 30 seconds in a 60 cm circle, then 4 slides within 30 cm of the marks, with no stick pushed the wrong way.'; }] },
+{ id: 'circle', n: 12, title: 'Circles and figure-8', secs: 80, easy: false,
+  how: function (r) { return 'Fly the ' + num(r.circ) + ' m ring with the nose along the path. Hold both sticks steady.'; },
+  lv: [function (r) { return 'One circle each way (' + num(r.circ) + ' m), finishing within 50 cm of the start, height within 30 cm.'; },
+       function () { return 'Two circles each way back to back, finishing within 30 cm of the start.'; },
+       function () { return 'One clean figure-8 each way (start right, then start left), within 30 cm of the crossing each time.'; }] },
+{ id: 'snap', n: 13, title: 'Snap turns', secs: 50, easy: false,
+  how: function () { return 'Call the turn out loud, turn quickly, and ease the stick back a little early.'; },
+  lv: [function () { return 'Five snap turns (90° and 180° mixed), each stopping within 20° of its wall marker, inside a 1 m circle.'; },
+       function () { return 'Five snap turns, each within 15° of its marker, inside a 60 cm circle.'; },
+       function () { return 'Eight snap turns, each within 10°, called out one second before you do them, inside a 60 cm circle.'; }] },
+{ id: 'scurve', n: 14, title: 'Curves and S-curves', secs: 60, easy: false,
+  how: function (r) { return 'Fly the ' + num(r.line) + ' m line as an S, swinging out to the side marks. Steady forward, the turn stick shapes the path.'; },
+  lv: [function () { return 'One S-curve right-first and one left-first, passing within 30 cm of both side marks and finishing within 50 cm of the end spot.'; },
+       function () { return 'The same two S-curves, passing within 20 cm of the side marks and finishing within 30 cm of the end spot.'; },
+       function () { return 'Both S-curves back to back with no stop between them, finishing within 30 cm of the end spot, nose along the path.'; }] },
+{ id: 'settle', n: 15, title: 'Stop and settle', secs: 45, easy: false, nose: true,
+  how: function () { return 'Fly a short forward move, let go of both sticks and count the seconds until it is still. Then turn a random amount and name the heading.'; },
+  lv: [function () { return 'Still within 4 seconds, within a shoe-length of where it stopped. Then name the nose heading correctly after a random turn.'; },
+       function () { return 'Still within 3 seconds, within a shoe-length. Then name the heading correctly after two random turns in a row.'; },
+       function () { return 'Still within 2 seconds, also after a quick quarter-turn. Then name the heading correctly after three random turns in a row.'; }] },
+{ id: 'nosebox', n: 16, title: 'Box, nose-in', secs: 90, easy: false, nose: true,
+  how: function (r) { return 'The ' + num(r.box) + ' m box with the nose on you, 2 m back from the near edge. Say “drone’s left” or “drone’s right” first.'; },
+  lv: [function () { return 'One lap: stop within 50 cm of every corner with a 2-second pause, no stick pushed the wrong way.'; },
+       function () { return 'One lap each way: stop within 30 cm of every corner with a 1-second pause.'; },
+       function () { return 'Two laps in a row with no pauses: stops within 30 cm, nose within 15° of pointing at you.'; }] },
+{ id: 'nosecircle', n: 17, title: 'Circle, nose-in', secs: 90, easy: false, nose: true,
+  how: function (r) { return 'The ' + num(r.circ) + ' m ring with the nose on you. Build it up from the four-point diamond.'; },
+  lv: [function () { return 'The four-point diamond: stop within 30 cm of each point with a 1-second pause.'; },
+       function () { return 'One smooth circle each way, finishing within 50 cm of the start, nose within 15° of pointing at you.'; },
+       function () { return 'One clean nose-in figure-8, within 30 cm of the crossing, nose within 15° of pointing at you.'; }] },
+{ id: 'orbit', n: 18, title: 'Orbit', secs: 70, easy: false, obst: true,
+  how: function (r) { return 'Slide one way and turn the other, nose on the centre cup, about ' + num(r.orb) + ' m out.'; },
+  lv: [function () { return 'A quarter orbit each way, nose within 20° of the cup, staying within 30 cm of the ring.'; },
+       function () { return 'A half orbit each way, nose within 20° of the cup, staying within 30 cm of the ring.'; },
+       function () { return 'A full orbit each way, nose within 15° of the cup, staying within 25 cm of the ring.'; }] },
+{ id: 'slalom', n: 19, title: 'Slalom', secs: 70, easy: false, obst: true,
+  how: function (r) { return 'Weave round 3 markers, ' + num(r.slal) + ' m apart, without stopping. Look at the next gap.'; },
+  lv: [function () { return 'Slide-weave through the markers one way, passing a hand-width clear of each, without stopping.'; },
+       function () { return 'Turn-weave through the markers there and back, passing a hand-width clear of each, without stopping.'; },
+       function (r) { return 'Turn-weave there and back with the markers moved closer together (' + num(r.slal * 0.75) + ' m), without touching or stopping.'; }] },
+{ id: 'gap', n: 20, title: 'Passing through a gap', secs: 70, easy: false, obst: true,
+  how: function () { return 'Line up, settle, decide, then go. W is your drone’s width across the guards.'; },
+  lv: [function () { return 'A gap 4 × W wide: lined up before you start, through and back, no touching, stopping within 50 cm of the far tape line.'; },
+       function () { return 'A gap 3 × W wide: lined up before you start, through and back, no touching, stopping within 40 cm of the far tape line.'; },
+       function () { return 'A gap 2.5 × W wide: lined up before you start, through and back, no touching, stopping within 30 cm of the far tape line.'; }] },
+{ id: 'three', n: 21, title: 'Three-way moves', secs: 70, easy: false, obst: true,
+  how: function () { return 'Say the plan out loud, then add one stick at a time. Keep half a metre below the ceiling.'; },
+  lv: [function (r) { return 'Move A (descend + turn 180° + slide, about ' + num(r.side * 0.7) + ' m): finish within 60 cm of the cup, nose pointing back the way it came.'; },
+       function (r) { return 'Move A finishing within 40 cm of the cup, then Move B (climb + turn + forward) finishing within 40 cm of its marker.'; },
+       function () { return 'Move A and Move B back to back with no pause between them, each finishing within 40 cm of its marker.'; }] },
+{ id: 'landvar', n: 22, title: 'Landing from different sides', secs: 50, easy: false, nose: true,
+  how: function (r, f) { return 'Pick an approach (left, right, nose-in or after a turn). ' + landLine(f); },
+  lv: [function () { return 'Approach from the left or right and land with the whole drone body on the A4 sheet.'; },
+       function () { return 'Approach nose-in and land with the whole drone body on the A4 sheet.'; },
+       function () { return 'Do a snap 90° or 180° turn over the sheet, settle again, then land with the whole drone body on the A4 sheet.'; }] },
+{ id: 'course', n: 23, title: 'Compact mixed course', secs: 120, easy: false, obst: true,
+  how: function (r) { return 'The ' + num(r.box) + ' m box course: D, A, B, C, a quarter orbit round the cup, then land at D.'; },
+  lv: [function () { return 'The whole course once with 2-second settles at each marker, stops within 50 cm, landing within 50 cm of D.'; },
+       function () { return 'The whole course with 1-second settles, stops within 40 cm, landing within 30 cm of D.'; },
+       function () { return 'The whole course, then back the other way round, with settles of 1 second at most, stops within 30 cm, landing within 20 cm of D.'; }] }
+];
+function drillById(id) { return DRILLS.filter(function (d) { return d.id === id; })[0]; }
+function drillUnlocked(d) { return !!S.done[d.n]; }
+function gymTitle(a) { var d = drillById(a.drill); return d ? d.title : 'drill'; }
+
+// A level goes up after 3 "nailed it" in a row at that level. Flagged (draught) attempts are skipped.
+// 3 "missed" in a row at a level (not flagged) drops it one level, but never below level 1.
+function gymInfo(id) {
+  var all = S.attempts.filter(function (a) { return a.kind === 'gym' && a.drill === id; });
+  var clean = all.filter(isClean), level = 1, up = 0, down = 0;
+  clean.forEach(function (a) {
+    if (a.level !== level) return;   // an easier warm-up run: logged, but it doesn't move the level
+    if (a.rating === 'nailed') { up++; down = 0; if (up >= 3 && level < 3) { level++; up = 0; } }
+    else if (a.rating === 'missed') { up = 0; down++; if (down >= 3 && level > 1) { level--; down = 0; } }
+    else { up = 0; down = 0; }
+  });
+  var last5 = clean.slice(-5), c = function (r) { return last5.filter(function (a) { return a.rating === r; }).length; };
+  return { level: level, up: Math.min(up, 3), n: all.length, score: last5.length ? (c('nailed') + 0.5 * c('close')) / last5.length : null,
+    last: all.length ? all[all.length - 1].t : null, top: level === 3 && up >= 3 };
+}
+function levelLine(i) {
+  return 'Level ' + i.level + ' of 3' + (i.top ? ' (top level)' : '') + ' · ' + i.up + ' of 3 nailed in a row';
+}
+
+/* ---------- the daily mix ---------- */
+var gymMix = null;
+function seeded(str) {
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return function () { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
+}
+function buildMix(bump) {
+  var open = DRILLS.filter(drillUnlocked);
+  if (!open.length) return null;
+  var m = Number(S.setup.minutes) || 5, budget = Math.round(m * 60 * 0.8), day = dayKey(Date.now());
+  var rnd = seeded(day + ':' + bump), info = {};
+  open.forEach(function (d) { info[d.id] = gymInfo(d.id); });
+  function strength(d) { var s = info[d.id].score; if (s == null) s = stats(d.n).score; return s == null ? 0.5 : s; }
+  var easy = open.filter(function (d) { return d.easy; }), pool = easy.length ? easy : open;
+  var builder = pool.map(function (d) { return { d: d, k: strength(d) + rnd() * 0.2 }; }).sort(function (a, b) { return b.k - a.k; })[0].d;
+  var items = [{ id: builder.id, level: Math.max(1, info[builder.id].level - 1), tag: 'Confidence-builder', secs: builder.secs }], used = builder.secs;
+  var rest = open.filter(function (d) { return d !== builder; }).map(function (d) {
+    var i = info[d.id], weak = 1 - strength(d), days = i.last ? Math.max(0, daysSince(i.last)) : null, stale = days == null ? 1 : Math.min(1, days / 7);
+    return { d: d, p: 0.6 * weak + 0.4 * stale + rnd() * 0.15, tag: weak >= 0.5 ? 'Needs work' : days == null ? 'New in the gym' : days >= 7 ? 'Not done lately' : 'Keeps it fresh' };
+  }).sort(function (a, b) { return b.p - a.p; });
+  rest.forEach(function (x, k) {
+    // the single most-needed drill may use the whole battery time, so a long drill is not squeezed out
+    if (used + x.d.secs <= (k === 0 ? m * 60 : budget)) { items.push({ id: x.d.id, level: info[x.d.id].level, tag: x.tag, secs: x.d.secs }); used += x.d.secs; }
+  });
+  if (items.length === 1 && rest.length && used + rest[0].d.secs <= m * 60) { items.push({ id: rest[0].d.id, level: info[rest[0].d.id].level, tag: rest[0].tag, secs: rest[0].d.secs }); used += rest[0].d.secs; }
+  return { day: day, sig: open.map(function (d) { return d.id; }).join(','), bump: bump, items: items, total: used };
+}
+function ensureMix() {
+  var sig = DRILLS.filter(drillUnlocked).map(function (d) { return d.id; }).join(',');
+  if (!gymMix || gymMix.day !== dayKey(Date.now()) || gymMix.sig !== sig) gymMix = buildMix(0);
+  return gymMix;
+}
+
+/* ---------- gym screens ---------- */
+function viewGym() {
+  var h = '<h2 style="margin-top:6px">Skills gym</h2><p class="muted">Repeatable drills with 3 levels each. Small, smooth inputs at every level. A level goes up after 3 “nailed it” in a row at that level.</p>';
+  var mix = ensureMix();
+  if (!mix) return h + banner('warning', 'Not ready yet', 'Drills unlock as you mark lessons done. Finish lesson 2 and mark it done, then come back.') + '<div style="margin-top:12px"><button class="button big" data-act="go" data-arg="path">Go to the lessons</button></div>';
+  var m = Number(S.setup.minutes) || 5;
+  h += '<div class="card stack"><h3>Today’s mix</h3><p class="muted small-text" style="margin:0">About ' + num(Math.max(0.5, Math.round(mix.total / 30) / 2)) + ' minutes of your ' + num(m) + '-minute battery. It starts with an easy one, then the drills you rate weakest or haven’t done lately.</p><ol>';
+  mix.items.forEach(function (it) {
+    h += '<li><b>' + esc(drillById(it.id).title) + '</b> <span class="tag">Level ' + it.level + '</span> <span class="muted small-text">' + it.tag + '</span></li>';
+  });
+  h += '</ol><button class="button big" data-act="gmix">Start today’s mix</button><button class="button button--secondary block" data-act="gnew">Show a different mix</button></div>';
+  h += '<h2>All drills</h2>';
+  DRILLS.forEach(function (d) {
+    var un = drillUnlocked(d), i = gymInfo(d.id);
+    h += '<button class="button button--secondary lessonbtn"' + (un ? '' : ' aria-disabled="true"') + ' data-act="gopen" data-arg="' + d.id + '"><span class="num">' + (un ? 'L' + i.level : '·') + '</span><span><b>' + esc(d.title) + '</b><small>' +
+      (un ? levelLine(i) + (i.n ? ' · ' + i.n + ' attempt' + (i.n === 1 ? '' : 's') : ' · not tried yet') : 'Unlocks when lesson ' + d.n + ' is marked done') + '</small></span></button>';
+  });
+  return h;
+}
+
+function viewGymDrill(id) {
+  var d = drillById(id), r = R(), f = S.setup.f, i = gymInfo(id);
+  var h = '<button class="link" data-act="go" data-arg="gym">‹ Skills gym</button>';
+  h += '<h2 style="margin-top:6px">' + esc(d.title) + '</h2><p class="muted" style="margin-top:-4px">From lesson ' + d.n + ' · ' + levelLine(i) + '</p>';
+  h += '<div class="card target"><h3>Your level now: ' + i.level + '</h3><p class="big-text">' + d.lv[i.level - 1](r, f) + '</p></div>';
+  h += '<div class="card"><h3>What to fly</h3><p>' + d.how(r, f) + '</p><p class="muted small-text">Set up the room as in <button class="link" data-act="open" data-arg="' + d.n + '" style="min-height:0">lesson ' + d.n + '</button>. Room size: ' + r.name + '.</p></div>';
+  h += '<div class="card"><h3>The three levels</h3>' + d.lv.map(function (g, k) { return '<div class="pair"><span class="bad">Level ' + (k + 1) + (k + 1 === i.level ? ' (you are here)' : '') + '</span><span>' + g(r, f) + '</span></div>'; }).join('') + '</div>';
+  h += '<div class="card"><h3>Safety</h3><p>' + ABORT + ' Keep the drone at least half a metre below the ceiling.' + (d.nose ? ' ' + NOSEIN : '') + '</p></div>';
+  h += '<div class="stack" style="margin-top:14px"><button class="button big" data-act="gstart" data-arg="' + id + '">Start drill</button></div>';
+  return h;
+}
+
+function viewGymRun() {
+  var d = drill, h = '<button class="link" data-act="leaveDrill">‹ Back</button>';
+  if (d.kind === 'mix' && d.idx >= d.items.length) {
+    return h + '<div class="card stack" style="margin-top:12px"><h2>Today’s mix done</h2><p>Nice. You rated ' + d.count + ' drill' + (d.count === 1 ? '' : 's') + '. Check the Progress tab for your levels.</p><button class="button big" data-act="leaveDrill">Back to the gym</button></div>';
+  }
+  var it = curItem(d), dr = drillById(it.id), r = R(), f = S.setup.f;
+  h += '<h2 style="margin-top:6px">' + (d.kind === 'mix' ? 'Today’s mix ' + (d.idx + 1) + ' of ' + d.items.length + ': ' : 'Gym: ') + esc(dr.title) + '<span class="tag">Level ' + it.level + '</span></h2>';
+  if (d.kind === 'mix') h += '<p class="muted" style="margin-top:-4px">' + it.tag + (it.tag === 'Confidence-builder' && it.level < gymInfo(it.id).level ? ' (one level easier than your level, so it won’t move your level)' : '') + '</p>';
+  if (d.msg) h += '<div style="margin-bottom:12px">' + banner(d.msg.type, d.msg.word, d.msg.text) + '</div>';
+  h += '<div class="card target"><p class="big-text" style="margin:0">' + dr.lv[it.level - 1](r, f) + '</p></div>';
+  h += '<div class="card"><p style="margin:0">' + dr.how(r, f) + '</p><p class="muted small-text" style="margin:8px 0 0">' + ABORT + (dr.nose ? ' ' + NOSEIN : '') + '</p></div>';
+  h += clockCard(d) + rateCard(d);
+  h += '<p class="muted small-text" style="margin-top:12px">Sound and buzz check: <button class="link" data-act="testAlert">test beep and buzz</button>' + (('vibrate' in navigator) ? '' : '. This browser can’t buzz, so you’ll get the beep only.') + '</p>';
+  return h;
+}
+function curItem(d) { return d.kind === 'mix' ? d.items[d.idx] : { id: d.id, level: gymInfo(d.id).level, tag: '' }; }
+
+// the message shown after each gym rating
+function gymMessage(a, before) {
+  var after = gymInfo(a.drill);
+  if (a.draught) return { type: 'warning', word: 'Saved', text: 'Flagged as draught, so it doesn’t count towards your level.' };
+  if (a.level !== before.level) return { type: 'warning', word: 'Logged', text: 'That was a gentler run (level ' + a.level + '), so it doesn’t move your level.' };
+  if (after.level > before.level) return { type: 'success', word: 'Level up', text: 'Three “nailed it” in a row. This drill is now level ' + after.level + '.' };
+  if (after.level < before.level) return { type: 'warning', word: 'Level down', text: 'Three misses in a row, so this drill is back to level ' + after.level + '. Go gently and rebuild.' };
+  if (a.rating === 'nailed') return { type: 'success', word: 'Nailed it', text: levelLine(after) + '.' };
+  return { type: 'warning', word: 'Logged', text: 'Your run of “nailed it” starts again: 0 of 3 at level ' + after.level + '.' };
+}
+
+// the Progress tab: each unlocked drill and its level
+function gymProgress() {
+  var open = DRILLS.filter(drillUnlocked), h = '<h2>Skills gym levels</h2>';
+  if (!open.length) return h + '<p class="muted">Drills unlock as you mark lessons done.</p>';
+  open.forEach(function (d) {
+    var i = gymInfo(d.id);
+    h += '<div class="row"><b>' + esc(d.title) + '</b><div class="muted small-text">' + levelLine(i) + (i.n ? ' · ' + i.n + ' attempt' + (i.n === 1 ? '' : 's') + '. Last: ' + fmtDate(i.last) : ' · not tried yet') + '</div></div>';
+  });
+  return h;
 }
 
 /* ---------- views ---------- */
@@ -1028,8 +1625,8 @@ function header() {
   return '<div class="top"><h1>Drone <span>Tutor</span></h1><button class="button button--secondary small" data-act="safety">Safety card</button></div>';
 }
 function nav() {
-  var cur = view.n === 'lesson' ? 'path' : view.n;
-  var tabs = [['path', 'Path', ICON.path], ['warmup', 'Warm-up', ICON.warm], ['progress', 'Progress', ICON.prog], ['setup', 'Setup', ICON.set]];
+  var cur = view.n === 'lesson' ? 'path' : view.n === 'gdrill' ? 'gym' : view.n;
+  var tabs = [['path', 'Path', ICON.path], ['warmup', 'Warm-up', ICON.warm], ['gym', 'Gym', ICON.gym], ['progress', 'Progress', ICON.prog], ['setup', 'Setup', ICON.set]];
   return '<nav class="nav">' + tabs.map(function (t) {
     return '<button class="tab' + (cur === t[0] ? ' on' : '') + '" data-act="go" data-arg="' + t[0] + '"' + (cur === t[0] ? ' aria-current="page"' : '') + '>' + t[2] + '<span>' + t[1] + '</span></button>';
   }).join('') + '</nav>';
@@ -1038,9 +1635,11 @@ function nav() {
 function viewPath() {
   var sug = suggestion(), cur = currentLessonId(), dc = doneCount();
   var h = '<div class="card stack"><h2>What to work on next</h2><p>' + esc(sug.text) + '</p><button class="button big" data-act="' + sug.act + '" data-arg="' + sug.arg + '">' + esc(sug.label) + '</button></div>';
-  h += '<div class="card"><div class="kv"><b>' + dc + ' of 12 lessons done</b><span class="muted">' + S.attempts.length + ' attempt' + (S.attempts.length === 1 ? '' : 's') + ' logged</span></div><div class="bar" style="margin-top:10px"><span style="width:' + Math.round(dc / 12 * 100) + '%"></span></div></div>';
-  h += '<h2>The 12 lessons</h2>';
+  h += '<div class="card"><div class="kv"><b>' + dc + ' of ' + LESSONS.length + ' lessons done</b><span class="muted">' + S.attempts.length + ' attempt' + (S.attempts.length === 1 ? '' : 's') + ' logged</span></div><div class="bar" style="margin-top:10px"><span style="width:' + Math.round(dc / LESSONS.length * 100) + '%"></span></div></div>';
+  h += '<h2>The ' + LESSONS.length + ' lessons</h2>';
   LESSONS.forEach(function (l) {
+    if (l.id === 1) h += '<h3 class="muted">The basics (lessons 1 to 12)</h3>';
+    if (l.id === 13) h += '<h3 class="muted" style="margin-top:16px">More practice (lessons 13 on)</h3>';
     var st = stats(l.id), un = isUnlocked(l.id), done = !!S.done[l.id];
     var status = done ? 'Done' : un ? (st.n ? 'In progress, ' + st.n + ' attempt' + (st.n === 1 ? '' : 's') : 'Open') : 'Locked: tap to read, or unlock';
     h += '<button class="button ' + (l.id === cur ? '' : 'button--secondary') + ' lessonbtn"' + (un || done ? '' : ' aria-disabled="true"') + ' data-act="open" data-arg="' + l.id + '"><span class="num">' + (done ? '✓' : l.id) + '</span><span><b>' + esc(l.title) + '</b><small>' + status + '</small></span></button>';
@@ -1059,7 +1658,7 @@ function lessonNeeds(f) {
 function viewLesson(id) {
   var l = lesson(id), r = R(), f = S.setup.f, un = isUnlocked(id), done = !!S.done[id];
   var h = '<button class="link" data-act="go" data-arg="path">‹ All lessons</button>';
-  h += '<h2 style="margin-top:6px">Lesson ' + id + ' of 12' + (done ? '<span class="tag">Done</span>' : '') + '</h2><h1 style="margin:0 0 12px;font-size:26px">' + esc(l.title) + '</h1>';
+  h += '<h2 style="margin-top:6px">Lesson ' + id + ' of ' + LESSONS.length + (done ? '<span class="tag">Done</span>' : '') + '</h2><h1 style="margin:0 0 12px;font-size:26px">' + esc(l.title) + '</h1>';
   if (!un) h += banner('warning', 'Locked', 'Lesson ' + (id - 1) + ' isn’t marked done yet. You can read this lesson now, and unlock it if you want to fly it anyway.') + '<div style="margin:10px 0"><button class="button button--secondary block" data-act="unlock" data-arg="' + id + '">Unlock this lesson anyway</button></div>';
   if (S.setup.modeHS !== S.setup.modeMini) h += '<div style="margin-bottom:12px">' + banner('warning', 'Warning', 'Your HS210 is on Mode ' + S.setup.modeHS + ' but your Mini SE is on Mode ' + S.setup.modeMini + '. What your thumbs learn here won’t carry over until they match. The diagrams below follow your HS210.') + '</div>';
   h += '<div class="card"><p class="muted" style="margin:0"><b style="color:var(--color-text)">Small and smooth.</b> Move the stick a fingernail’s width, let go, and watch before you move again.</p></div>';
@@ -1067,12 +1666,12 @@ function viewLesson(id) {
   h += '<div class="card"><h3>Set up the room</h3><p>' + l.setup(r) + '</p><p class="muted small-text">Room size: ' + r.name + ', ' + r.size + '.</p></div>';
   h += '<div class="card"><h3>Steps</h3><ol>' + l.steps(r, f).map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol></div>';
   h += '<div class="card target"><h3>What “good” looks like</h3><p class="big-text">' + l.good(r) + '</p></div>';
-  h += '<div class="card"><h3>Common mistakes and fixes</h3>' + l.mistakes.map(function (m) { return '<div class="pair"><span class="bad">' + m[0] + '</span><span>' + m[1] + '</span></div>'; }).join('') + '</div>';
-  h += '<div class="card"><h3>Stick diagram (HS210, Mode ' + S.setup.modeHS + ')</h3>' + stickSvg(S.setup.modeHS, l.dia) + '<ul class="muted small-text" style="margin-top:8px">' + stickCaption(S.setup.modeHS, l.dia).map(function (c) { return '<li>' + c + '</li>'; }).join('') + '</ul></div>';
+  h += '<div class="card"><h3>Common mistakes and fixes</h3>' + val(l.mistakes, f).map(function (m) { return '<div class="pair"><span class="bad">' + m[0] + '</span><span>' + m[1] + '</span></div>'; }).join('') + '</div>';
+  h += '<div class="card"><h3>Stick diagram (HS210, Mode ' + S.setup.modeHS + ')</h3>' + stickSvg(S.setup.modeHS, val(l.dia, f)) + '<ul class="muted small-text" style="margin-top:8px">' + stickCaption(S.setup.modeHS, val(l.dia, f)).map(function (c) { return '<li>' + c + '</li>'; }).join('') + '</ul>' + (val(l.dia, f).length ? '' : '<p class="muted small-text">No stick moves are shown here, because you land with the land button.</p>') + '</div>';
   var ex = l.extras(f).concat(lessonNeeds(f));
   h += '<div class="card"><h3>For your HS210 (from your Setup ticks)</h3><ul>' + ex.map(function (e) { return '<li>' + e + '</li>'; }).join('') + '</ul></div>';
-  h += '<div class="card"><h3>Carries over to the Mini SE</h3><p>' + l.carries + '</p></div>';
-  if (l.differs) h += '<div class="card"><h3>Different on the Mini SE</h3><p>' + l.differs + '</p></div>';
+  h += '<div class="card"><h3>Carries over to the Mini SE</h3><p>' + val(l.carries, f) + '</p></div>';
+  var df = val(l.differs, f); if (df) h += '<div class="card"><h3>Different on the Mini SE</h3><p>' + df + '</p></div>';
   h += '<div class="stack" style="margin-top:14px"><button class="button big" data-act="drill" data-arg="' + id + '"' + (un ? '' : ' aria-disabled="true"') + '>Start drill</button><button class="button button--secondary block" data-act="toggleDone" data-arg="' + id + '">' + (done ? 'Mark as not done' : 'Mark lesson as done') + '</button></div>';
   return h;
 }
@@ -1132,19 +1731,21 @@ function viewProgress() {
   var h = '<h2 style="margin-top:6px">Progress</h2>';
   if (pmsg) { h += banner(pmsg.type, pmsg.word, pmsg.text); pmsg = null; }
   var total = S.attempts.length, n = S.attempts.filter(function (a) { return a.rating === 'nailed'; }).length;
-  h += '<div class="card"><div class="kv"><b>' + doneCount() + ' of 12 lessons done</b><span>' + total + ' attempts, ' + n + ' nailed</span></div></div>';
+  var gymN = S.attempts.filter(function (a) { return a.kind === 'gym'; }).length;
+  h += '<div class="card"><div class="kv"><b>' + doneCount() + ' of ' + LESSONS.length + ' lessons done</b><span>' + total + ' attempts, ' + n + ' nailed</span></div>' + (gymN ? '<div class="muted small-text" style="margin-top:6px">The ' + total + ' attempts include ' + gymN + ' in the Skills gym.</div>' : '') + '</div>';
   h += '<h2>By lesson</h2>';
   LESSONS.forEach(function (l) {
     var st = stats(l.id);
     h += '<div class="row"><b>' + l.id + '. ' + esc(l.title) + '</b>' + (S.done[l.id] ? ' <span class="tag">Done</span>' : '') + '<div class="muted small-text">' + (st.n ? st.n + ' attempts: ' + st.nailed + ' nailed, ' + st.close + ' close, ' + st.missed + ' missed. Last: ' + fmtDate(st.last.t) : 'No attempts yet') + '</div></div>';
   });
+  h += gymProgress();
   h += '<h2>History</h2>';
   if (!total) h += '<p class="muted">Attempts you log in a drill show up here.</p>';
   else {
     var list = S.attempts.slice().reverse(); if (!histAll) list = list.slice(0, 20);
     list.forEach(function (a) {
       var l = lesson(a.lesson), word = a.rating === 'nailed' ? 'Nailed it' : a.rating === 'close' ? 'Close' : 'Missed';
-      h += '<div class="row hist"><div class="kv"><b>' + (l ? 'Lesson ' + l.id + ': ' + esc(l.title) : 'Lesson') + '</b><span class="pill-n">' + word + '</span></div><div class="muted small-text">' + fmtDate(a.t) + (a.kind === 'warm' ? ' (warm-up)' : '') + '</div>' + (a.note ? '<span class="note">' + esc(a.note) + '</span>' : '') + '</div>';
+      h += '<div class="row hist"><div class="kv"><b>' + (a.kind === 'gym' ? 'Gym: ' + esc(gymTitle(a)) : l ? 'Lesson ' + l.id + ': ' + esc(l.title) : 'Lesson') + '</b><span class="pill-n">' + word + '</span></div><div class="muted small-text">' + fmtDate(a.t) + (a.kind === 'warm' ? ' (warm-up)' : '') + (a.kind === 'gym' ? ' (level ' + a.level + (a.mix ? ', daily mix' : '') + ')' : '') + (a.draught ? ' · draught got me, not counted for levels' : '') + '</div>' + (a.note ? '<span class="note">' + esc(a.note) + '</span>' : '') + '</div>';
     });
     if (!histAll && total > 20) h += '<button class="button button--secondary block" data-act="histAll">Show all ' + total + ' attempts</button>';
   }
@@ -1157,6 +1758,7 @@ function viewProgress() {
 }
 
 function viewDrill() {
+  if (drill.kind === 'gym' || drill.kind === 'mix') return viewGymRun();
   var d = drill, l, items = d.items, done = d.kind === 'warm' && d.idx >= items.length;
   var h = '<button class="link" data-act="leaveDrill">‹ Back</button>';
   if (done) {
@@ -1165,13 +1767,26 @@ function viewDrill() {
   l = lesson(d.kind === 'warm' ? items[d.idx] : d.id);
   h += '<h2 style="margin-top:6px">' + (d.kind === 'warm' ? 'Warm-up ' + (d.idx + 1) + ' of ' + items.length + ': ' : 'Drill: ') + 'Lesson ' + l.id + '</h2><p class="muted" style="margin-top:-4px">' + esc(l.title) + '</p>';
   h += '<div class="card target"><p class="big-text" style="margin:0">' + l.good(R()) + '</p></div>';
-  h += '<div class="card" style="text-align:center"><div class="clock" id="clock" aria-live="off">' + clockText(d.remain) + '</div><div class="muted small-text">of a ' + num(S.setup.minutes) + '-minute battery</div><div class="drill-status" id="tstatus" style="margin:10px 0">' + timerStatus() + '</div>';
-  h += '<div class="btnrow"><button class="button" data-act="tStart"' + (d.finished ? ' aria-disabled="true"' : '') + '>' + (d.finished ? 'Timer finished' : d.running ? 'Pause' : d.remain < d.total ? 'Resume' : 'Start timer') + '</button><button class="button button--secondary" data-act="tReset">Reset timer</button></div><p class="muted small-text" id="wakeStatus" style="margin-top:10px">' + wakeText() + '</p></div>';
-  h += '<div class="card stack"><div class="attempt">Attempt ' + (d.count + 1) + '</div><div class="rate"><button class="button" data-act="rate" data-arg="nailed">Nailed it</button><button class="button button--secondary" data-act="rate" data-arg="close">Close</button><button class="button button--secondary" data-act="rate" data-arg="missed">Missed</button></div><textarea id="note" class="input" rows="2" placeholder="Add a note (optional)" data-f="note">' + esc(d.note) + '</textarea>' + (d.lastId ? '<button class="button button--secondary block" data-act="undo">Undo last rating</button>' : '') + '</div>';
+  h += clockCard(d);
+  h += rateCard(d);
   h += '<p class="muted small-text" style="margin-top:12px">Sound and buzz check: <button class="link" data-act="testAlert">test beep and buzz</button>' + (('vibrate' in navigator) ? '' : '. This browser can’t buzz, so you’ll get the beep only.') + '</p>';
   return h;
 }
 
+function clockCard(d) {
+  var h = '';
+  h += '<div class="card" style="text-align:center"><div class="clock" id="clock" aria-live="off">' + clockText(d.remain) + '</div><div class="muted small-text">of a ' + num(S.setup.minutes) + '-minute battery</div><div class="drill-status" id="tstatus" style="margin:10px 0">' + timerStatus() + '</div>';
+  h += '<div class="btnrow"><button class="button" data-act="tStart"' + (d.finished ? ' aria-disabled="true"' : '') + '>' + (d.finished ? 'Timer finished' : d.running ? 'Pause' : d.remain < d.total ? 'Resume' : 'Start timer') + '</button><button class="button button--secondary" data-act="tReset">Reset timer</button></div><p class="muted small-text" id="wakeStatus" style="margin-top:10px">' + wakeText() + '</p></div>';
+  return h;
+}
+function rateCard(d) {
+  var h = '';
+  h += '<div class="card stack"><div class="attempt">Attempt ' + (d.count + 1) + '</div>' + draughtBtn(d) + '<div class="rate"><button class="button" data-act="rate" data-arg="nailed">Nailed it</button><button class="button button--secondary" data-act="rate" data-arg="close">Close</button><button class="button button--secondary" data-act="rate" data-arg="missed">Missed</button></div><textarea id="note" class="input" rows="2" placeholder="Add a note (optional)" data-f="note">' + esc(d.note) + '</textarea>' + (d.lastId ? '<button class="button button--secondary block" data-act="undo">Undo last rating</button>' : '') + '</div>';
+  return h;
+}
+function draughtBtn(d) {
+  return '<button class="button' + (d.draught ? '' : ' button--secondary') + ' block" data-act="draught" aria-pressed="' + !!d.draught + '">' + (d.draught ? '✓ ' : '') + 'Draught got me</button>' + (d.draught ? '<p class="muted small-text" style="margin:0">Saved, but it won’t count towards levels or lesson scores.</p>' : '');
+}
 function clockText(s) { s = Math.max(0, Math.round(s)); var m = Math.floor(s / 60), x = s % 60; return m + ':' + (x < 10 ? '0' : '') + x; }
 function timerStatus() {
   var d = drill; if (!d) return '';
@@ -1196,6 +1811,11 @@ function modal() {
     '<li><b>Check props and guards</b> before every flight: guards on, props not cracked or loose.</li>' +
     '<li><b>Know how to stop the motors fast on your remote.</b> Stopping them in the air makes the drone fall, so use it when a fall is the lesser risk.</li></ul>' +
     '<div class="card"><h3>Your stop-the-motors notes</h3><ul>' + stop('HS210', s.stopHS) + stop('Mini SE', s.stopMini) + '</ul></div>' +
+    '<div class="card"><h3>Draught check</h3><ul>' +
+    '<li>Close the doors and windows in the room.</li>' +
+    '<li>Turn fans and aircon off.</li>' +
+    '<li>Look for the drone being pushed with the sticks centred: hover at about knee height with your hands off the sticks for 5 seconds. If it keeps moving the same way, find the draught before you fly. (If it slides the same way even in still air, that may be trim: see lesson 4.)</li>' +
+    '<li>If a draught still catches you during a drill, tap “Draught got me” when you rate it. It is saved, but it doesn’t count towards levels.</li></ul></div>' +
     '<button class="button big" data-act="closeSafety">' + (first ? 'I’ve read it' : 'Close') + '</button></div></div>';
 }
 
@@ -1206,6 +1826,8 @@ function render(scrollTop) {
   else if (view.n === 'lesson') body = viewLesson(view.id);
   else if (view.n === 'warmup') body = viewWarmup();
   else if (view.n === 'progress') body = viewProgress();
+  else if (view.n === 'gym') body = viewGym();
+  else if (view.n === 'gdrill') body = viewGymDrill(view.id);
   else if (view.n === 'drill' && drill) { body = viewDrill(); showNav = false; }
   else body = viewPath();
   var fl = '';
@@ -1243,10 +1865,10 @@ document.addEventListener('visibilitychange', function () { if (document.visibil
 
 /* ---------- drill timer ---------- */
 function stopDrillTimers() { clearInterval(tickH); tickH = null; releaseWake(); drill = null; }
-function startDrill(kind, id) {
-  var items = kind === 'warm' ? buildWarmup().map(function (x) { return x.id; }) : [];
+function startDrill(kind, id, extra) {
+  var items = kind === 'warm' ? buildWarmup().map(function (x) { return x.id; }) : (extra || []);
   var total = Math.round((Number(S.setup.minutes) || 5) * 60);
-  drill = { kind: kind, id: id, items: items, idx: 0, total: total, remain: total, running: false, endAt: 0, count: 0, note: '', stage: 0, finished: false, lastId: null };
+  drill = { kind: kind, id: id, items: items, idx: 0, total: total, remain: total, running: false, endAt: 0, count: 0, note: '', stage: 0, finished: false, lastId: null, draught: false, msg: null };
   view = { n: 'drill' };
   render(true);
   requestWake();
@@ -1275,23 +1897,37 @@ function tReset() {
   clearInterval(tickH); tickH = null; d.running = false; d.finished = false; d.remain = d.total; d.stage = 0; render();
 }
 function rate(r) {
-  var d = drill; if (!d || (d.kind === 'warm' && d.idx >= d.items.length)) return;
-  var lid = d.kind === 'warm' ? d.items[d.idx] : d.id, a = { id: uid(), t: new Date().toISOString(), lesson: lid, rating: r, note: (d.note || '').trim(), kind: d.kind };
+  var d = drill; if (!d || ((d.kind === 'warm' || d.kind === 'mix') && d.idx >= d.items.length)) return;
+  var a, before = null;
+  if (d.kind === 'gym' || d.kind === 'mix') {
+    var it = curItem(d); before = gymInfo(it.id);
+    a = { id: uid(), t: new Date().toISOString(), lesson: null, rating: r, note: (d.note || '').trim(), kind: 'gym', drill: it.id, level: it.level };
+    if (d.kind === 'mix') a.mix = true;
+  } else {
+    var lid = d.kind === 'warm' ? d.items[d.idx] : d.id;
+    a = { id: uid(), t: new Date().toISOString(), lesson: lid, rating: r, note: (d.note || '').trim(), kind: d.kind };
+  }
+  if (d.draught) a.draught = true;   // saved, but left out of levels and lesson scores
   S.attempts.push(a); save(); d.count++; d.note = ''; d.lastId = a.id;
-  if (d.kind === 'warm') d.idx++;
+  d.msg = before ? gymMessage(a, before) : null; d.draught = false;
+  if (d.kind === 'warm' || d.kind === 'mix') d.idx++;
   render();
 }
 function undo() {
   var d = drill; if (!d || !d.lastId) return;
   var i = S.attempts.map(function (a) { return a.id; }).indexOf(d.lastId);
-  if (i >= 0) { S.attempts.splice(i, 1); save(); d.count = Math.max(0, d.count - 1); if (d.kind === 'warm') d.idx = Math.max(0, d.idx - 1); }
-  d.lastId = null; render();
+  if (i >= 0) { S.attempts.splice(i, 1); save(); d.count = Math.max(0, d.count - 1); if (d.kind === 'warm' || d.kind === 'mix') d.idx = Math.max(0, d.idx - 1); }
+  d.lastId = null; d.msg = null; d.draught = false; render();
 }
 
 /* ---------- backup and restore ---------- */
+var BACKUP_VERSION = 2;
+// Version 1 files (the first release) have no gym data and no land-button tick. Everything new is optional and
+// is filled in by merge(), so a version 1 file needs no conversion. A file from a newer version is refused.
+function migrateState(state, ver) { return state; }
 function backup() {
   try {
-    var data = { app: 'drone-tutor', version: 1, exportedAt: new Date().toISOString(), state: S };
+    var data = { app: 'drone-tutor', version: BACKUP_VERSION, exportedAt: new Date().toISOString(), state: S };
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     var name = 'drone-tutor-backup-' + dayKey(Date.now()) + '.json';
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
@@ -1309,11 +1945,14 @@ function restoreFrom(text) {
   if (!o || o.app !== 'drone-tutor' || !o.state || !Array.isArray(o.state.attempts) || !o.state.setup) {
     pmsg = { type: 'error', word: 'Error', text: 'That file isn’t a Drone Tutor backup, so nothing was changed.' }; render(); return;
   }
+  var ver = Number(o.version) || 1;
+  if (ver > BACKUP_VERSION) { pmsg = { type: 'error', word: 'Error', text: 'That backup was made by a newer version of Drone Tutor than this page. Close the page and open it again to update it, then try again. Nothing was changed.' }; render(); return; }
+  o.state = migrateState(o.state, ver);
   var n = o.state.attempts.length;
   if (!confirm('Replace the progress on this phone with the backup from ' + fmtDay(o.exportedAt || Date.now()) + ' (' + n + ' attempts)? What is here now will be lost.')) return;
   S = merge(o.state); save();
   view = { n: 'progress' };
-  pmsg = { type: 'success', word: 'Restored', text: 'Progress loaded from the backup: ' + n + ' attempts, ' + doneCount() + ' of 12 lessons done.' };
+  pmsg = { type: 'success', word: 'Restored', text: 'Progress loaded from the backup: ' + n + ' attempts, ' + doneCount() + ' of ' + LESSONS.length + ' lessons done.' };
   render(true);
 }
 
@@ -1337,7 +1976,7 @@ var ACTS = {
   unlock: function (t) { S.unlocked[Number(t.dataset.arg)] = true; save(); render(); },
   toggleDone: function (t) {
     var id = Number(t.dataset.arg);
-    if (S.done[id]) { delete S.done[id]; flash = null; } else { S.done[id] = true; flash = { type: 'success', word: 'Done', text: 'Lesson ' + id + ' marked done.' + (id < 12 ? ' Lesson ' + (id + 1) + ' is now open.' : ' That’s all 12.') }; }
+    if (S.done[id]) { delete S.done[id]; flash = null; } else { S.done[id] = true; flash = { type: 'success', word: 'Done', text: 'Lesson ' + id + ' marked done.' + (id < LESSONS.length ? ' Lesson ' + (id + 1) + ' is now open.' : ' That’s all ' + LESSONS.length + '.') }; }
     save(); go('path');
   },
   drill: function (t) {
@@ -1350,13 +1989,29 @@ var ACTS = {
   },
   leaveDrill: function () {
     if (drill && drill.running && !confirm('The timer is running. Leave the drill and stop it?')) return;
-    var id = drill && drill.kind === 'lesson' ? drill.id : null;
+    var id = drill && drill.kind === 'lesson' ? drill.id : null, back = drill && drill.kind === 'gym' ? ['gdrill', drill.id] : drill && drill.kind === 'mix' ? ['gym'] : null;
     stopDrillTimers();
-    if (id) go('lesson', id); else go('path');
+    if (id) go('lesson', id); else if (back) go(back[0], back[1]); else go('path');
   },
   tStart: tStart, tReset: tReset,
   rate: function (t) { rate(t.dataset.arg); },
   undo: undo,
+  draught: function () { if (drill) { drill.draught = !drill.draught; render(); } },
+  gopen: function (t) {
+    var d = drillById(t.dataset.arg);
+    if (!d || !drillUnlocked(d)) { flash = { type: 'warning', word: 'Locked', text: 'Mark lesson ' + (d ? d.n : '') + ' as done to unlock this drill.' }; render(true); return; }
+    go('gdrill', d.id);
+  },
+  gstart: function (t) {
+    var id = t.dataset.arg, go2 = function () { startDrill('gym', id); };
+    if (!S.safetySeen) { pendingAfterSafety = go2; showSafety = true; render(); } else go2();
+  },
+  gmix: function () {
+    var mix = ensureMix(); if (!mix) return;
+    var go2 = function () { startDrill('mix', null, clone(mix.items)); };
+    if (!S.safetySeen) { pendingAfterSafety = go2; showSafety = true; render(); } else go2();
+  },
+  gnew: function () { gymMix = buildMix(gymMix ? gymMix.bump + 1 : 1); render(); },
   testAlert: function () { beep(2, 880, 220); buzz([200, 100, 200]); },
   mode: function (t) { draft[t.dataset.which] = Number(t.dataset.arg); render(); },
   feat: function (t) { draft.f[t.dataset.arg] = !draft.f[t.dataset.arg]; render(); },

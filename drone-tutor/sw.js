@@ -3,11 +3,16 @@
    It only covers this folder (drone-tutor), so the other tutors are not touched.
    The page opens from the saved copy first, then fetches the latest version in the background,
    so a newly published version shows up the next time you open the page. */
-var CACHE = 'drone-tutor-v1';
+var CACHE = 'drone-tutor-v2';   // bumped for the Skills gym and lessons 13 to 23, so phones fetch the new page
 var FILES = ['./', './index.html'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
+  // cache: 'reload' makes sure the copy saved here is the newest one from the web, not an older one the browser was holding
+  e.waitUntil(caches.open(CACHE).then(function (c) {
+    return Promise.all(FILES.map(function (f) {
+      return fetch(new Request(f, { cache: 'reload' })).then(function (res) { if (!res.ok) throw new Error('bad response'); return c.put(f, res); });
+    }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener('activate', function (e) {
