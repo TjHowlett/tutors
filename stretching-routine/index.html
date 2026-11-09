@@ -1221,6 +1221,65 @@ code, pre { font-family: var(--font-code); }
     }
   };
 
+  /* ---------------------------------------------------------------
+     Bending-limb diagrams on Safari
+     Many diagrams bend a limb by animating the CSS "d" property. Safari (so the iPhone) does
+     not support that property, so those limbs would stay still. Where it is missing, each such
+     path gets a matching <animate> element built from the same keyframes (Safari does
+     support those). Where the property works nothing here runs.
+  ---------------------------------------------------------------- */
+  var CSS_D_OK = (function () {
+    try { return !!(window.CSS && CSS.supports && CSS.supports("d", 'path("M0,0 L1,1")')); } catch (e) { return false; }
+  })();
+  var D_FRAMES = null;
+  function readDFrames() {
+    D_FRAMES = {};
+    var css = "", sheets = document.getElementsByTagName("style");
+    for (var s = 0; s < sheets.length; s++) css += sheets[s].textContent;
+    var re = /@keyframes\s+([\w-]+)\s*\{/g, m;
+    while ((m = re.exec(css))) {
+      var name = m[1], depth = 1, i = re.lastIndex;
+      while (i < css.length && depth) { var c = css.charAt(i); if (c === "{") depth++; else if (c === "}") depth--; i++; }
+      var body = css.slice(re.lastIndex, i - 1);
+      re.lastIndex = i;
+      var frames = [], fr = /([^{}]+)\{([^{}]*)\}/g, f;
+      while ((f = fr.exec(body))) {
+        var dm = /d\s*:\s*path\("([^"]+)"\)/.exec(f[2]);
+        if (!dm) continue;
+        var tm = /animation-timing-function\s*:\s*([\w-]+)/.exec(f[2]);
+        f[1].split(",").forEach(function (sel) {
+          sel = sel.replace(/\s+/g, "");
+          var t = sel === "from" ? 0 : (sel === "to" ? 1 : parseFloat(sel) / 100);
+          frames.push({ t: t, d: dm[1], ease: tm ? tm[1] : null });
+        });
+      }
+      if (frames.length) { frames.sort(function (p, q) { return p.t - q.t; }); D_FRAMES[name] = frames; }
+    }
+  }
+  var SPLINES = { "ease-in-out": "0.42 0 0.58 1", "linear": "0 0 1 1", "ease": "0.25 0.1 0.25 1", "ease-in": "0.42 0 1 1", "ease-out": "0 0 0.58 1" };
+  function morphFix(svg) {
+    if (!D_FRAMES) readDFrames();
+    return svg.replace(/<path d="([^"]*)" style="animation:([A-Za-z0-9_]+) calc\(([\d.]+)s \* var\(--pace\)\) ([a-z-]+) infinite"><\/path>/g,
+      function (whole, base, name, secs, ease) {
+        var fr = D_FRAMES[name];
+        if (!fr) return whole;
+        fr = fr.slice();
+        if (fr[0].t > 0) fr.unshift({ t: 0, d: base, ease: null });
+        if (fr[fr.length - 1].t < 1) fr.push({ t: 1, d: base, ease: null });
+        var times = [], values = [], splines = [];
+        fr.forEach(function (p, k) {
+          times.push(p.t); values.push(p.d);
+          if (k < fr.length - 1) splines.push(SPLINES[p.ease || ease] || SPLINES["ease-in-out"]);
+        });
+        return '<path d="' + base + '"><animate attributeName="d" dur="' + secs + 's" repeatCount="indefinite" calcMode="spline"' +
+          ' keyTimes="' + times.join(";") + '" keySplines="' + splines.join(";") + '" values="' + values.join(";") + '"></animate></path>';
+      });
+  }
+  function animHtml(name) {
+    var svg = ANIMS[name]();
+    return CSS_D_OK ? svg : morphFix(svg);
+  }
+
   function ring(pct, size, innerHtml) {
     var r = (size - 10) / 2;
     var c = 2 * Math.PI * r;
@@ -1632,7 +1691,7 @@ code, pre { font-family: var(--font-code); }
         '<div class="serif" style="font-size:22px;font-weight:500">' + esc(ex.name) + '</div>' +
         variantLine +
       '</div>' +
-      '<div class="anim-box" style="height:' + animHeight + 'px">' + ANIMS[getAnim(ex, state)]() + '</div>' +
+      '<div class="anim-box" style="height:' + animHeight + 'px">' + animHtml(getAnim(ex, state)) + '</div>' +
       '<div style="text-align:center;font-size:16px;line-height:1.4">' + esc(info.guidance) + '</div>' +
       '<div style="text-align:center;font-size:16px;line-height:1.4;color:var(--ink-soft)">' + esc(ex.cue) + '</div>' +
       (info.note ? '<div style="text-align:center;font-size:12px;color:var(--ink-soft)">' + esc(info.note) + '</div>' : "") +
