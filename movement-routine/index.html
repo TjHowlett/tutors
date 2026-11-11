@@ -1189,7 +1189,7 @@ code, pre { font-family: var(--font-code); }
      App state + render loop
   ---------------------------------------------------------------- */
   var state = loadState();
-  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | done | dropped | all | backup | resetConfirm
+  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | dropped | all | backup | resetConfirm
   var exIndex = 0;
   var secondsLeft = 0;
   var running = true;
@@ -1539,7 +1539,7 @@ code, pre { font-family: var(--font-code); }
   }
   function finishFeedback() {
     if (!adjustments.length) recordDay(); // nothing changed: "Just right"
-    screen = "done";
+    screen = "home";
     render();
   }
   function restoreExercise(id) {
@@ -1783,18 +1783,32 @@ code, pre { font-family: var(--font-code); }
           adjustments.map(function (a) { return '<div>' + esc(adjustLabel(a.kind) + ": " + a.names.join(", ")) + '</div>'; }).join("") +
         '</div>'
       : "";
-    // Done is the only way to finish. With nothing adjusted it counts as "just right".
+    // Shown once a Felt pain round has been applied (it used to be on the Nice work screen).
+    var painNote = adjustments.some(function (a) { return a.kind === "pain"; })
+      ? '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--ink-soft);line-height:1.5;text-align:left">Put them back from the home screen when you\'re ready, and check in with a physio or doctor if the pain continues.</div>'
+      : "";
+    // The streak counts today even though today's history entry is only written at the first Apply or at Done.
+    var streak = computeStreak(state.history.concat([{ date: todayStr() }]));
+    var streakHtml = '<div style="font-size:13px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px">' +
+      iconFlame(14, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>';
+    // Done is the only way to finish and goes straight home. With nothing adjusted it counts as "just right".
     return (
-      '<div style="display:flex;flex-direction:column;gap:14px;padding-top:20px">' +
+      '<div style="display:flex;flex-direction:column;gap:14px;padding-top:12px">' +
         '<div style="text-align:center">' +
-          '<div class="serif" style="font-size:24px;font-weight:500">' + (hasAdj ? "Anything else to adjust?" : "How did that feel?") + '</div>' +
+          '<div class="serif" style="font-size:26px;font-weight:500">Nice work</div>' +
+          streakHtml +
+        '</div>' +
+        '<div style="text-align:center;margin-top:4px">' +
+          '<div class="serif" style="font-size:20px;font-weight:500">' + (hasAdj ? "Anything else to adjust?" : "How did that feel?") + '</div>' +
           '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.5">' + (hasAdj ? "Pick another, or tap Done." : "Tap an option to adjust some exercises. If nothing needs changing, just tap Done.") + '</div>' +
         '</div>' +
         summary +
+        painNote +
         '<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">' + btns + '</div>' +
         '<div style="height:1px;background:var(--line);margin-top:10px"></div>' +
         '<button id="btn-feedback-done" class="button" style="width:100%;justify-content:center;gap:8px;padding:16px 18px;font-size:16px;font-weight:500">' +
           iconCheck(18, "var(--color-button-text)") + 'Done</button>' +
+        '<div style="font-size:12px;color:var(--ink-soft);text-align:center;line-height:1.5">Symptoms should settle afterwards and should not be worse the next morning.</div>' +
       '</div>'
     );
   }
@@ -1927,28 +1941,6 @@ code, pre { font-family: var(--font-code); }
     );
   }
 
-  function buildDone() {
-    var streak = computeStreak(state.history);
-    var lines = adjustments.length
-      ? adjustments.map(function (a) { return adjustLabel(a.kind) + ": " + a.names.join(", ") + "."; })
-      : ["Holding steady next time."];
-    if (adjustments.some(function (a) { return a.kind === "pain"; })) {
-      lines.push("Put them back from the home screen when you're ready, and check in with a physio or doctor if the pain continues.");
-    }
-    lines.push("Symptoms should settle afterwards and should not be worse the next morning.");
-    var streakHtml = streak > 0
-      ? '<div style="font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px">' + iconFlame(14, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>'
-      : "";
-    return (
-      '<div class="col-center" style="justify-content:center;min-height:480px;gap:14px">' +
-        '<div style="width:56px;height:56px;border-radius:50%;background:var(--color-button-mid);border:1px solid var(--color-edge-hover);display:flex;align-items:center;justify-content:center">' + iconCheck(28, "var(--color-button-text)") + '</div>' +
-        '<div class="serif" style="font-size:26px;font-weight:500">Nice work</div>' +
-        streakHtml +
-        '<div style="font-size:13px;color:var(--ink-soft);max-width:260px;display:flex;flex-direction:column;gap:6px">' + lines.map(function (l) { return '<div>' + esc(l) + '</div>'; }).join("") + '</div>' +
-        '<button id="btn-home" class="button" style="margin-top:10px">Done ' + iconChevronRight(15, "var(--color-button-text)") + '</button>' +
-      '</div>'
-    );
-  }
   /* ---------------------------------------------------------------
      Render + event binding
   ---------------------------------------------------------------- */
@@ -1962,7 +1954,6 @@ code, pre { font-family: var(--font-code); }
     else if (screen === "feedbackPick") html = buildFeedbackPick();
     else if (screen === "dropped") html = buildDropped();
     else if (screen === "all") html = buildAllExercises();
-    else if (screen === "done") html = buildDone();
     else if (screen === "backup") html = buildBackup();
     else if (screen === "resetConfirm") html = buildResetConfirm();
     else html = "";
@@ -1996,7 +1987,6 @@ code, pre { font-family: var(--font-code); }
     if (byId("btn-rest-plus")) byId("btn-rest-plus").addEventListener("click", function () { changeRest(5); });
     if (byId("btn-pause")) byId("btn-pause").addEventListener("click", togglePause);
     if (byId("btn-skip")) byId("btn-skip").addEventListener("click", skip);
-    if (byId("btn-home")) byId("btn-home").addEventListener("click", function () { screen = "home"; render(); });
     if (byId("btn-backup-open")) byId("btn-backup-open").addEventListener("click", function () { screen = "backup"; render(); });
     if (byId("btn-backup-close")) byId("btn-backup-close").addEventListener("click", function () { screen = "home"; render(); });
     if (byId("btn-backup-copy")) byId("btn-backup-copy").addEventListener("click", function () {

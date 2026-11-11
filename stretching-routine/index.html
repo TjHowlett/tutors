@@ -1297,14 +1297,13 @@ code, pre { font-family: var(--font-code); }
      App state + render loop
   ---------------------------------------------------------------- */
   var state = loadState();
-  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | done | dropped | backup | resetConfirm
+  var screen = "home"; // home | ready | session | rest | feedback | feedbackPick | dropped | backup | resetConfirm
   var exIndex = 0;
   var secondsLeft = 0;
   var running = true;
-  var lastFeedback = null;
-  var lastChanged = [];
   var pickKind = null;
   var pickSelected = {};
+  var adjustments = []; // this session's feedback rounds: { kind, ids, names }
   var timerHandle = null;
   var root = document.getElementById("app");
 
@@ -1378,6 +1377,8 @@ code, pre { font-family: var(--font-code); }
       window.localStorage.setItem(SESSION_KEY, JSON.stringify({
         date: todayStr(),
         setLetter: activeSetLetter,
+        ids: activeExercises.map(function (e) { return e.id; }),
+        adj: adjustments,
         screen: screen === "feedbackPick" ? "feedback" : screen,
         exIndex: exIndex,
         secondsLeft: secondsLeft,
@@ -1397,10 +1398,19 @@ code, pre { font-family: var(--font-code); }
       if (!raw) return false;
       var s = JSON.parse(raw);
       if (!s || s.date !== todayStr() || !SESSION_SCREENS[s.screen]) return false;
+      // Rebuild the session from its saved list of exercises, so an exercise dropped at
+      // the feedback screen doesn't shorten the list and lose the session on reload.
       var exercises = getSet(s.setLetter);
+      if (Array.isArray(s.ids)) {
+        exercises = s.ids.map(function (id) {
+          return SETS[s.setLetter].filter(function (e) { return e.id === id; })[0];
+        }).filter(Boolean);
+        if (exercises.length !== s.ids.length) return false;
+      }
       if (!exercises.length || s.exIndex < 0 || s.exIndex >= exercises.length) return false;
       activeSetLetter = s.setLetter;
       activeExercises = exercises;
+      adjustments = Array.isArray(s.adj) ? s.adj : [];
       exIndex = s.exIndex;
       screen = s.screen;
       secondsLeft = s.secondsLeft;
@@ -1532,6 +1542,7 @@ code, pre { font-family: var(--font-code); }
     unlockAudio();
     activeSetLetter = getNextSetLetter(state);
     activeExercises = getSet(activeSetLetter);
+    adjustments = [];
     if (!activeExercises.length) { screen = "home"; render(); return; }
     exIndex = 0; screen = "ready"; secondsLeft = 10; running = true;
     render(); startTimer();
@@ -1563,35 +1574,55 @@ code, pre { font-family: var(--font-code); }
     if (running) startTimer(); else stopTimer();
     render();
   }
-  // Step 1: "Just right" finishes in one tap. Any other answer opens a list
-  // of today's exercises so only the ticked ones change.
+  // Step 1: Too easy, Too hard or Felt pain opens a list of this session's
+  // exercises so only the ticked ones change. Done (no answer) finishes.
   function submitFeedback(feedback) {
-    if (feedback === "right") { finishFeedback("right", [], []); return; }
     pickKind = feedback;
     pickSelected = {};
     screen = "feedbackPick";
     render();
   }
+  // One adjustment per exercise per session: once an exercise has been ticked in
+  // any round (too easy, too hard or felt pain), it can't be ticked again until
+  // the next session.
+  function adjustedThisSession(id) {
+    return adjustments.some(function (a) { return a.ids && a.ids.indexOf(id) >= 0; });
+  }
   function togglePick(id) {
     if (pickSelected[id]) delete pickSelected[id]; else pickSelected[id] = true;
     render();
   }
-  // Step 2: apply the ticks (if any) and record the day.
+  // Step 2: apply the ticks and go back to the choices, so several adjustments
+  // can be made to one session (for example drop one exercise, step another up).
+  // Each Apply is saved at once, and today's history entry is written each time,
+  // so nothing is lost if the app is closed before Done.
   function applyPicked() {
-    var ids = Object.keys(pickSelected);
-    if (!ids.length) { finishFeedback("right", [], []); return; }
+    var ids = Object.keys(pickSelected).filter(function (id) { return !adjustedThisSession(id); });
+    if (!ids.length) { screen = "feedback"; render(); return; }
     var res = applyPick(state, pickKind, ids, activeExercises);
-    finishFeedback(pickKind, ids, res.changed, res.next);
+    if (!res.changed.length) { screen = "feedback"; render(); return; }
+    persist(Object.assign({}, state, res.next));
+    adjustments.push({ kind: pickKind, ids: ids, names: res.changed });
+    recordDay();
+    screen = "feedback";
+    render();
   }
-  function finishFeedback(kind, ids, changedNames, nextParts) {
+  // Today's history entry, built from this session's adjustments (it replaces any
+  // earlier entry for today). feedback is the first adjustment's kind (or "right"),
+  // ex lists every exercise ticked, adjust keeps each round.
+  function recordDay() {
     var history = state.history.filter(function (h) { return h.date !== todayStr(); });
-    var entry = { date: todayStr(), feedback: kind, set: activeSetLetter };
-    if (ids.length) entry.ex = ids;
+    var entry = { date: todayStr(), feedback: adjustments.length ? adjustments[0].kind : "right", set: activeSetLetter };
+    var all = [];
+    adjustments.forEach(function (a) { a.ids.forEach(function (id) { if (all.indexOf(id) < 0) all.push(id); }); });
+    if (all.length) entry.ex = all;
+    if (adjustments.length) entry.adjust = adjustments.map(function (a) { return { k: a.kind, ex: a.ids }; });
     history.push(entry);
-    persist(Object.assign({}, state, nextParts || {}, { history: history }));
-    lastFeedback = kind;
-    lastChanged = changedNames;
-    screen = "done";
+    persist(Object.assign({}, state, { history: history }));
+  }
+  function finishFeedback() {
+    if (!adjustments.length) recordDay(); // nothing changed: "Just right"
+    screen = "home";
     render();
   }
   function restoreExercise(id) {
@@ -1799,23 +1830,50 @@ code, pre { font-family: var(--font-code); }
     );
   }
 
+  function adjustLabel(kind) {
+    return kind === "easy" ? "Stepping up next time" : (kind === "hard" ? "Easing back next time" : "Taken out of your sets");
+  }
   function buildFeedback() {
+    var hasAdj = adjustments.length > 0;
     var options = [
       { key: "easy", label: "Too easy", sub: "I could do more" },
-      { key: "right", label: "Just right", sub: "Good effort level" },
       { key: "hard", label: "Too hard", sub: "I need to ease off" },
       { key: "pain", label: "Felt pain", sub: "Something didn't feel right" }
     ];
     var btns = options.map(function (o) {
       return '<button class="button button--secondary feedback-btn" data-feedback="' + o.key + '"><span class="label">' + o.label + '</span><span class="sub">' + o.sub + '</span></button>';
     }).join("");
+    var summary = hasAdj
+      ? '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--ink-soft);line-height:1.5;text-align:left">' +
+          adjustments.map(function (a) { return '<div>' + esc(adjustLabel(a.kind) + ": " + a.names.join(", ")) + '</div>'; }).join("") +
+        '</div>'
+      : "";
+    // Shown once a Felt pain round has been applied (it used to be on the Nice work screen).
+    var painNote = adjustments.some(function (a) { return a.kind === "pain"; })
+      ? '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--ink-soft);line-height:1.5;text-align:left">Put them back from the home screen when you\'re ready, and check in with a physio or doctor if the pain continues.</div>'
+      : "";
+    // The streak counts today even though today's history entry is only written at the first Apply or at Done.
+    var streak = computeStreak(state.history.concat([{ date: todayStr() }]));
+    var streakHtml = '<div style="font-size:13px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px">' +
+      iconFlame(14, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>';
+    // Done is the only way to finish and goes straight home. With nothing adjusted it counts as "just right".
     return (
-      '<div style="display:flex;flex-direction:column;gap:14px;padding-top:20px">' +
+      '<div style="display:flex;flex-direction:column;gap:14px;padding-top:12px">' +
         '<div style="text-align:center">' +
-          '<div class="serif" style="font-size:24px;font-weight:500">How did that feel?</div>' +
-          '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px">This tunes tomorrow\'s session.</div>' +
+          '<div class="serif" style="font-size:26px;font-weight:500">Nice work</div>' +
+          streakHtml +
         '</div>' +
+        '<div style="text-align:center;margin-top:4px">' +
+          '<div class="serif" style="font-size:20px;font-weight:500">' + (hasAdj ? "Anything else to adjust?" : "How did that feel?") + '</div>' +
+          '<div style="font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.5">' + (hasAdj ? "Pick another, or tap Done." : "Tap an option to adjust some exercises. If nothing needs changing, just tap Done.") + '</div>' +
+        '</div>' +
+        summary +
+        painNote +
         '<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">' + btns + '</div>' +
+        '<div style="height:1px;background:var(--line);margin-top:10px"></div>' +
+        '<button id="btn-feedback-done" class="button" style="width:100%;justify-content:center;gap:8px;padding:16px 18px;font-size:16px;font-weight:500">' +
+          iconCheck(18, "var(--color-button-text)") + 'Done</button>' +
+        '<div style="font-size:12px;color:var(--ink-soft);text-align:center;line-height:1.5">Symptoms should settle afterwards and should not be worse the next morning.</div>' +
       '</div>'
     );
   }
@@ -1830,11 +1888,13 @@ code, pre { font-family: var(--font-code); }
     var rows = activeExercises.filter(function (ex) {
       return pickKind === "pain" ? true : hasSteps(ex);
     }).map(function (ex) {
-      var disabled = !canMove(ex, pickKind);
-      var selected = !!pickSelected[ex.id];
+      var already = adjustedThisSession(ex.id);
+      var disabled = already || !canMove(ex, pickKind);
+      var selected = !!pickSelected[ex.id] && !already;
       var info = getGuidance(ex, state);
       var sub = info.label && info.label !== ex.name ? info.label : ex.category;
-      if (disabled) sub = pickKind === "easy" ? "Already at the top step" : "Already at the easiest step";
+      if (already) sub = "Already adjusted this session";
+      else if (disabled) sub = pickKind === "easy" ? "Already at the top step" : "Already at the easiest step";
       return '<button class="button button--secondary pick-row' + (selected ? ' selected' : '') + '" data-pick="' + ex.id + '"' + (disabled ? ' disabled' : '') + '>' +
         '<span class="pick-box">' + (selected ? iconCheck(14, "var(--color-button-text)") : '') + '</span>' +
         '<span class="pick-text"><span>' + esc(ex.name) + '</span><span class="sub">' + esc(sub) + '</span></span>' +
@@ -1896,30 +1956,6 @@ code, pre { font-family: var(--font-code); }
     );
   }
 
-  function buildDone() {
-    var streak = computeStreak(state.history);
-    var names = lastChanged.join(", ");
-    var messages = {
-      easy: names ? "Stepping up next time: " + names + "." : "Nothing changed.",
-      right: "Holding steady next time.",
-      hard: names ? "Easing back next time: " + names + "." : "Nothing changed.",
-      pain: "Taken out of your sets: " + names + ". Put them back from the home screen when you're ready, and check in with a physio or doctor if the pain continues."
-    };
-    var streakHtml = streak > 0
-      ? '<div style="font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px">' + iconFlame(14, "var(--amber)") + streak + ' day' + (streak === 1 ? "" : "s") + ' in a row</div>'
-      : "";
-    return (
-      '<div class="col-center" style="justify-content:center;height:480px;gap:14px">' +
-        '<div style="width:56px;height:56px;border-radius:50%;background:var(--color-button-mid);border:1px solid var(--color-edge-hover);display:flex;align-items:center;justify-content:center">' + iconCheck(28, "var(--color-button-text)") + '</div>' +
-        '<div class="serif" style="font-size:26px;font-weight:500">Nice work</div>' +
-        streakHtml +
-        '<div style="font-size:13px;color:var(--ink-soft);max-width:240px">' + (messages[lastFeedback] || "") + '</div>' +
-        '<div style="font-size:12px;color:var(--ink-soft);max-width:260px;line-height:1.5">Symptoms should settle afterwards and should not be worse the next morning.</div>' +
-        '<button id="btn-home" class="button" style="margin-top:10px">Done ' + iconChevronRight(15, "var(--color-button-text)") + '</button>' +
-      '</div>'
-    );
-  }
-
   /* ---------------------------------------------------------------
      Render + event binding
   ---------------------------------------------------------------- */
@@ -1932,7 +1968,6 @@ code, pre { font-family: var(--font-code); }
     else if (screen === "feedback") html = buildFeedback();
     else if (screen === "feedbackPick") html = buildFeedbackPick();
     else if (screen === "dropped") html = buildDropped();
-    else if (screen === "done") html = buildDone();
     else if (screen === "backup") html = buildBackup();
     else if (screen === "resetConfirm") html = buildResetConfirm();
     else html = "";
@@ -1963,7 +1998,6 @@ code, pre { font-family: var(--font-code); }
     if (byId("btn-quit")) byId("btn-quit").addEventListener("click", quitSession);
     if (byId("btn-pause")) byId("btn-pause").addEventListener("click", togglePause);
     if (byId("btn-skip")) byId("btn-skip").addEventListener("click", skip);
-    if (byId("btn-home")) byId("btn-home").addEventListener("click", function () { screen = "home"; render(); });
     if (byId("btn-backup-open")) byId("btn-backup-open").addEventListener("click", function () { screen = "backup"; render(); });
     if (byId("btn-backup-close")) byId("btn-backup-close").addEventListener("click", function () { screen = "home"; render(); });
     if (byId("btn-backup-copy")) byId("btn-backup-copy").addEventListener("click", function () {
@@ -2002,6 +2036,7 @@ code, pre { font-family: var(--font-code); }
     if (byId("btn-dropped-close")) byId("btn-dropped-close").addEventListener("click", function () { screen = "home"; render(); });
     if (byId("btn-pick-back")) byId("btn-pick-back").addEventListener("click", function () { screen = "feedback"; render(); });
     if (byId("btn-pick-apply")) byId("btn-pick-apply").addEventListener("click", applyPicked);
+    if (byId("btn-feedback-done")) byId("btn-feedback-done").addEventListener("click", finishFeedback);
     document.querySelectorAll(".pick-row").forEach(function (btn) {
       btn.addEventListener("click", function () { togglePick(btn.getAttribute("data-pick")); });
     });
