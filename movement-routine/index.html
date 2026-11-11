@@ -1476,12 +1476,12 @@ code, pre { font-family: var(--font-code); }
     screen = "feedbackPick";
     render();
   }
-  // One adjustment per exercise per session: once an exercise has been ticked
-  // too easy or too hard it can't be ticked again until the next session, and a
-  // dropped exercise can't be adjusted at all. "Felt pain" is the exception: it
-  // can always be ticked, and it replaces any earlier adjustment of that exercise.
+  // One adjustment per exercise per session: once an exercise has been ticked in
+  // any round (too easy, too hard or felt pain), it can't be ticked again until
+  // the next session, and a dropped exercise can't be adjusted at all. Same rule
+  // as the morning, Chloe's and Jasmin's apps (changed from "Felt pain always
+  // allowed" on 11 Nov 2026). The kind argument is kept so callers don't change.
   function adjustedThisSession(id, kind) {
-    if (kind === "pain") return false;
     return adjustments.some(function (a) { return a.ids && a.ids.indexOf(id) >= 0; });
   }
   function togglePick(id) {

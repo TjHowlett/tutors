@@ -423,7 +423,8 @@ code, pre { font-family: var(--font-code); }
     --sw: 3.4px;
     --pace: 1;
   }
-  @keyframes headRoll{0%{transform:rotate(-24deg)}50%{transform:rotate(24deg)}100%{transform:rotate(-24deg)}}
+  @keyframes neckLRHead{0%,8%,32%,56%,86%,100%{transform:translate(0px,0px)}20%{transform:translate(-1px,0px)}44%{transform:translate(1px,0px)}66%,74%{transform:translate(0px,1.5px)}}
+  @keyframes neckLRFace{0%,8%,32%,56%,86%,100%{transform:translate(0px,0px)}20%{transform:translate(-8px,-1px)}44%{transform:translate(8px,-1px)}66%,74%{transform:translate(0px,2px)}}
   @keyframes shoulderRoll{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(-5px)}}
   @keyframes catcowSpine{0%,100%{d:path("M68,112 Q104,92 140,112")}50%{d:path("M68,112 Q104,128 140,112")}}
   @keyframes catcowHead{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(16deg)}}
@@ -470,6 +471,7 @@ code, pre { font-family: var(--font-code); }
   @keyframes cr1FootL{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(-24deg)}90%,100%{transform:rotate(0deg)}}
   @keyframes cr1FootR{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(24deg)}90%,100%{transform:rotate(0deg)}}
   @keyframes cr2Rise{0%,10%{transform:translateY(0)}45%,57%{transform:translateY(-8px)}90%,100%{transform:translateY(0)}}
+  @keyframes cr2Arm{0%,10%{d:path("M108,72 L130,89.1 L125,112")}45%,57%{d:path("M108,64 L120.2,89.1 L125,112")}90%,100%{d:path("M108,72 L130,89.1 L125,112")}}
   @keyframes cr2Foot{0%,10%{transform:rotate(0deg)}45%,57%{transform:rotate(24deg)}90%,100%{transform:rotate(0deg)}}
   @keyframes pk1Hold{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-2px) rotate(-0.8deg)}}
   @keyframes pk2Hold{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
@@ -1391,10 +1393,9 @@ code, pre { font-family: var(--font-code); }
         '<path d="M82,72 L78,98 L80,122"></path>' +
         '<path d="M118,72 L122,98 L120,122"></path>' +
         '<path d="M100,70 L100,62"></path>' +
-        '<g style="animation:headRoll calc(4.5s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:100px 62px">' +
-        '<circle cx="100" cy="50" r="11"></circle>' +
-        '<circle cx="100" cy="55" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
-        '</g></g></g></svg>';
+        '<circle cx="100" cy="50" r="11" style="animation:neckLRHead calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
+        '<circle cx="100" cy="55" r="2.6" style="fill:var(--accent);stroke:none;animation:neckLRFace calc(6s * var(--pace)) ease-in-out infinite"></circle>' +
+        '</g></g></svg>';
     },
     catcow: function () {
       return '<svg viewBox="0 0 200 190">' +
@@ -1751,6 +1752,9 @@ code, pre { font-family: var(--font-code); }
       return '<svg viewBox="0 0 200 190">' +
         '<g style="fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;opacity:.85">' +
         '<path d="M28,178 L178,178"></path>' +
+        '<path d="M114,114 L190,114"></path>' +
+        '<path d="M120,114 L120,178"></path>' +
+        '<path d="M186,114 L186,178"></path>' +
         '</g>' +
         '<g style="fill:none;stroke:var(--ink);stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round">' +
         '<g style="animation:cr2Rise calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:98px 174px">' +
@@ -1760,11 +1764,11 @@ code, pre { font-family: var(--font-code); }
         '<path d="M92,112 L92,72"></path>' +
         '<path d="M76,72 L108,72"></path>' +
         '<path d="M76,72 L68,98 L68,120"></path>' +
-        '<path d="M108,72 L116,98 L118,120"></path>' +
         '<path d="M92,70 L92,62"></path>' +
         '<circle cx="92" cy="50" r="11"></circle>' +
         '<circle cx="100" cy="52" r="2.6" style="fill:var(--accent);stroke:none"></circle>' +
         '</g>' +
+        '<path d="M108,72 L130,89.1 L125,112" style="animation:cr2Arm calc(3.8s * var(--pace)) ease-in-out infinite"></path>' +
         '<path d="M98,172 L114,176" style="animation:cr2Foot calc(3.8s * var(--pace)) ease-in-out infinite;transform-box:view-box;transform-origin:114px 176px"></path>' +
         '</g></svg>';
     },
